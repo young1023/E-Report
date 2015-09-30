@@ -77,31 +77,17 @@ function listToAray(fullString, separator) {
 			Do While Not Rs1.EoF
 
        ' Get the folder
-      sFolder=Rs1("DepotFolder")
+      sFolder = Trim(Rs1("DepotFolder"))
 
-      If fs.FolderExists(sFolder)=true Then
+      sReadyToConvert = Trim(Rs1("ReadyToConvert"))
 
-    
-      If fs.GetFolder(sFolder).Files.Count  > 0  Then
+      If sReadyToConvert = "True" Then
 
-
+ 
             set fo=fs.GetFolder(sFolder)
 
             for each x in fo.files  
 
-       ' Check file extension
-      If Right(x.Name,3) = Rs1("FileType") Then
-
- 
-     Sql = "Select count(f.depotid) as Tcount from  (ReconDepotFolder f join reconfileorder o "
-
-     Sql = Sql & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
-
-     Sql = Sql & " and f.depotid=" &Rs1("DepotID")
-  
-     Set Rs = Conn.Execute(Sql)
-
-     If Rs("Tcount") > 0 then
 
      Sql2 = "Select f.depotid, fieldname from  (ReconDepotFolder f join reconfileorder o "
 
@@ -134,7 +120,7 @@ function listToAray(fullString, separator) {
    
 
 
-  Response.write("Converting "&x.Name& "<br/><br/>")
+  Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
 
   set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
 
@@ -167,9 +153,7 @@ function listToAray(fullString, separator) {
 
    Loop
 
-      End if ' check depot field exist
-
-      End If ' check file type
+      
 
      'sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
 
@@ -181,9 +165,9 @@ function listToAray(fullString, separator) {
      
     
 
- End if    ' check file exists
+ 
 
-End if     ' check folder exists
+End if     
 
 
 %>

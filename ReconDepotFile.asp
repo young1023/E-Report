@@ -125,6 +125,8 @@ function doUpload(what)
 
 <%
 
+ ReadyToConvert = True
+
  sFolder = Rs1("DepotFolder")
 
 ' ---------------------------------------------------------
@@ -148,11 +150,39 @@ function doUpload(what)
 
      Response.write "Folder is empty." 
 
-  Else  
+     ReadyToConvert = False
+
+  Elseif fs.GetFolder(sFolder).Files.Count  > 1 then
+
+     Response.write "There are more than one file in the folder" 
+
+     ReadyToConvert = False
+
+  Else
+
 
     set fo=fs.GetFolder(sFolder)
 
   for each x in fo.files
+
+
+' ---------------------------------------------------------
+'                                                          
+' Check if Depot has set up                  
+'
+' ---------------------------------------------------------
+
+  
+     Sql = "Select count(f.depotid) as Tcount from  (ReconDepotFolder f join reconfileorder o "
+
+     Sql = Sql & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
+
+     Sql = Sql & " and f.depotid=" &Rs1("DepotID")
+  
+     Set Rs = Conn.Execute(Sql)
+
+     If Rs("Tcount") > 0 then
+
 
 ' ---------------------------------------------------------
 '                                                          
@@ -174,14 +204,10 @@ function doUpload(what)
 
 
 
-          'Print the name of all files in the test folder
+          'Print the name of file in the test folder
            Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
 
            set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
-
-           Set objFile = fs.GetFile(sFolder&"\"&x.Name)
-
-           Response.Write objFile.Attributes
 
            Response.Write("<b>First line of file:</b><br/>"&f.ReadLine)
 
@@ -192,6 +218,7 @@ function doUpload(what)
 
 
 
+     
 
 
 
@@ -200,29 +227,80 @@ function doUpload(what)
 
 
 
-
-
-
-
+' ---------------------------------------------------------
+'                                                          
+' End of checking file type                 
+'
+' ---------------------------------------------------------
 
      Else
 
         Response.Write "Wrong file type."
 
+        ReadyToConvert = False
+
      End if
 
+
+' ---------------------------------------------------------
+'                                                          
+'  End of checking depot's field                
+'
+' ---------------------------------------------------------
+
+
+     Else 
+
+        Response.Write "Depot's field setup is not completed."
+
+        ReadyToConvert = False
+
+     End if
+
+' ---------------------------------------------------------
+'                                                          
+'  Next file in folder               
+'
+' ---------------------------------------------------------
+   
   next
 
- End If 'Check if file exists
+' ---------------------------------------------------------
+'                                                          
+'  End of Check if file exists              
+'
+' ---------------------------------------------------------
 
-' folder does not exist
+ End If 
+
+' ---------------------------------------------------------
+'                                                          
+'  End of folder does not exist            
+'
+' ---------------------------------------------------------
+ 
 else
 
   response.write("Folder "& Rs1("DepotFolder") &" does not exist!")
 
+  ReadyToConvert = False
+
 end if
 
+   Response.write "<br/>" & ReadyToConvert
 
+
+   If ReadyToConvert = False Then
+
+       SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 0 Where DepotID ="&Rs1("DepotID")
+
+   Else
+       
+     SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
+
+   End If
+
+       Conn.Execute(SQL4)
 
 %>
 
@@ -230,6 +308,9 @@ end if
 </tr>
 
 <%
+
+    
+
 	Rs1.movenext 
 
 	   loop 
