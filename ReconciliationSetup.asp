@@ -47,7 +47,7 @@ if trim(request("action_button")) = "add section" then
 
 		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, delimiter , ReadyToConvert) "
 
-        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , '"& Delimiter1 &"' , 1)"
+        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& Delimiter1 &" , 1)"
 
 		Conn.Execute sql1
 
@@ -68,11 +68,17 @@ if trim(request("action_button")) = "add field" then
 		FieldLength1 = trim(request(replace("FieldLength1","'","''")))
 
       
-		sql2 = "insert into ReconFile (FieldName, FieldType, FieldLength, Delimiter) "
+		sql2 = "insert into ReconFile (FieldName, FieldType, FieldLength) "
 
         sql2 = sql2 & "values ( '"& FieldName1 & "', '"& FieldType1 & "', "& FieldLength1 &")"
 
-		Conn.Execute sql2
+        Conn.Execute sql2
+
+
+        sql21 = "Alter Table StockReconciliation Add " & FieldName1 & " nvarchar(" & FieldLength1 & ")"
+  
+      	Conn.Execute sql21
+
 
         Message =  "The field ("&FieldName1&") was added."
 	
@@ -102,11 +108,11 @@ if trim(request("action_button")) = "modify depot" then
 
         strsql= strsql & trim(replace(FileType2(i),"'","''")) 
 
-        strsql= strsql & "' , Delimiter ='"
+        strsql= strsql & "' , Delimiter ="& trim(Delimiter2(i)) 
 
-        strsql= strsql & trim(replace(Delimiter2(i),"'","''")) 
+        strsql= strsql & " where DepotID= "& trim(mid4(i))
 
-        strsql= strsql & "' where DepotID= "& trim(mid4(i))
+        'response.write strsql
 		
 	    conn.execute strsql 
 
@@ -220,19 +226,7 @@ end if
 <SCRIPT language=JavaScript>
 <!--
 
-function getFolder()
-{
-   alert("Please enter the Field Name!");
-   var myObject = new ActiveXObject("Scripting.FileSystemObject");
-   var myFolder = myObject.GetFolder("c:\\Temp");
-   alert (myFolder.Path);
-   
-  
-}
-
-
-
-function addSection()
+function addDepot()
 {
 
 	if(document.fm1.DepotName1.value =="")
@@ -275,6 +269,19 @@ function addField()
         document.fm1.FieldName1.focus();
         return false;
        }
+     if(document.fm1.FieldType1.value =="")
+       {
+		alert("Please enter the Field Type!");
+        document.fm1.FieldType1.focus();
+        return false;
+       }
+     if(document.fm1.FieldLength1.value =="")
+       {
+		alert("Please enter the Field Length!");
+        document.fm1.FieldLength1.focus();
+        return false;
+       }
+    
 	else
 		{
 		document.fm1.action_button.value="add field";
@@ -429,7 +436,7 @@ function doChange(flag)
 
     <tr> 
       <td  class="BlueClr" <% If FunctionID <> 1 Then %>bgcolor="#C0C0C0"<% End If %> width="20%">
-      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=1">Add Depot Folder and Import File Information
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=1">Depot Folder and Import File Information
       </a>
       </td> 
       <td  class="BlueClr" width="20%" <% If FunctionID <> 2 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
@@ -504,8 +511,6 @@ Depot Name</td>
 Depot Folder</td> 
       <td width="69%">
       <Input name="DepotFolder1" type=text value="" size="80">&nbsp;
-
-      <input type="button" value="    Select   " onClick="javascript:getFolder();">
        </td>
     </tr>
 
@@ -523,8 +528,17 @@ File Extension</td>
       <td width="27%">
 Delimiter</td> 
       <td width="69%">
-      <Input name="Delimiter1" type=text value="" size="80">&nbsp;
+      	<select size="1" name="Delimiter1" class="common">
+		
+		  <option value="0">Comma</option>
+			
+		  <option value="1">|</option>
+	
+	      <option value="2">Tab</option>
 
+          <option value="3">Fixed Width</option>
+	
+	    </select>
 
        </td>
     </tr>
@@ -533,7 +547,7 @@ Delimiter</td>
       <td width="27%">
 ¡@</td> 
       <td width="69%">
-      	<input type="button" value="    Add    " onClick="javascript:addSection();">
+      	<input type="button" value="    Add    " onClick="javascript:addDepot();">
          <input type="hidden" name="action_button" value="">   
 ¡@</td>
     </tr>
@@ -624,7 +638,17 @@ Delimiter</td>
 </td>
 
 <td>
-<Input type="text" name="Delimiter2" value="<% = Rs4("Delimiter") %>" size="3">
+<select size="1" name="Delimiter2" class="common">
+		
+		  <option value="0" <%if trim(Rs4("Delimiter"))=0 then%>Selected<%end if%>>Comma</option>
+			
+		  <option value="1" <%if trim(Rs4("Delimiter"))=1 then%>Selected<%end if%>>|</option>
+	
+	      <option value="2" <%if trim(Rs4("Delimiter"))=2 then%>Selected<%end if%>>Tab</option>
+
+          <option value="3" <%if trim(Rs4("Delimiter"))=3 then%>Selected<%end if%>>Fixed Width</option>
+	
+	    </select>
 </td>
 
 <td><input type="checkbox" name="id4" value="<% = Rs4("DepotID") %>"></td> 

@@ -111,16 +111,15 @@ function listToAray(fullString, separator) {
 
      FieldName = Left(FieldName,Len(FieldName)-1) 
 
-     Response.write FieldName
+     'Response.write FieldName
 
-     'sqv = "create view vw_"&Rs1("DepotID")&" as select "&FieldName&" from StockReconciliation"
+     sqv = "create view vw_"&Rs1("DepotID")&" as select "&FieldName&" from StockReconciliation"
 
      'Conn.Execute(sqv)
   
-   
+      response.write sqv & "<br/>"
 
-
-  Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
+  'Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
 
   set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
 
@@ -130,7 +129,7 @@ function listToAray(fullString, separator) {
 
     strReadLineText = f.ReadLine
 
-    response.Write(strReadLineText & "<br>")
+    'response.Write(strReadLineText & "<br>")
 
       
 
@@ -140,7 +139,7 @@ function listToAray(fullString, separator) {
 
             strReadLineTextArr=split(strReadLineText,",")
 
-            response.Write(strReadLineTextArr(1)&"<br/>")
+            'response.Write(strReadLineTextArr(1)&"<br/>")
 
             'URLString=strReadLineTextArr(1)
 
@@ -149,15 +148,31 @@ function listToAray(fullString, separator) {
 
     end if
 
+
+  
+
     
 
    Loop
 
-      
+    Sql3 = "bulk insert view vw_"&Rs1("DepotID")
 
-     'sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
+    Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
+
+    Sql3 = Sql3 & " WITH (FIRSTROW = 2, "
+
+    Sql3 = Sql3 & " FIELDTERMINATOR= ',',"
+
+    Sql3 = Sql3 & " ROWTERMINATOR = '\n')"
+
+    response.write Sql3 & "<br/>"
+
+
+     sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
 
      'Conn.Execute(sqv_d)
+
+    response.write sqv_d
 
 
   next
