@@ -1,0 +1,307 @@
+@charset "big5";
+.HSEBlue
+{
+    BACKGROUND-COLOR: #9fd0f0
+}
+.NavyBlue
+{
+    BACKGROUND-COLOR: #080063
+}
+A
+{
+    COLOR: Black;
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+    FONT-SIZE: 11px
+    TEXT-DECORATION: none;
+
+}
+A:hover
+{
+    COLOR: orange;
+}
+
+Body
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+	FONT-SIZE: 11px
+}
+
+TABLE.Common
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+	FONT-SIZE: 11px;
+    
+}
+
+TABLE.Normal
+{
+    BORDER-TOP: #9fd0f0 solid 1px;
+    BORDER-LEFT: #9fd0f0 solid 1px;
+    BORDER-RIGHT: #9fd0f0 solid 1px;
+    BORDER-BOTTOM: #9fd0f0 solid 1px;    
+    
+    COLOR: black;
+    FONT-SIZE: 11px;
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+}
+
+Table.alignright  {
+    BORDER-TOP: #9fd0f0 solid 1px;
+    BORDER-LEFT: #9fd0f0 solid 1px;
+    BORDER-RIGHT: #9fd0f0 solid 1px;
+    BORDER-BOTTOM: #9fd0f0 solid 1px;    
+    TEXT-ALIGN: Right;
+    COLOR: black;
+    FONT-SIZE: 11px;
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+}
+
+
+div#Header {
+	position: absolute; 
+	width: 100%; 
+	height: 50px;  
+	padding: 2px
+}
+
+
+div#Title {
+	position: absolute; 
+	top: 68px; 
+	width:100%; 
+	height: 16px;  
+	padding: 1px; 
+	background-color:#080063;
+	FONT-SIZE: 13px;
+	Color: white;
+	TEXT-ALIGN: center
+}
+
+div#BlueSeparator {
+	position: absolute; 
+	top: 90px; 
+	width:160px; 
+	height: 21px;
+    FONT-SIZE: 9px;
+    Text-Align:bottom; 
+	background-color:#9fd0f0
+}
+
+div#ThinBlueSeparator {
+	position: absolute; 
+	top: 86px; 
+	width:100%;
+	height: 4px; 
+	display: inline
+	left: 158px;
+	background-color:#9fd0f0
+}
+
+div#Curve {
+	position: absolute; 
+	top: 90px; 
+	left: 161px
+	
+}
+
+div#VerticalBlueSeparator {
+	position: absolute; 
+	top: 86px; 
+	width:1px;
+	left: 160px;
+	height: 100%; 
+	background-color:#9fd0f0
+}
+
+div#Navigation {
+	position: absolute; 
+	top: 107px; 
+	width:160px; 
+	height: 100%;  
+	FONT-SIZE: 10px;
+	TEXT-ALIGN: Left;
+	background-color:white;
+	TEXT-DECORATION: none;
+	line-height: 2.0em
+}
+
+div#Content {
+	position: absolute; 
+	top: 120px;
+	left: 170px;
+	width:85%; 
+	padding: 2px
+	
+}
+
+div#DetailHeader
+{
+	position: absolute;
+    Top: 2px; 
+	width: 97%;
+    left:   2px;  
+	height: 28px;  
+	padding: 4px;
+    TEXT-ALIGN: Center;
+    border:solid;
+    border-width: 1px;
+    border-color: #808080; 
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+	FONT-SIZE: 11px;
+    background-color:#FFFFCC;
+}
+
+div#DetailContent
+{
+	position: absolute;
+    width: 98%;
+    top:   45px; 
+    left:  2px;  
+	
+}
+
+div#DetailSectionLeft
+{
+	float:left;
+    padding: 4px;
+    TEXT-ALIGN: Center;
+    width: 49%;
+    border:solid;
+    border-width: 0.1em;
+    border-color: #808080; 
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+	FONT-SIZE: 11px;
+    background-color:#ADF3B6; 
+	
+}
+
+
+ul{
+	
+	list-style-type: none
+}
+
+li{
+	
+	list-style-type: none;
+    display: inline;
+}
+
+
+TABLE.TitleBar
+{
+    COLOR: #FFFFFF;
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+    FONT-WEIGHT: Bold;
+    FONT-SIZE: 11px    
+}
+
+
+TD.NaviBar
+{
+    COLOR: blue;
+    FONT-SIZE: 9px;
+    
+}
+
+TD.NavaMenu
+{
+    COLOR: black;
+    FONT-SIZE: 11px;
+    
+}
+
+TD.BlueClr
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+    COLOR: #080063;
+    FONT-SIZE: 10px 
+    TEXT-ALIGN: left 
+    CURSOR: hand  
+    text-decoration:none
+}
+
+TD.RedClr
+{
+    COLOR: #F50448;
+    FONT-SIZE: 10px   
+}
+
+
+INPUT.Button
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial;
+    FONT-SIZE: xx-small;
+    COLOR: #080063;
+    BACKGROUND: #FFFFFF;
+    CURSOR: hand       
+}
+
+TD.Common
+{
+    BACKGROUND-COLOR: #FFFFE6;
+    COLOR: black;
+    FONT-SIZE: 11px
+}
+
+
+
+INPUT
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+    COLOR: black;
+    FONT-SIZE: 10px;
+    TEXT-ALIGN: left    
+}
+
+
+textarea
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+    COLOR: black;
+    FONT-SIZE: 10px;
+    TEXT-ALIGN: left    
+}
+
+
+SELECT.Common
+{
+    FONT-FAMILY: Verdana, 'MS Sans Serif', Arial
+    COLOR: black;
+    FONT-SIZE: 10px
+}
+
+
+IMG.Link
+{
+    CURSOR: hand       
+}
+
+
+@media print 
+{
+
+Body
+{
+     margin-top:0px;
+     margin-right:0px;
+     margin-left:0px;
+}
+
+table
+{
+     border-collapse:collapse;
+}
+
+table, td
+{
+     border:1px dotted black;
+}
+
+.noprint {
+
+    display: none;
+    
+    	}
+
+}
