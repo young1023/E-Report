@@ -130,6 +130,8 @@ if trim(request("action_button")) = "modify field" then
 
 	FieldLength2 = split(trim(request.form("FieldLength2")),",")
 
+	FieldName2 = split(trim(request.form("FieldName2")),",")
+
     FieldType2 = trim(request(replace("FieldType2","'","''")))
 
 	
@@ -145,7 +147,8 @@ if trim(request("action_button")) = "modify field" then
         Message =  "Done."
 
 	next
-	
+
+
 
 	
 end if
@@ -172,12 +175,22 @@ if trim(request("action_button")) = "delete field" then
 
 	delid = split(trim(request("id6")),",")
 
+
 	for j=0 to ubound(delid)
+
+        sql6 = "Select FieldName from ReconFile Where FieldID ="&  delid(j) 
+
+        Set Rs6 = Conn.Execute(sql6)
+
+		sql61 = "Alter Table StockReconciliation drop column " & Rs6("FieldName") & "; Delete ReconFile where FieldID="& trim(delid(j))
 	
-		sql6 = "Delete ReconFile where FieldID="& trim(delid(j))
-	
-	    conn.execute sql6 
+	    conn.execute sql61 
 	next
+
+  	
+        Message =  "Done."
+
+
 	
 end if
 
@@ -446,7 +459,7 @@ function doChange(flag)
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=3">Add Field in Master Table
       </a></td>
       <td  class="BlueClr" width="20%" <% If FunctionID <> 4 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
-      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Edit/Delete field in Master Table
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Delete field in Master Table
       </a></td>
       <td  class="BlueClr" width="20%" <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds Allocation
@@ -793,16 +806,17 @@ Field Length</td>
 		
 %>
 <tr> 
-	<td width="30%"><% = Rs5("FieldName") %>
+	<td width="30%"><% = Rs5("FieldID") %>. <% = Rs5("FieldName") %>
 			¡@</td>
+
 <td width="30%">
-<input type=text name="FieldType2" value ="<%= Rs5("FieldType") %>" >
+<input type=text name="FieldType2" value ="<%= Rs5("FieldType") %>"  readonly>
 			¡@</td>
 
 <td width="20%">
-<input type=text name="FieldLength2" value ="<%= Rs5("FieldLength") %>" >
+<input type=text name="FieldLength2" value ="<%= Rs5("FieldLength") %>" readonly>
 			¡@</td>
-<td><input type="checkbox" name="id6" value="<% = Rs5("FieldID") %>"></td> 
+<td><input type="radio" name="id6" value="<% = Rs5("FieldID") %>"></td> 
 	</tr>
 <input type="hidden" name="mid7" value="<% = Rs5("FieldID") %>">	
 <%
@@ -824,8 +838,7 @@ Field Length</td>
 	
       <tr> 
       <td colspan=2></td> 
-      <td width="30%">
-      <input type="button" value="Edit" onClick="EditField();"></td>
+      <td width="30%"></td>
       <td width="30%">
       <input type="button" value="Delete" onClick="DeleteField();"></td>
     </tr>
