@@ -43,11 +43,14 @@ if trim(request("action_button")) = "add section" then
 
         FileType1 = trim(request(replace("FileType1","'","''")))
 
+        FirstRow1 = trim(request(replace("FirstRow1","'","''")))
+
+
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, delimiter , ReadyToConvert) "
+		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert) "
 
-        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& Delimiter1 &" , 1)"
+        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 1)"
 
 		Conn.Execute sql1
 
@@ -93,6 +96,8 @@ if trim(request("action_button")) = "modify depot" then
 
     FileType2 = split(trim(request.form("FileType2")),",")
 
+    FirstRow2 = split(trim(request.form("FirstRow2")),",")
+
     Delimiter2 = split(trim(request.form("Delimiter2")),",")
 
 	mid4 = split(trim(request.form("mid4")),",")
@@ -108,7 +113,9 @@ if trim(request("action_button")) = "modify depot" then
 
         strsql= strsql & trim(replace(FileType2(i),"'","''")) 
 
-        strsql= strsql & "' , Delimiter ="& trim(Delimiter2(i)) 
+        strsql= strsql & "' , FirstRow ="& trim(FirstRow2(i)) 
+
+        strsql= strsql & " , Delimiter ="& trim(Delimiter2(i)) 
 
         strsql= strsql & " where DepotID= "& trim(mid4(i))
 
@@ -259,6 +266,12 @@ function addDepot()
        {
 		alert("Please enter the file extension!");
         document.fm1.FileType1.focus();
+        return false;
+       }
+ if(document.fm1.FirstRow1.value =="")
+       {
+		alert("Please enter first row value!");
+        document.fm1.FirstRow1.focus();
         return false;
        }
   if(document.fm1.Delimiter1.value =="")
@@ -539,6 +552,16 @@ File Extension</td>
 
 <tr> 
       <td width="27%">
+First Row</td> 
+      <td width="69%">
+      <Input name="FirstRow1" type=text value="" size="80">&nbsp;
+
+
+       </td>
+    </tr>
+
+<tr> 
+      <td width="27%">
 Delimiter</td> 
       <td width="69%">
       	<select size="1" name="Delimiter1" class="common">
@@ -593,7 +616,8 @@ Delimiter</td>
             
 			<td width="30%" bgcolor="#FFFFCC">Depot Name</td> 
 			<td width="30%" bgcolor="#FFFFCC">Folder</td>
-         	<td width="20%" bgcolor="#FFFFCC">File Extension</td>
+         	<td width="10%" bgcolor="#FFFFCC">File Extension</td>
+	        <td width="10%" bgcolor="#FFFFCC">First Row</td>
      	    <td width="10%" bgcolor="#FFFFCC">Delimiter</td>
             <td width="10%" bgcolor="#FFFFCC">Delete</td>
 	</tr>
@@ -625,7 +649,7 @@ Delimiter</td>
 	
 %>
 <tr bgcolor="#ffffff"> 
-      <td colspan="4">
+      <td colspan="6">
         
           <%call showpageno(pageno)%>
           
@@ -648,6 +672,10 @@ Delimiter</td>
 			¡@</td>
 <td>
 <Input type="text" name="FileType2" value="<% = Rs4("FileType") %>" size="3">
+</td>
+
+<td>
+<Input type="text" name="FirstRow2" value="<% = Rs4("FirstRow") %>" size="3">
 </td>
 
 <td>
@@ -686,8 +714,7 @@ Delimiter</td>
 
 <tr> 
       <td colspan="6" align =center><font color="red"><% = Message %></font></td> 
-      <td >
-¡@</td>
+      
     </tr>
 	
       <tr> 
@@ -931,7 +958,7 @@ Field Length</td>
 
 <td>
 
-	<select size="10" name="appendfield" id="appendfield" class="common">
+	<select size="20" name="appendfield" id="appendfield" class="common">
 
 <%
                         Rs9.MoveFirst
@@ -977,7 +1004,7 @@ Field Length</td>
          
 <td>
 
-        <select size="10" name="RemoveField" id="removefield" class="common">
+        <select size="20" name="RemoveField" id="removefield" class="common">
 
 <%
                         If Not Rs10.EoF Then
