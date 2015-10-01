@@ -114,6 +114,84 @@ if trim(request("action_button")) = "sort" then
 end if
 
 
+' sorting the menu
+
+if trim(request("action_button")) = "MenuUp" then
+
+	MenuID = trim(request("MenuOrder"))
+	
+        sql1 = "Select OrderID - 1 as OrderID From Menu Where ID="&MenuID
+
+        Set Rs1 = Conn.Execute(sql1)
+
+        'response.write rs1("orderid")
+
+        sql2 = "Select ID as id From menu where orderid="&rs1("orderid")
+
+        Set Rs2 = Conn.Execute(sql2)
+
+        'response.write rs2("id")
+
+	
+	    sql3="Update Menu set OrderID = OrderID - 1 where ID="&MenuID
+		
+	    conn.execute(sql3) 
+
+        sql4="Update Menu set OrderID = OrderID + 1 where ID="&Rs2("ID")
+
+        conn.execute(sql4)
+
+	
+end if
+
+' sorting the menu
+
+if trim(request("action_button")) = "MenuDown" then
+
+	MenuID = trim(request("MenuOrder"))
+	
+        sql1 = "Select OrderID + 1 as OrderID From Menu Where ID="&MenuID
+
+        Set Rs1 = Conn.Execute(sql1)
+
+        'response.write rs1("orderid")
+
+        sql2 = "Select ID as id From menu where orderid="&rs1("orderid")
+
+        Set Rs2 = Conn.Execute(sql2)
+
+        'response.write rs2("id")
+
+	
+	    sql3="Update Menu set OrderID = OrderID + 1 where ID="&MenuID
+		
+	    conn.execute(sql3) 
+
+        sql4="Update Menu set OrderID = OrderID - 1 where ID="&Rs2("ID")
+
+        conn.execute(sql4)
+
+	
+end if
+
+' sorting the menu
+
+if trim(request("action_button")) = "sort" then
+
+	vOrder = split(trim(request("OrderID")),",")
+	
+	vid = split(trim(request("mid")),",")
+	
+	for i=0 to ubound(vid)
+	
+		strsql="Update Menu set OrderID = "& trim(replace(vOrder(i),"'","''")) &" where id="& trim(vid(i))
+		
+	    conn.execute strsql 
+	next
+	
+end if
+
+
 '************************
 Userlevel = trim(request(replace("Userlevel","'","''")))
 
@@ -276,6 +354,47 @@ else if (k==1)
    }
  }
 
+}
+
+
+function doUp()
+{
+        if(document.getElementById('MenuOrder').selectedIndex == -1){
+        alert("Please select a option in the menu!");
+        return false;
+        }
+        
+        if(document.getElementById('MenuOrder').selectedIndex == 0){
+        alert("It is already at the top position in the menu!");
+        return false;
+        }
+
+        {
+		document.fm1.action_button.value="MenuUp";
+		document.fm1.submit();
+		}
+	
+}
+
+function doDown()
+{
+        if(document.getElementById('MenuOrder').selectedIndex == -1){
+        alert("Please select a option in the menu!");
+        return false;
+        }
+
+       var x = document.getElementById('MenuOrder').length;
+       x = x-1;
+       if(document.getElementById('MenuOrder').selectedIndex == x){
+        alert("It is already at the bottom position in the menu!");
+        return false;
+        }
+
+        {
+		document.fm1.action_button.value="MenuDown";
+		document.fm1.submit();
+		}
+	
 }
 
 //-->
@@ -504,12 +623,6 @@ Page Link</td>
 
 
 
-	<tr> 
-			<td colspan="3">¡@</td> 
-			
-			 
-			¡@</td>
-	</tr>
 	    
     <%
 	sql = " SELECT * from Menu order by OrderID Asc"
@@ -519,41 +632,51 @@ Page Link</td>
 				
 %>
      <tr> 
-      <td width="50%" bgcolor="#FFFFCC">Menu Name
+      <td bgcolor="#FFFFCC" align="center" colspan="2">Menu Name
       ¡@</td>
-       <td width="30%" bgcolor="#FFFFCC">Order
-      ¡@</td>
+      
     </tr>
-<% 
-	if not acres.eof then
-	  	do while not acres.eof
-		   
-%>
+
 
      <tr> 
        
-      <td>     	     
-				<% = acres("MenuName") %></td>
-				<td>     	     
-				<Input name="OrderID" type=text value="<% = acres("OrderID") %>" size="2" maxlength="2">
-				<input type="hidden" name="mid" value="<% = acres("ID") %>">
+      <td align="center" width="60%">     	 
+
+	<select size="30" name="MenuOrder" id="MenuOrder" class="common">
+
+    <% 
+	if not acres.eof then
+	  	do while not acres.eof
+		   
+    %>
+
+<option value="<%=acres("ID")%>" >&nbsp;&nbsp;&nbsp;&nbsp;<% = acres("MenuName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
+
+<%
+
+                   acres.movenext
+
+							loop
+						
+						End if
+					%>
+
+
+    </select>
 				</td>
 
-    </tr>
-<%
-	acres.movenext  
-	
-	loop 
-%>
-<% end if  %>
+    <td>
+<input type="button" value="&#916;" onClick="doUp();">
 
-     <tr> 
-      <td>
-    
-              <td width="13%">
-        <input type="button" value="  Sort" onClick="doOrder();"></td> 
+<br/><br/><br/>
+
+<input type="button" value="&#8711;" onClick="doDown();">
+
+     </td>
 
     </tr>
+
+
     </table>
 </div>
 
