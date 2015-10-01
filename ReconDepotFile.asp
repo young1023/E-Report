@@ -202,6 +202,15 @@ function doUpload(what)
 
 
 
+' Remove comma in sting
+%>
+
+
+<!--#include file="include/remove_comma.inc.asp" -->
+
+
+<%
+
 
 
           'Print the name of file in the test folder

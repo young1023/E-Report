@@ -95,7 +95,7 @@ function listToAray(fullString, separator) {
 
      Sql2 = Sql2 & " and f.depotid=" &Rs1("DepotID")
 
-     Sql2 = Sql2 & "order by f.depotid, o.priority"
+     Sql2 = Sql2 & "order by f.depotid, o.priority desc"
 
      FieldName = ""
 
@@ -115,11 +115,13 @@ function listToAray(fullString, separator) {
 
      sqv = "create view vw_"&Rs1("DepotID")&" as select "&FieldName&" from StockReconciliation"
 
+     response.write sqv & "<br/>"
+
      'Conn.Execute(sqv)
   
-      response.write sqv & "<br/>"
+      
 
-  'Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
+  Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
 
   set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
 
@@ -155,7 +157,7 @@ function listToAray(fullString, separator) {
 
    Loop
 
-    Sql3 = "bulk insert view vw_"&Rs1("DepotID")
+    Sql3 = "bulk insert vw_"&Rs1("DepotID")
 
     Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
 
@@ -167,12 +169,30 @@ function listToAray(fullString, separator) {
 
     response.write Sql3 & "<br/>"
 
+    'Conn.Execute(Sql3)
+
+    response.write sFolder &"\" &x.Name  & "<br>"
+   
+
 
      sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
 
      'Conn.Execute(sqv_d)
 
     response.write sqv_d
+
+
+    ' Move File to Archive Folder
+
+     If fs.FileExists(sFolder&"\"&x.Name) Then 
+
+      If fs.FileExists("E:\Data\Recon\Archive\") then
+
+     'fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
+
+      end if
+
+     end if
 
 
   next
@@ -206,9 +226,12 @@ set fs=nothing
 
 </td>
   <tr>
-    <td align="center" height="50"><br><a href="<%=whatgo%>">Return</a></td>
+    <td align="center" height="50"><br><a href="ReconDepotFile.asp?sid=<%=sessionid%>">Return</a></td>
   </tr>
   
+  <tr>
+    <td align="center" height="50"><br><a href="MoveFile.asp?sid=<%=sessionid%>">Return</a></td>
+  </tr>
 </table>
             
 </div>        

@@ -919,7 +919,7 @@ Field Length</td>
 
            %>               
 
-<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("Market")) %> - <% =trim(Rs8("DepotName")) %></option>
+<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("Market")) %> - <% =trim(Rs8("DepotName")) %></option>
 
                   <%
 
