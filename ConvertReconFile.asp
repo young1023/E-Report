@@ -117,7 +117,7 @@ function listToAray(fullString, separator) {
 
      response.write sqv & "<br/>"
 
-     'Conn.Execute(sqv)
+     Conn.Execute(sqv)
   
       
 
@@ -169,7 +169,7 @@ function listToAray(fullString, separator) {
 
     response.write Sql3 & "<br/>"
 
-    'Conn.Execute(Sql3)
+    Conn.Execute(Sql3)
 
     response.write sFolder &"\" &x.Name  & "<br>"
    
@@ -177,22 +177,11 @@ function listToAray(fullString, separator) {
 
      sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
 
-     'Conn.Execute(sqv_d)
+     Conn.Execute(sqv_d)
 
     response.write sqv_d
 
 
-    ' Move File to Archive Folder
-
-     If fs.FileExists(sFolder&"\"&x.Name) Then 
-
-      If fs.FileExists("E:\Data\Recon\Archive\") then
-
-     'fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
-
-      end if
-
-     end if
 
 
   next
@@ -225,10 +214,7 @@ set fs=nothing
 
 
 </td>
-  <tr>
-    <td align="center" height="50"><br><a href="ReconDepotFile.asp?sid=<%=sessionid%>">Return</a></td>
-  </tr>
-  
+   
   <tr>
     <td align="center" height="50"><br><a href="MoveFile.asp?sid=<%=sessionid%>">Return</a></td>
   </tr>
