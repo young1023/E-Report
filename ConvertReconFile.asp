@@ -117,7 +117,7 @@ function listToAray(fullString, separator) {
 
      response.write sqv & "<br/>"
 
-     Conn.Execute(sqv)
+     'Conn.Execute(sqv)
   
       
 
@@ -169,7 +169,7 @@ function listToAray(fullString, separator) {
 
     response.write Sql3 & "<br/>"
 
-    Conn.Execute(Sql3)
+    'Conn.Execute(Sql3)
 
     response.write sFolder &"\" &x.Name  & "<br>"
    
@@ -177,7 +177,7 @@ function listToAray(fullString, separator) {
 
      sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
 
-     Conn.Execute(sqv_d)
+     'Conn.Execute(sqv_d)
 
     response.write sqv_d
 

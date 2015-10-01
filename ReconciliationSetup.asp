@@ -248,6 +248,7 @@ end if
 
 function addDepot()
 {
+       
 
 	if(document.fm1.DepotName1.value =="")
        {

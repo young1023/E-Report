@@ -7,6 +7,7 @@ end if
 
 
 Title = "Audit Log"
+
 %>
 
 <html>
@@ -164,6 +165,9 @@ window.open("ConvertLog.asp?ConvertLog=" + ConvertLog + "&sid=<%=sessionid%>");
    else
 	 mycolor="#efefef"
    end if
+
+
+
 %>
 <tr>
 
