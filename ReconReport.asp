@@ -593,7 +593,6 @@ for i=Year_starting to Year_ending
     
 <%
 
-'If Search_ClientFrom = "" Then
 
 If Request.form("submitted") = 0 Then
 
@@ -625,7 +624,7 @@ else
 
 'iRecord = (iPageCurrent -1) * RECORDPERPAGE  +1
 
-	Response.write 	("Exec Retrieve_StockReconciliation  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '1' ") 
+	'Response.write 	("Exec Retrieve_StockReconciliation  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '1' ") 
 
  	Rs1.open ("Exec Retrieve_StockReconciliation  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '1' ") ,  StrCnn,3,1
 			
@@ -650,6 +649,7 @@ else
   itotalCCYcount=0
   
 	do while (  Not rs1.EOF)
+
 			itotalCCYcount=itotalCCYcount+1
 
 
@@ -670,7 +670,7 @@ else
 			
 	loop
 		
-	'	response.write itotalturnover(1) & "AAA"  & itotalconsideration(1)
+		'response.write iRecordCount & itotalturnover(1) & "AAA"  & itotalconsideration(1)
 	
 'iRecordCount = 0
 
@@ -680,8 +680,9 @@ else
 		
 		If Err.Number <> 0 then
 			
+            'response.write Err.Number
 			'SQL connection error handler
-		'	response.write  "<table><tr><td class='RedClr'>The server is currently too busy to process your request right now. Please wait a moment and then try again. If the problem persists, please contact systems administrator.<br></td></tr></table>"
+			response.write  "<table><tr><td class='RedClr'>The server is currently too busy to process your request right now. Please wait a moment and then try again. If the problem persists, please contact systems administrator.<br></td></tr></table>"
 			
 		else
 			'no record found
@@ -698,6 +699,8 @@ else
 		
 		'move to next recordset
   	Set rs1 = rs1.NextRecordset() 
+
+   
  
 %>    
    
@@ -773,7 +776,7 @@ End If
 <table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">　</td>
-      <td align="center">詳細交易紀錄<br><u>Stock Reconciliation Report</u></td> 
+      <td align="center">詳細紀錄<br><u>Stock Reconciliation Report</u></td> 
       <td align="right" width="20%">
 						<% 'If Session("PrintAllowed") = 1 then %>   
 						<%if (session("shell_power") <> 1 and session("shell_power") <> 5) then %>  
@@ -789,60 +792,20 @@ End If
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
 <tr bgcolor="#ADF3B6" align="center">
-      <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADENO")  %>) >Trade Code<br>交易編號</a></td>
-      <td width="16%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADINGCCY")  %>) >Currency<br>貨幣</a></td>
-     <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADEDATE")  %>) >Trade Date<br>交易日期</a></td>
-     <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("SETTLEDATE")  %>) >Settle Date<br>結算日期</a></td>
-   <td width="30%"><a href=javascript:ordersubmit(<% call OrderVariable("CLIENTCODE")  %>) >Client Code <br> 客戶編號 </a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("BUYSELL")  %>) >Buy/Sell<br>買/賣</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("MARKET")  %>) >Location<br>地點</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("INSTRUMENT")  %>) >Stock Code<br>股票編號</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("TTLQTY")  %>) >Share No<br>股票數量</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("PRICE")  %>) >Price<br>價錢</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("SETFXAMOUNT")  %>) >Consideration<br>交易總額</a></td>
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("a")  %>) >Client Brokerage<br>客戶佣金 </a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("b")  %>) >Client Rebate<br>客戶回扣</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE1")  %>) >Broker Brokerage<br>經紀佣金</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE2")  %>) >Charge 1<br>收入 一</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE3")  %>) >Charge 2<br>收入 二</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE4")  %>) >Charge 3<br>收入 三</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE5")  %>) >Charge 4<br>收入 四</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE6")  %>) >Charge 5<br>收入 五</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE7")  %>) >Charge 6<br>收入 六</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE8")  %>) >Charge 7<br>收入 七</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("REBATEAMOUNT")  %>) >Broker Rebate<br>經紀回扣</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("CONSIDERATION")  %>) >Turnover<br>交易量</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("CONFIRMATIONDATE")  %>) >Confirmation Date<br>確認日期</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("BROKERAGERATE")  %>) >Brokerage Rate<br>佣金比率</a></td> 
-</tr>
-<tr bgcolor="#ADF3B6" align="center">
-			<td><% call OrderImage("TRADENO")  %></td>
-			<td><% call OrderImage("TRADINGCCY")  %></td>
-			<td><% call OrderImage("TRADEDATE")  %></td>
-			<td><% call OrderImage("SETTLEDATE")  %></td>
-			<td><% call OrderImage("CLIENTCODE")  %></td>
-			<td><% call OrderImage("BUYSELL")  %></td>
-			<td><% call OrderImage("MARKET")  %></td>
-			<td><% call OrderImage("INSTRUMENT")  %></td>
-			<td><% call OrderImage("TTLQTY")  %></td>
-			<td><% call OrderImage("PRICE")  %></td>
-			<td><% call OrderImage("NetAmount")  %></td>
-			<td><% call OrderImage("a")  %></td> 
-			<td><% call OrderImage("b")  %></td> 
-			<td><% call OrderImage("ORFEE1")  %></td> 
-			<td><% call OrderImage("ORFEE2")  %></td> 
-			<td><% call OrderImage("ORFEE3")  %></td> 
-			<td><% call OrderImage("ORFEE4")  %></td> 
-			<td><% call OrderImage("ORFEE5")  %></td> 
-			<td><% call OrderImage("ORFEE6")  %></td> 
-			<td><% call OrderImage("ORFEE7")  %></td> 
-			<td><% call OrderImage("ORFEE8")  %></td> 
-			<td><% call OrderImage("REBATEAMOUNT")  %></td> 
-			<td><% call OrderImage("CONSIDERATION")  %></td> 
-			<td><% call OrderImage("CONFIRMATIONDATE")  %></td> 
-			<td><% call OrderImage("BROKERAGERATE")  %></td> 
+
+<%
+
+    for each x in Rs1.Fields
+
+     
+%>
+
+      <td><% = x.name %></td>
+ 
+<% Next %>
 
 </tr>
+
 		<%
 			dim iPageCCYcount
 			dim k
@@ -860,72 +823,28 @@ End If
 			'iPageCCY(0) = ""
 			
 			dim mystr
-			do while (  Not rs1.EOF)
+			do while (Not rs1.EOF)
 				k=1
 				
 		%>
-<tr bgcolor="#FFFFCC"> 
-   <td width="14%"><%=rs1("TradeNo") %></td>
-   <td width="16%"><%=rs1("TradingCcy") %>　</td>
-   <td width="12%"><%=rs1("TradeDate") %>　</td>
-   <td width="12%"><%=rs1("SettleDate") %>　</td>
-   <td width="26%"><%=rs1("ClientCode") %><img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("ClientCode") %>')"></img></td>
-   <td width="10%"><%=rs1("BuySell") %>　</td>
-   <td width="10%"><%=rs1("Market") %>　</td>
-   <td width="10%"><%=rs1("Instrument") %></td>
-   <td width="10%"><% mystr = replace(rs1("Quantity"), chr(13), "<br>")
-   										response.write	left(mystr, len(mystr)-1) %>　</td>
-   <td width="10%"><% mystr = replace(rs1("Price"), chr(13), "<br>")
-   										response.write	left(mystr, len(mystr)-1) %>　</td>
-									
-   <td width="10%"><%=formatnumber(rs1("NetAmount")) %>　</td>
-   <td width="17%">　</td> 
-   <td width="17%">　</td> 
-   <td width="17%"><%=formatnumber(rs1("ORFee1"),2) %>　　</td> 
-   <td width="17%"><% if clng(rs1("ORFee2")) <> 0 then response.write  rs1("FeeName2") & " " & formatnumber(rs1("ORFee2"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee3")) <> 0 then response.write  rs1("FeeName3") & " " & formatnumber(rs1("ORFee3"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee4")) <> 0 then response.write  rs1("FeeName4") & " " & formatnumber(rs1("ORFee4"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee5")) <> 0 then response.write  rs1("FeeName5") & " " & formatnumber(rs1("ORFee5"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee6")) <> 0 then response.write  rs1("FeeName6") & " " & formatnumber(rs1("ORFee6"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee7")) <> 0 then response.write  rs1("FeeName7") & " " & formatnumber(rs1("ORFee7"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee8")) <> 0 then response.write  rs1("FeeName8") & " " & formatnumber(rs1("ORFee8"))  end if  %>　</td> 
-   <td width="17%"><%=rs1("RebateAmount")  %>　</td> 
-   <td width="17%"><%=formatnumber(rs1("Consideration"))%>　</td> 
-   <td width="17%"><%=rs1("confirmationdate") %>　</td> 
-   <td width="17%"><%=rs1("BrokerageRate") %>　</td> 
-</tr>
-<%
-				iPageUpdate = 0
-				'find if any existing CCY array
-				for k=1 to iPageCCYcount
-				
-					if iPageCCY(k) = rs1("TradingCCY") then
-							iPageturnover(k) = iPageturnover(k)  + cDbl(rs1("Consideration"))
-							iPageconsideration(k)= iPageconsideration(k)  + cDbl(rs1("NetAmount")) 
-							iPagebrokerage(k) = iPagebrokerage(k)  + cDbl(rs1("ORFee1"))
-							iPageUpdate = 1
-							Exit For
-					end if
-					
 
-				next
-				
-				
-				'if no existing CCy array found, create a new record array
-				if iPageUpdate = 0 then
-						iPageCCYcount = iPageCCYcount + 1
-						ReDim Preserve iPageCCY(iPageCCYcount)
-						ReDim Preserve iPageturnover(iPageCCYcount)
-						ReDim Preserve iPageconsideration(iPageCCYcount)
-						ReDim Preserve iPagebrokerage(iPageCCYcount)
-						
-						
-						iPageCCY(iPageCCYcount) = rs1("TradingCCY")
-						iPageturnover(iPageCCYcount) = cDbl(rs1("Consideration"))
-						iPageconsideration(iPageCCYcount)= cDbl(rs1("NetAmount")) 
-						iPagebrokerage(iPageCCYcount) = cDbl(rs1("ORFee1"))
-				end if
-				
+<tr bgcolor="#FFFFCC"> 
+
+<%
+
+    for each x in Rs1.Fields
+
+     
+%>
+
+      <td><% = Rs1(x.name) %></td>
+ 
+<% Next %>
+</tr>
+
+
+<%
+
 				
 					
 				rs1.movenext
@@ -945,7 +864,7 @@ End If
 
 <tr bgcolor="#FFFFCC"> 
 
-   <td colspan="10" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
+   <td colspan="9" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
    <td ><%=iPageCCY(l)%>&nbsp;<%=formatnumber(iPageconsideration(l)) %></td>
 
    <td colspan="2" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
@@ -954,8 +873,7 @@ End If
    <td colspan="8" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
    <td ><%=iPageCCY(l)%>&nbsp;<%=formatnumber(iPageturnover(l)) %></td>
 
-   <td colspan="2" align="right"></td>
-
+ 
 </tr>
 
 <% Next %>
@@ -970,17 +888,16 @@ End If
 
 <tr bgcolor="#FFFFCC"> 
 	 
-   <td colspan="10" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
+   <td colspan="9" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
    <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalconsideration(j)) %></td>
 
    <td colspan="2" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
    <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalbrokerage(j)) %></td>
 
-   <td colspan="8" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
+   <td colspan="7" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
    <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalturnover(j)) %></td>
 
-   <td colspan="2" align="right"></td>
-
+   
 </tr>
 
 <% Next %>
