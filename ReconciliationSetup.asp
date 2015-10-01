@@ -209,7 +209,7 @@ if trim(request("action_button")) = "append field" then
 
         FieldID = Trim(Request("AppendField"))
 
-        sqlc = "Select count(*) as tcount from ReconFileOrder where DepotID = "&DepotID
+        sqlc = "Select count(*) as tcount from ReconFileOrder where DepotID = "&DepotId
 
         Set Rsc1 = Conn.Execute(sqlc)
 
@@ -235,6 +235,73 @@ if trim(request("action_button")) = "remove field" then
         conn.execute sql12
 	
 end if
+
+
+
+
+' sorting the menu
+'*******************
+
+if trim(request("action_button")) = "MenuUp" then
+
+	FieldID = trim(request("RemoveField"))
+
+    DepotID = trim(Request("DepotID"))
+	
+        sql1 = "Select Priority - 1 as Priority From ReconFileOrder Where FieldID="&FieldID&" and DepotID="&DepotID
+
+        Set Rs1 = Conn.Execute(sql1)
+
+        'response.write rs1("priority")
+        'response.write depotid
+
+        sql2 = "Select FieldID From ReconFileOrder Where Priority="&Rs1("Priority")&" and DepotID="&DepotID
+
+        Set Rs2 = Conn.Execute(sql2)
+
+        'response.write rs2("Fieldid")
+
+	
+	    sql3="Update ReconFileOrder set Priority = Priority - 1 where DepotID="&DepotID&" and FieldId="&FieldID
+		
+	    conn.execute(sql3) 
+
+        sql4="Update ReconFileOrder set Priority = Priority + 1 where DepotID="&DepotID&" and FieldId="&rs2("Fieldid")
+
+        conn.execute(sql4)
+
+	
+end if
+
+' sorting the menu
+'*********************
+
+if trim(request("action_button")) = "MenuDown" then
+
+	FieldID = trim(request("RemoveField"))
+
+    DepotID = trim(Request("DepotID"))
+	
+        sql1 = "Select Priority + 1 as Priority From ReconFileOrder Where FieldID="&FieldID&" and DepotID="&DepotID
+
+        Set Rs1 = Conn.Execute(sql1)
+
+        sql2 = "Select FieldID From ReconFileOrder Where Priority="&Rs1("Priority")&" and DepotID="&DepotID
+
+        Set Rs2 = Conn.Execute(sql2)
+
+        sql3="Update ReconFileOrder set Priority = Priority + 1 where DepotID="&DepotID&" and FieldId="&FieldID
+	
+        conn.execute(sql3) 
+
+         sql4="Update ReconFileOrder set Priority = Priority - 1 where DepotID="&DepotID&" and FieldId="&rs2("Fieldid")
+
+
+        conn.execute(sql4)
+
+	
+end if
+
 %>
 
 <!--#include file="include/SQLconn.inc.asp" -->
@@ -439,6 +506,47 @@ function doChange(flag)
        {
 		document.fm1.submit();
 		}
+}
+
+
+function doUp()
+{
+        if(document.getElementById('removefield').selectedIndex == -1){
+        alert("Please select a option in the menu!");
+        return false;
+        }
+        
+        if(document.getElementById('removefield').selectedIndex == 0){
+        alert("It is already at the top position in the menu!");
+        return false;
+        }
+
+        {
+		document.fm1.action_button.value="MenuUp";
+		document.fm1.submit();
+		}
+	
+}
+
+function doDown()
+{
+        if(document.getElementById('removefield').selectedIndex == -1){
+        alert("Please select a option in the menu!");
+        return false;
+        }
+
+       var x = document.getElementById('removefield').length;
+       x = x-1;
+       if(document.getElementById('removefield').selectedIndex == x){
+        alert("It is already at the bottom position in the menu!");
+        return false;
+        }
+
+        {
+		document.fm1.action_button.value="MenuDown";
+		document.fm1.submit();
+		}
+	
 }
 
 //-->
@@ -938,8 +1046,9 @@ Field Length</td>
 
 	<tr> 
 			
-			<td width="50%" bgcolor="#FFFFCC">Field available</td>
-            <td width="50%" bgcolor="#FFFFCC">Current Field</td>
+			<td width="35%" align="center" bgcolor="#FFFFCC">Field available</td>
+            <td width="35%" align="center" bgcolor="#FFFFCC">Current Field</td>
+            <td width="30%" align="center" bgcolor="#FFFFCC"></td>
 	</tr>
 
 
@@ -957,7 +1066,7 @@ Field Length</td>
 
 <tr> 
 
-<td>
+<td align="center">
 
 	<select size="20" name="appendfield" id="appendfield" class="common">
 
@@ -967,7 +1076,7 @@ Field Length</td>
 							do while not Rs9.eof
 %>
 
-     <option value="<%=Rs9("FieldID")%>" >&nbsp;<% = Rs9("FieldName") %>&nbsp;&nbsp;&nbsp;</option>
+     <option value="<%=Rs9("FieldID")%>" >&nbsp;&nbsp;<% = Rs9("FieldName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
 
 <%
 
@@ -1003,7 +1112,7 @@ Field Length</td>
 
 %>
          
-<td>
+<td align="center">
 
         <select size="20" name="RemoveField" id="removefield" class="common">
 
@@ -1015,7 +1124,7 @@ Field Length</td>
 							do while not Rs10.eof
 %>
 
-     <option value="<%=Rs10("FieldID")%>" >&nbsp;<% = Rs10("FieldName") %>&nbsp;&nbsp;&nbsp;</option>
+     <option value="<%=Rs10("FieldID")%>" >&nbsp;&nbsp;<% = Rs10("FieldName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
 
 <%
 
@@ -1029,13 +1138,25 @@ Field Length</td>
 
     </select>
 </td> 
+
+<td>
+
+         <input type="button" value="&#916;" onClick="doUp();">
+
+              <br/><br/><br/>
+
+            <input type="button" value="&#8711;" onClick="doDown();">
+
+
+
+</td>
 	</tr>
 
 <tr> 
       <td>
 			<input type="button" value="Append Field to Depot" onClick="appendField();">
       </td> 
-      <td >
+      <td colspan="2">
 
 			<input type="button" value="Remove Field from Depot" onClick="removeField();">
 ¡@</td>
@@ -1049,12 +1170,8 @@ Field Length</td>
 ¡@</td>
     </tr>
 	
-      <tr> 
-      <td></td>
-      <td>
+     
    <input type="hidden" name="DepotFileID" value="<% = DepotID %>">	
-
-    </tr>
 
 </table> 
 
