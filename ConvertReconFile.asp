@@ -21,6 +21,8 @@ Title = "Depot File Conversion"
    SQL1 = "select * from ReconDepotFolder order by DepotName Asc"
    Set Rs1 = Conn.Execute(SQL1)
 
+   
+
 %>   
 
 <html>
@@ -88,37 +90,6 @@ function listToAray(fullString, separator) {
 
             for each x in fo.files  
 
-
-     Sql2 = "Select f.depotid, fieldname from  (ReconDepotFolder f join reconfileorder o "
-
-     Sql2 = Sql2 & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
-
-     Sql2 = Sql2 & " and f.depotid=" &Rs1("DepotID")
-
-     Sql2 = Sql2 & "order by f.depotid, o.priority desc"
-
-     FieldName = ""
-
-     Set Rs2 = Conn.Execute(Sql2)
-
-      Do While Not Rs2.EoF
-
-     FieldName =  Rs2("fieldname") & "," & FieldName
-
-     Rs2.MoveNext
-
-      Loop ' Rs2
-
-     FieldName = Left(FieldName,Len(FieldName)-1) 
-
-     'Response.write FieldName
-
-     sqv = "create view vw_"&Rs1("DepotID")&" as select "&FieldName&" from StockReconciliation"
-
-     response.write sqv & "<br/>"
-
-     'Conn.Execute(sqv)
-  
       
 
   Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
@@ -151,17 +122,16 @@ function listToAray(fullString, separator) {
     end if
 
 
-  
-
-    
 
    Loop
+
+     
 
     Sql3 = "bulk insert vw_"&Rs1("DepotID")
 
     Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
 
-    Sql3 = Sql3 & " WITH (FIRSTROW = 2, "
+    Sql3 = Sql3 & " WITH (FIRSTROW = "& Rs1("FirstRow") &", "
 
     Sql3 = Sql3 & " FIELDTERMINATOR= ',',"
 
@@ -173,13 +143,6 @@ function listToAray(fullString, separator) {
 
     response.write sFolder &"\" &x.Name  & "<br>"
    
-
-
-     sqv_d = "drop view vw_"&Rs1("DepotID")&"" 
-
-     'Conn.Execute(sqv_d)
-
-    response.write sqv_d
 
 
 

@@ -115,7 +115,7 @@ function doUpload(what)
 
 <tr>
 <td width="20%">
-<% = Rs1("Market") %> - <% = Rs1("DepotName") %>
+<% = Rs1("DepotID") %>. <% = Rs1("Market") %> - <% = Rs1("DepotName") %>
 </td>
 <td>
 <% = Rs1("DepotFolder") %>
@@ -173,15 +173,14 @@ function doUpload(what)
 ' ---------------------------------------------------------
 
   
-     Sql = "Select count(f.depotid) as Tcount from  (ReconDepotFolder f join reconfileorder o "
+     ' Check if view exist
+     sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&Rs1("DepotID")&"'"
 
-     Sql = Sql & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
+     'response.write sql
 
-     Sql = Sql & " and f.depotid=" &Rs1("DepotID")
-  
-     Set Rs = Conn.Execute(Sql)
+     Set Rs = Conn.Execute(sql)
 
-     If Rs("Tcount") > 0 then
+     If Rs("count1") = 1 then
 
 
 ' ---------------------------------------------------------
@@ -216,10 +215,7 @@ function doUpload(what)
           'Print the name of file in the test folder
            Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
 
-           set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
-
-           Response.Write("<b>First line of file:</b><br/>"&f.ReadLine)
-
+        
 
 
 
@@ -260,7 +256,7 @@ function doUpload(what)
 
      Else 
 
-        Response.Write "Depot's field setup is not completed."
+        Response.Write "Depot's profile not created."
 
         ReadyToConvert = False
 

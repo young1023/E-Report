@@ -302,6 +302,62 @@ if trim(request("action_button")) = "MenuDown" then
 	
 end if
 
+' sorting the menu
+'*********************
+
+if trim(request("action_button")) = "CreateProfile" then
+
+
+     DepotID = trim(Request("DepotID"))
+
+     ' Check if view exist
+     sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&DepotID&"'"
+
+    'response.write sql
+
+     Set Rs = Conn.Execute(sql)
+
+     If Rs("count1") = 1 then
+
+         sqv_d = "drop view vw_"&DepotID&""
+
+          Conn.Execute(sqv_d)
+
+     End if
+
+	
+     Sql2 = "Select f.depotid, fieldname from  (ReconDepotFolder f join reconfileorder o "
+
+     Sql2 = Sql2 & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
+
+     Sql2 = Sql2 & " and f.depotid=" &DepotID
+
+     Sql2 = Sql2 & "order by f.depotid, o.priority desc"
+
+     Set Rs2 = Conn.Execute(Sql2)
+
+     Do While Not Rs2.EoF
+
+     FieldName =  Rs2("fieldname") & "," & FieldName
+
+     Rs2.MoveNext
+
+     Loop 
+
+     FieldName = Left(FieldName,Len(FieldName)-1) 
+
+     'Response.write FieldName
+
+     sqv = "create view vw_"&DepotID&" as select "&FieldName&" from StockReconciliation"
+
+     'response.write sqv & "<br/>"
+
+     Conn.Execute(sqv)
+  
+     Message = "Profile Created."
+	
+end if
+
 %>
 
 <!--#include file="include/SQLconn.inc.asp" -->
@@ -549,6 +605,17 @@ function doDown()
 	
 }
 
+function createProfile()
+{
+       
+
+        {
+		document.fm1.action_button.value="CreateProfile";
+		document.fm1.submit();
+		}
+	
+}
+
 //-->
 </SCRIPT>
 </head>
@@ -584,7 +651,7 @@ function doDown()
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Delete field in Master Table
       </a></td>
       <td  class="BlueClr" width="20%" <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
-      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds Allocation
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds matching
       </a></td>
     </tr>
 
@@ -661,7 +728,7 @@ File Extension</td>
 
 <tr> 
       <td width="27%">
-First Row</td> 
+First row of data</td> 
       <td width="69%">
       <Input name="FirstRow1" type=text value="" size="80">&nbsp;
 
@@ -1151,18 +1218,37 @@ Field Length</td>
 
 </td>
 	</tr>
-
+<tr> 
+      <td colspan="3">
+      </td> 
+      
+    </tr>
+<tr> 
+      <td align="center">
+			<input type="button" value="Append Field to Depot" onClick="appendField();">
+      </td> 
+      <td align="center">
+      
+			<input type="button" value="Remove Field from Depot" onClick="removeField();">
+¡@</td>
+  <td></td>
+    </tr>
+	<tr> 
+      <td colspan="3">
+      </td> 
+      
+    </tr>
+<tr> 
 <tr> 
       <td>
-			<input type="button" value="Append Field to Depot" onClick="appendField();">
+			
       </td> 
       <td colspan="2">
 
-			<input type="button" value="Remove Field from Depot" onClick="removeField();">
+			<input type="button" value="  Create Profile  " onClick="createProfile();">
 ¡@</td>
     </tr>
 	
-
 
 <tr> 
       <td colspan="2" align =center><font color="red"><% = Message %></font></td> 

@@ -554,24 +554,17 @@ Characters</td>
     </tr>
 
      <tr> 
-      <td width="43%"><b>Stock Reconciliation Import Folder Setup:</b></td> 
+      <td width="43%"><b>Stock Reconciliation Setup:</b></td> 
       <td width="55%">
 ¡@</td>
     </tr>
+<% ArchiveFolder = "E:\Data\Recon\Archive\" %>
      <tr> 
-      <td width="43%">Depot:</td> 
-      <td width="55%">Import Folder:
+      <td width="43%">Archive Folder:</td> 
+      <td width="55%"><input name="ArchiveFoler" type=text value="<% = ArchiveFolder %>" size="36">
 ¡@</td>
     </tr>
-	<tr> 
-			<td width="43%">
-			<input name="Depot" type=text value="<% = Depot %>" size="36">
-</td> 
-			<td width="55%">			
-			<input name="ReconFoler" type=text value="<% = ReconFolder %>" size="36">
-</td>
-
-	</tr>
+	
 <input name="NoChangeEmailBody2" type=hidden value="<% = NoChangeEmailBody %>" size="5000">	
 
      <tr> 
