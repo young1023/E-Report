@@ -32,7 +32,7 @@ Message = ""
 
 ' Add Depot
 '************
-if trim(request("action_button")) = "add section" then
+if trim(request("action_button")) = "add depot" then
 
 
 		DepotName1 = trim(request(replace("DepotName1","'","''")))
@@ -209,6 +209,18 @@ if trim(request("action_button")) = "append field" then
 
         FieldID = Trim(Request("AppendField"))
 
+        sqlcheck = "Select Count(*) as Count1 From ReconFileOrder Where DepotId ="&DepotID&" and FieldId="&FieldId
+
+        Set RsCheck = Conn.Execute(sqlcheck)
+
+           If RsCheck("Count1") > 0 Then
+
+  
+                   Message = "Field is already selected."
+
+            Else
+  
+
         sqlc = "Select count(*) as tcount from ReconFileOrder where DepotID = "&DepotId
 
         Set Rsc1 = Conn.Execute(sqlc)
@@ -218,6 +230,12 @@ if trim(request("action_button")) = "append field" then
 		sql8 = "Insert into ReconFileOrder (DepotID, FieldID, Priority) Values ("&depotid&","&FieldID&","&tcount&")"
 	    
         conn.execute sql8
+
+
+              End If
+
+
+      
 	
 end if
 
@@ -267,6 +285,7 @@ if trim(request("action_button")) = "MenuUp" then
 	    conn.execute(sql3) 
 
         sql4="Update ReconFileOrder set Priority = Priority + 1 where DepotID="&DepotID&" and FieldId="&rs2("Fieldid")
+ 'response.write sql4
 
         conn.execute(sql4)
 
@@ -406,7 +425,7 @@ function addDepot()
        }
 	else
 		{
-		document.fm1.action_button.value="add section";
+		document.fm1.action_button.value="add depot";
 		document.fm1.submit();
 		}
 }

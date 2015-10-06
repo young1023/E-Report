@@ -100,7 +100,7 @@ function listToAray(fullString, separator) {
   Do While Not f.AtEndOfStream
 
 
-    strReadLineText = f.ReadLine
+    'strReadLineText = Rs1("DepotID") & f.ReadLine
 
     'response.Write(strReadLineText & "<br>")
 
@@ -139,7 +139,7 @@ function listToAray(fullString, separator) {
 
     response.write Sql3 & "<br/>"
 
-    'Conn.Execute(Sql3)
+    Conn.Execute(Sql3)
 
     response.write sFolder &"\" &x.Name  & "<br>"
    

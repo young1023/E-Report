@@ -11,6 +11,41 @@ dim fs, fo, ts, f
 set fs=Server.CreateObject("Scripting.FileSystemObject")
 
 Title = "Depot File Reconciliation"
+
+
+
+' Delete File
+'***************
+if trim(request("action_button")) = "deleteFile" then
+
+	depotid = trim(request("depotid"))
+
+       'response.write depotid
+
+        sql = "Select DepotFolder from ReconDepotFolder where DepotId="&depotid
+
+        Set Rs = Conn.Execute(sql)
+
+         'response.write Rs("DepotFolder")
+
+  	     set fo=fs.GetFolder(Rs("DepotFolder"))
+
+               for each x in fo.files
+
+                'Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
+
+                fs.DeleteFile(Rs("DepotFolder")&"\"&x.Name)
+
+ 
+               next
+	
+end if
+
+
+
+
+
+
 %>
 
 <html>
@@ -32,15 +67,21 @@ Title = "Depot File Reconciliation"
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
 <SCRIPT language=JavaScript>
 <!--
-function doCovert(){
+function doCovert(Flat){
 document.fm1.action="ConvertReconFile.asp?sid=<%=sessionid%>";
+document.fm1.submit();
+}
+
+function doDelete(what){
+document.fm1.action="ReconDepotFile.asp?sid=<%=sessionid%>&depotid="+what;
+document.fm1.action_button.value="deleteFile";
 document.fm1.submit();
 }
 
 
 function doUpload(what)
 {
- window.open('upload_file.asp?sPath='+what,'user','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,top=20,left=30,width=600,height=400');
+ window.open('upload_file.asp?sid=<%=sessionid%>&depotId='+what,'user','toolbar=no,location=no,directories=no,titlebar=no, status=no,menubar=no,scrollbars=yes,resizable=yes,top=20,left=30,width=600,height=400');
 }
 //-->
 </SCRIPT>
@@ -104,7 +145,8 @@ function doUpload(what)
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
 <td width="30%"><font color="#FFFFFF">Folder</font></td>
-<td width="50%"><font color="#FFFFFF">Status</font></td>     
+<td width="40%"><font color="#FFFFFF">Status</font></td> 
+<td width="10%"><font color="#FFFFFF">Action</font></td>     
 </tr>
 
 <%
@@ -124,6 +166,10 @@ function doUpload(what)
 
 
 <%
+
+ FileIsEmpty = False
+
+ FileExists = False
 
  ReadyToConvert = True
 
@@ -149,6 +195,8 @@ function doUpload(what)
     'sFolder1 = replace(sFolder,"\","\\")
 
      Response.write "Folder is empty." 
+
+     FileIsEmpty = True
 
      ReadyToConvert = False
 
@@ -189,9 +237,13 @@ function doUpload(what)
 '
 ' ---------------------------------------------------------
 
-     If trim(Right(x.Name,3)) = Trim(Rs1("FileType")) Then
+     If trim(Right(x.Name,3)) <> Trim(Rs1("FileType")) Then
 
+     Response.Write "Wrong file type. <br/><br/>"
 
+        ReadyToConvert = False
+
+     End if
 ' ---------------------------------------------------------
 '                                                          
 ' Check file date                 
@@ -202,15 +254,17 @@ function doUpload(what)
 
 
 ' Remove comma in sting
+
+' <!--#include file="include/remove_comma.inc.asp" -->
+
 %>
 
 
-<!--#include file="include/remove_comma.inc.asp" -->
 
 
 <%
 
-
+           FileExists = True
 
           'Print the name of file in the test folder
            Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
@@ -231,20 +285,6 @@ function doUpload(what)
 
 
 
-
-' ---------------------------------------------------------
-'                                                          
-' End of checking file type                 
-'
-' ---------------------------------------------------------
-
-     Else
-
-        Response.Write "Wrong file type."
-
-        ReadyToConvert = False
-
-     End if
 
 
 ' ---------------------------------------------------------
@@ -310,6 +350,21 @@ end if
 %>
 
 </td>
+<td>
+<% If FileIsEmpty = True then %>
+           
+               <input type="Button" value=" Upload " onClick="doUpload(<%=Rs1("DepotID")%>);" class="Normal">
+
+<% End If %>
+
+<% If FileExists = True then %>
+           
+               <input type="Button" value=" Delete " onClick="doDelete(<%=Rs1("DepotID")%>);" class="Normal">
+
+               <input type="hidden" name="DepotID" value="<% = Rs1("DepotID") %>">  
+
+<% End If %>
+</td>
 </tr>
 
 <%
@@ -327,6 +382,17 @@ set fs=nothing
 
 
 %>
+
+<tr bgcolor="#006699">
+<td width="20%"><font color="#FFFFFF"></font></td>
+<td width="30%"><font color="#FFFFFF"></font></td>
+<td width="40%"><font color="#FFFFFF"></font></td> 
+<td width="10%">
+
+
+
+</td>     
+</tr>
 
                                   </table>
                               
@@ -346,7 +412,9 @@ set fs=nothing
      </tr>
       <tr> 
          <td align="center">
-          <input type="Button" value=" Convert" onClick="doCovert();" class="Normal"></td>
+          <input type="Button" value=" Convert" onClick="doCovert();" class="Normal">
+              <input type="hidden" name="action_button" value="">   
+</td>
                              
 </tr>
                             </table>
