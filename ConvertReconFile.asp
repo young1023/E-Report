@@ -79,7 +79,7 @@ function listToAray(fullString, separator) {
 			Do While Not Rs1.EoF
 
        ' Get the folder
-      sFolder = Trim(Rs1("DepotFolder"))
+      sFolder = Trim(Server.MapPath(Rs1("DepotFolder")))
 
       sReadyToConvert = Trim(Rs1("ReadyToConvert"))
 

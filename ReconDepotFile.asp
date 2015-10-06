@@ -28,21 +28,18 @@ if trim(request("action_button")) = "deleteFile" then
 
          'response.write Rs("DepotFolder")
 
-  	     set fo=fs.GetFolder(Rs("DepotFolder"))
+  	     set fo=fs.GetFolder(Server.MapPath(Rs("DepotFolder")))
 
                for each x in fo.files
 
                 'Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
 
-                fs.DeleteFile(Rs("DepotFolder")&"\"&x.Name)
+                fs.DeleteFile(Server.MapPath(Rs("DepotFolder"))&"\"&x.Name)
 
  
                next
 	
 end if
-
-
-
 
 
 
@@ -173,7 +170,8 @@ function doUpload(what)
 
  ReadyToConvert = True
 
- sFolder = Rs1("DepotFolder")
+ sFolder = Server.MapPath(Rs1("DepotFolder"))
+
 
 ' ---------------------------------------------------------
 '                                                          
@@ -192,19 +190,12 @@ function doUpload(what)
 
   If fs.GetFolder(sFolder).Files.Count  = 0 then
 
-    'sFolder1 = replace(sFolder,"\","\\")
-
      Response.write "Folder is empty." 
 
      FileIsEmpty = True
 
      ReadyToConvert = False
 
-  Elseif fs.GetFolder(sFolder).Files.Count  > 1 then
-
-     Response.write "There are more than one file in the folder" 
-
-     ReadyToConvert = False
 
   Else
 
