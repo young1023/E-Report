@@ -18,11 +18,11 @@ Title = "Depot File Reconciliation"
 '***************
 if trim(request("action_button")) = "deleteFile" then
 
-	depotid = trim(request("depotid"))
+	delete_depotid = trim(request("depotid"))
 
        'response.write depotid
 
-        sql = "Select DepotFolder from ReconDepotFolder where DepotId="&depotid
+        sql = "Select DepotFolder from ReconDepotFolder where DepotId="&delete_depotid
 
         Set Rs = Conn.Execute(sql)
 
@@ -31,12 +31,9 @@ if trim(request("action_button")) = "deleteFile" then
   	     set fo=fs.GetFolder(Server.MapPath(Rs("DepotFolder")))
 
                for each x in fo.files
-
-                'Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
-
+ 
                 fs.DeleteFile(Server.MapPath(Rs("DepotFolder"))&"\"&x.Name)
 
- 
                next
 	
 end if
@@ -75,6 +72,9 @@ document.fm1.action_button.value="deleteFile";
 document.fm1.submit();
 }
 
+function setFocus(){
+    document.getElementById("getFocus").focus();
+}
 
 function doUpload(what)
 {
@@ -83,7 +83,7 @@ function doUpload(what)
 //-->
 </SCRIPT>
 </head>
-<body leftmargin="0" topmargin="0">
+<body leftmargin="0" topmargin="0" onload='setFocus()'>
 
 
 
@@ -150,9 +150,10 @@ function doUpload(what)
       	If Not Rs1.EoF Then
              		
 			Do While Not Rs1.EoF
-%>
 
-<tr>
+ 
+%>
+<tr <% If Trim(delete_depotid) = Trim(Rs1("DepotID")) then%>bgcolor="#ffccff"<% end if%>>
 <td width="20%">
 <% = Rs1("DepotID") %>. <% = Rs1("Market") %> - <% = Rs1("DepotName") %>
 </td>
@@ -160,7 +161,6 @@ function doUpload(what)
 <% = Rs1("DepotFolder") %>
 </td>
 <td>
-
 
 <%
 
@@ -241,12 +241,20 @@ function doUpload(what)
 '
 ' ---------------------------------------------------------
 
-
-
-
 ' Remove comma in sting
 
-' <!--#include file="include/remove_comma.inc.asp" -->
+  If Rs1("FileCleaned") = 0 then
+%>
+
+ <!--#include file="include/remove_comma.inc.asp" -->
+<%
+
+       
+   SQL_FC = "Update ReconDepotFolder Set FileCleaned = 1 Where DepotID ="&Rs1("DepotID")
+
+   Conn.Execute(SQL_FC)
+
+  End IF
 
 %>
 
@@ -332,7 +340,7 @@ end if
 
    Else
        
-     SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
+       SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
 
    End If
 
