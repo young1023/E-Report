@@ -138,7 +138,7 @@ function doUpload(what)
                               <tr> 
                                 <td valign="top" align="center" height="28"> 
    
-<table border="1" cellpadding="5" cellspacing="1" class="normal" width="99%">
+<table border="1" cellpadding="6" cellspacing="0" class="normal" width="99%">
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
 <td width="30%"><font color="#FFFFFF">Folder</font></td>
@@ -266,7 +266,7 @@ function doUpload(what)
            FileExists = True
 
           'Print the name of file in the test folder
-           Response.write("<b>File Name:</b><br/> "&x.Name& "<br/><br/>")
+           Response.write(x.Name)
 
         
 
@@ -331,7 +331,7 @@ else
 
 end if
 
-   Response.write "<br/>" & ReadyToConvert
+   'Response.write "<br/>" & ReadyToConvert
 
 
    If ReadyToConvert = False Then
