@@ -286,7 +286,7 @@ for i=Year_starting to Year_ending
       'fsql = fsql & " and  TradeDate < DATEADD(dd,DATEDIFF(dd,0, Convert(datetime, '" & Search_NDate &"', 105)),0) + 1 " 
 
 
-      fsql = fsql & " order by DepotID desc"
+      fsql = fsql & " order by r.DepotID desc"
 
         response.write fsql
         'response.end
@@ -317,31 +317,9 @@ for i=Year_starting to Year_ending
 					   	
 			</td>
 </tr>
-</table>
-<br>
 
-
-<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-
-<tr bgcolor="#ADF3B6" align="center">
-
-      <td>Depot</td>
-      <td>Market</td>
-      <td>Custodian ID</td>
-      <td>Trade Date</td>
-      <td>ISINCode</td>
-      <td>Common Code</td>
-      <td>Security Name</td>
-      <td>Description</td>
-      <td>Unit Held</td>
-      <td>Total Amount</td>
- 
-
-
-
-
-</tr>
-
+<tr>
+   <td bgcolor="#FFFFCC" colspan="3">
 
 <%
 
@@ -364,20 +342,53 @@ for i=Year_starting to Year_ending
          end if
 
 %>
+</td>
+</tr>
+</table>
+<br>
+
+
+<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
+
+<tr bgcolor="#ADF3B6" align="center">
+
+      <td width="10">Depot</td>
+      <td width="10">Market</td>
+      <td>Custodian ID</td>
+      <td>Trade Date</td>
+      <td>ISINCode</td>
+      <td>Common Code</td>
+      <td>Security Name</td>
+      <td>Description</td>
+      <td>Unit Held</td>
+      <td>Total Amount</td>
+ 
+
+
+
+
+</tr>
 
 
 		<%
 			
-			do while (Not frs.EOF)
-				k=1
-				
+Total = 0
+
+i=0
+
+ if frs.recordcount>0 then
+  frs.AbsolutePage = pageid
+  do while (frs.PageSize-i)
+   if frs.eof then exit do
+   i=i+1
+		
 		%>
 
 <tr bgcolor="#FFFFCC"> 
 
 
-<td></td>
-<td></td>
+<td><% = frs("DepotName") %></td>
+<td><% = frs("Market") %></td>
 <td><% = frs("CustodianID") %></td>
 <td><% = frs("TradeDate") %></td>
 <td><% = frs("ISINCode") %></td>
@@ -400,36 +411,27 @@ for i=Year_starting to Year_ending
 				frs.movenext
 				
 		loop
-		
+	
+end if	
 
 %>
 
-                              <tr> 
-                                <td align="right" height="28"> 
+                              <tr bgcolor="#FFFFCC"> 
+                                <td align="right" colspan="10" height="28"> 
 <script language=JavaScript>
 <!--
 
 function gtpage(what)
 {
 document.fm1.pageid.value=what;
-document.fm1.action="DailyReport.asp"
-document.fm1.submit();
-}
-
-function findenum()
-{
-document.fm1.action="DailyReport.asp"
-document.fm1.submit();
-}
-
-function Report()
-{
-document.fm1.action="DailyReport.asp"
+document.fm1.action="ReconReport.asp"
 document.fm1.submit();
 }
 
 //-->
 </script>
+
+
 
 <span class="noprint">
 <%
@@ -486,6 +488,40 @@ document.fm1.submit();
 
  Conn.Close
  Set Conn = Nothing
+
+
+
+  ' function
+  Sub countpage(PageCount,pageid)
+  response.write pagecount&"</font> Pages "
+	   if PageCount>=1 and PageCount<=10 then
+		 for i=1 to PageCount
+		   if (pageid-i =0) then
+              response.write "<font color=green> "&i&"</font> "
+		   else
+             response.write " <a href=javascript:gtpage('"&i&"') style='cursor:hand' >"&i&"</a>"
+		   end if
+		 next
+	   elseif PageCount>11 then
+	      if pageid<=5 then
+		     for i=1 to 10
+		       if (pageid-i =0) then
+                 response.write "<font color=green> "&i&"</font> "
+		       else
+                 response.write " <a href=javascript:gtpage('"&i&"') style='cursor:hand' >"&i&"</a>"
+		       end if
+		     next
+		  else
+		    for i=(pageid-4) to (pageid+5)
+		       if (pageid-i =0) then
+                 response.write "<font color=green> "&i&"</font> "
+		       elseif i=<pagecount then
+                 response.write " <a href=javascript:gtpage('"&i&"') style='cursor:hand' >"&i&"</a>"
+		       end if
+			next
+		  end if
+	   end if
+  end sub
 %>
 <SCRIPT language=JavaScript>
 <!--
