@@ -48,9 +48,9 @@ if trim(request("action_button")) = "add depot" then
 
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert) "
+		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert, FileCleaned) "
 
-        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 1)"
+        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 0, 0)"
 
 		Conn.Execute sql1
 
@@ -78,7 +78,9 @@ if trim(request("action_button")) = "add field" then
         Conn.Execute sql2
 
 
-        sql21 = "Alter Table StockReconciliation Add " & FieldName1 & " nvarchar(" & FieldLength1 & ")"
+        sql21 = "Alter Table StockReconciliation Add " & FieldName1 & " nvarchar(30)"
+
+        'response.write sql21
   
       	Conn.Execute sql21
 
@@ -670,7 +672,7 @@ function createProfile()
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Delete field in Master Table
       </a></td>
       <td  class="BlueClr" width="20%" <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
-      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds matching
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds mapping
       </a></td>
     </tr>
 
@@ -823,33 +825,12 @@ Delimiter</td>
         
 		sql4 = " Select * From ReconDepotFolder order by DepotName Asc"
 
-	    set Rs4 = nothing
-				set Rs4 = createobject("adodb.recordset")
-				Rs4.cursortype = 3
-				Rs4.locktype = 1
-				Rs4.open sql4,conn
-				
-				recount = Rs4.recordcount
+	            set Rs4 = Conn.Execute(sql4)
 			
-				if pageno="" then
-				   pageno=1
-			    end if 
-			    
-				 if pageno > 1 then
-				   i = (pageno - 1) * 10
-				   Rs4.move i
-				 end if
-				 
-				   
+				
 	
 %>
-<tr bgcolor="#ffffff"> 
-      <td colspan="6">
-        
-          <%call showpageno(pageno)%>
-          
-      </td>
-    </tr>
+
 <%		
 		If Not Rs4.EoF Then
 
@@ -899,13 +880,7 @@ Delimiter</td>
  
 	End If
 %>
-<tr bgcolor="#ffffff"> 
-      <td colspan="6">
-        <div align="right"> 
-          <%call showpageno(pageno)%>
-          </div>
-      </td>
-    </tr>
+
 
 <tr> 
       <td colspan="6" align =center><font color="red"><% = Message %></font></td> 
@@ -1005,11 +980,8 @@ Field Length</td>
         
 		sql5 = " Select * From ReconFile order by FieldID Asc"
 
-	  
-				set Rs5 = conn.execute(sql5)
+			Set Rs5 = Conn.Execute(sql5)
 				 
-				   
-	
 %>
 <tr bgcolor="#ffffff"> 
       <td colspan="4">
@@ -1319,7 +1291,7 @@ function showpageno(pageno)
             if i- pageno=0 then
 				response.write cstr(i)&"&nbsp;&nbsp;"
 			else
-				response.write "<a href='ReconciliationSetup.asp?sid="&SessionID&"&functionid="&FunctionID&"&Pageno="&i&"'>"&cstr(i)&"</a>&nbsp;&nbsp;"
+				response.write "<a href='ReconciliationSetup.asp?Pageno="&i&"&functionid="&FunctionID&"&sid="&SessionID&"'>"&cstr(i)&"</a>&nbsp;&nbsp;"
 			end if	
 		next
 		if (pageno\10)<(lastpage\10) then

@@ -35,6 +35,17 @@ if trim(request("action_button")) = "deleteFile" then
                 fs.DeleteFile(Server.MapPath(Rs("DepotFolder"))&"\"&x.Name)
 
                next
+
+    sql1 = "Update ReconDepotFolder set ReadyToConvert = 0 where DepotID = "&delete_depotid
+
+    sql2 = "Update ReconDepotFolder set FileCleaned = 0 where DepotID = "&delete_depotid
+
+
+    Conn.Execute(sql1)
+
+    Conn.Execute(sql2)
+
+
 	
 end if
 
@@ -243,6 +254,8 @@ function doUpload(what)
 
 ' Remove comma in sting
 
+  'response.write Rs1("FileCleaned")
+
   If Rs1("FileCleaned") = 0 then
 %>
 
@@ -331,7 +344,7 @@ else
 
 end if
 
-   'Response.write "<br/>" & ReadyToConvert
+   Response.write "<br/>" & ReadyToConvert
 
 
    If ReadyToConvert = False Then

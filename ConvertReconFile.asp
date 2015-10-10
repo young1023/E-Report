@@ -92,12 +92,12 @@ function listToAray(fullString, separator) {
 
       
 
-  Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
+            Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
 
-  set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
+                'set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
 
-  ' read line
-  Do While Not f.AtEndOfStream
+                  ' read line
+   'Do While Not f.AtEndOfStream
 
 
     'strReadLineText = Rs1("DepotID") & f.ReadLine
@@ -106,24 +106,9 @@ function listToAray(fullString, separator) {
 
       
 
-    If strReadLineText<>"" then
-
-        If Instr(strReadLineText,",")>0 then
-
-            strReadLineTextArr=split(strReadLineText,",")
-
-            'response.Write(strReadLineTextArr(1)&"<br/>")
-
-            'URLString=strReadLineTextArr(1)
-
-         
-        end if 
-
-    end if
 
 
-
-   Loop
+   'Loop
 
      
 
@@ -137,24 +122,24 @@ function listToAray(fullString, separator) {
 
     Sql3 = Sql3 & " ROWTERMINATOR = '\n')"
 
-    response.write Sql3 & "<br/>"
+    'response.write Sql3 & "<br/>"
 
     Conn.Execute(Sql3)
 
-    response.write sFolder &"\" &x.Name  & "<br>"
+    'response.write sFolder &"\" &x.Name  & "<br>"
    
 
+    
 
 
-
-  next
+     next
 
      
     
 
  
 
-End if     
+  End if     
 
 
 %>
