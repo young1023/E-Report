@@ -34,9 +34,7 @@ Do Until objFile.AtEndOfStream
     strNewContents = strNewContents & strNewCharacters & vbCrLf
     strNewCharacters = ""
 
-    'strNewContents = replace(strNewContents,"""","")
-
-    response.Write(strNewContents & "<br>")
+    'response.Write(i & ". " &strNewContents & "<br/><br/>")
 
 
     

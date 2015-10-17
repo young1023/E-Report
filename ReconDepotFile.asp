@@ -36,11 +36,6 @@ if trim(request("action_button")) = "deleteFile" then
 
                next
 
-    sql1 = "Update ReconDepotFolder set ReadyToConvert = 0 where DepotID = "&delete_depotid
-
-    Conn.Execute(sql1)
-
-  
 
 	
 end if
@@ -68,8 +63,8 @@ end if
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
 <SCRIPT language=JavaScript>
 <!--
-function doCovert(Flat){
-document.fm1.action="ConvertReconFile.asp?sid=<%=sessionid%>";
+function doConvert(what){
+document.fm1.action="ConvertReconFile.asp?sid=<%=sessionid%>&depotid="+what;
 document.fm1.submit();
 }
 
@@ -149,8 +144,8 @@ function doUpload(what)
 <table border="1" cellpadding="6" cellspacing="0" class="normal" width="99%">
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
-<td width="70%"><font color="#FFFFFF">Status</font></td> 
-<td width="10%"><font color="#FFFFFF">Action</font></td>     
+<td width="65%"><font color="#FFFFFF">Status</font></td> 
+<td width="15%"><font color="#FFFFFF">Action</font></td>     
 </tr>
 
 <%
@@ -194,7 +189,20 @@ function doUpload(what)
 
   If fs.GetFolder(sFolder).Files.Count  = 0 then
 
-     Response.write "Folder is empty." 
+
+     Sql2 = "Select top 1 ImportFileName, CreateDate from StockReconciliation where depotid ="&Rs1("DepotID")&" order by CreateDate desc"
+
+     Set Rs2 = Conn.Execute(Sql2)
+
+     If Not Rs2.EoF Then
+
+     Response.Write "The Latest import file " & Rs2("ImportFileName") & " was imported on "& Rs2("CreateDate")
+
+     Else
+
+     Response.Write "No File was imported before."
+
+     End If
 
      FileIsEmpty = True
 
@@ -232,28 +240,13 @@ function doUpload(what)
 '
 ' ---------------------------------------------------------
 
-' Remove comma in sting
-
-  'If Trim(Rs1("ReadyToConvert")) = "True" then
-
-   ' <!--#include file="include/remove_comma.inc.asp" -->
-
-%>
-
-   
-
-<%  
-    
-     'response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
-
-   'End If
-
- 
 
            FileExists = True
 
           'Print the name of file in the test folder
            Response.write(x.Name)
+
+           ReadyToConvert = True
 
  
 
@@ -317,7 +310,9 @@ end if
 
 <% If FileExists = True then %>
            
-               <input type="Button" value=" Delete " onClick="doDelete(<%=Rs1("DepotID")%>);" class="Normal">
+               <input type="Button" value=" Delete " onClick="doDelete(<%=Rs1("DepotID")%>);" class="Normal">&nbsp;
+
+               <input type="Button" value=" Convert " onClick="doConvert(<%=Rs1("DepotID")%>);" class="Normal">
 
                <input type="hidden" name="DepotID" value="<% = Rs1("DepotID") %>">  
 
@@ -343,12 +338,8 @@ set fs=nothing
 
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF"></font></td>
-<td width="70%"><font color="#FFFFFF"></font></td> 
-<td width="10%">
-
-
-
-</td>     
+<td ><font color="#FFFFFF"></font></td> 
+<td ></td>     
 </tr>
 
                                   </table>
@@ -369,7 +360,6 @@ set fs=nothing
      </tr>
       <tr> 
          <td align="center">
-          <input type="Button" value=" Convert" onClick="doCovert();" class="Normal">
               <input type="hidden" name="action_button" value="">   
 </td>
                              

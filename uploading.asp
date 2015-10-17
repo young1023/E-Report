@@ -93,17 +93,9 @@ If Request("action")="1" Then
 
                 Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
 
-                    
-                    SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
-
-                    Conn.Execute(SQL4)
-               
-
-                Response.Write("file saved successfully!")
-
+   
             End If
 
-            Response.Write("<hr />")
         Next
 
 

@@ -48,9 +48,9 @@ if trim(request("action_button")) = "add depot" then
 
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert, FileCleaned) "
+		sql1 = "insert into ReconDepotFolder (DepotName, DepotFolder, FileType, FirstRow,delimiter ) "
 
-        sql1 = sql1 & "values ('"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 0, 0)"
+        sql1 = sql1 & "values ('"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" )"
 
 		Conn.Execute sql1
 
@@ -1063,7 +1063,7 @@ Field Length</td>
 
            %>               
 
-<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("Market")) %> - <% =trim(Rs8("DepotName")) %></option>
+<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %></option>
 
                   <%
 

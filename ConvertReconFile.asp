@@ -78,11 +78,7 @@ function listToAray(fullString, separator) {
        ' Get the folder
       sFolder = Trim(Server.MapPath(Rs1("DepotFolder")))
 
-      sReadyToConvert = Trim(Rs1("ReadyToConvert"))
-
-      If sReadyToConvert = "True" Then
-
- 
+   
             set fo=fs.GetFolder(sFolder)
 
             for each x in fo.files  
@@ -141,10 +137,6 @@ function listToAray(fullString, separator) {
      Conn.Execute(sqv)
 
 
-     SQL5 = "Update ReconDepotFolder Set ReadyToConvert = 0 Where DepotID ="&Rs1("DepotID")
-
-     Conn.Execute(SQL5)
-
 
 
 
@@ -153,6 +145,10 @@ function listToAray(fullString, separator) {
     Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
 
     Sql3 = Sql3 & " WITH (FIRSTROW = "& Rs1("FirstRow") &", "
+
+    Sql3 = Sql3 & " ERRORFILE = '" & sFolder & "\log.txt' , "
+
+    Sql3 = Sql3 & " MAXERRORS = 1000 , "
 
     Sql3 = Sql3 & " FIELDTERMINATOR= ',',"
 
@@ -177,12 +173,6 @@ function listToAray(fullString, separator) {
 
      next
 
-     
-    
-
- 
-
-  End if     
 
 
 %>
