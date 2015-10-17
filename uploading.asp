@@ -1,4 +1,4 @@
-<!-- #include file="include\SQLConn.inc.asp" -->
+<!--#include file="include/SessionHandler.inc.asp" -->
 
 <!-- #include file="ShadowUpload.asp" -->
 <%
@@ -24,10 +24,9 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 <!DOCTYPE html>
 <HTML>
 <HEAD>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
-<TITLE>Upload File</TITLE>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
+<TITLE>Upload File</TITLE>
 <script type="text/javascript">
     function CloseWindow() {
         
@@ -37,6 +36,13 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 </script>
 </head>
 <body leftmargin="0" topmargin="0">
+
+
+<!-- #include file ="include/Master.inc.asp" -->
+
+
+<div id="Content">
+
 
       <table width="600" height="400" border="0" cellspacing="0" cellpadding="2" class="Normal">
         <tr>
@@ -107,6 +113,8 @@ End If
 
 Set objUpload = Nothing
 
+response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
 
 
 %>
@@ -116,9 +124,9 @@ Set objUpload = Nothing
   </tr>
  
 
-<tr><td align=center valign=center>
-   <INPUT TYPE="BUTTON" VALUE="      Close Window" onclick="javascript: return CloseWindow();" />
-</td></tr>
      </table>
+
+</div>
+
  </body>
     </html>

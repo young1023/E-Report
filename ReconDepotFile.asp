@@ -85,7 +85,8 @@ function setFocus(){
 
 function doUpload(what)
 {
- window.open('upload_file.asp?sid=<%=sessionid%>&depotId='+what,'user','toolbar=no,location=no,directories=no,titlebar=no, status=no,menubar=no,scrollbars=yes,resizable=yes,top=20,left=30,width=600,height=400');
+  document.fm1.action="upload_file.asp?sid=<%=sessionid%>&depotid="+what;
+  document.fm1.submit();
 }
 //-->
 </SCRIPT>
@@ -233,17 +234,19 @@ function doUpload(what)
 
 ' Remove comma in sting
 
-  If Trim(Rs1("ReadyToConvert")) = "True" then
+  'If Trim(Rs1("ReadyToConvert")) = "True" then
+
+   ' <!--#include file="include/remove_comma.inc.asp" -->
 
 %>
 
-    <!--#include file="include/remove_comma.inc.asp" -->
+   
 
 <%  
     
-     response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+     'response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
-   End If
+   'End If
 
  
 

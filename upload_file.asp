@@ -1,10 +1,9 @@
-<!-- #include file="include\SQLConn.inc.asp" -->
+<!--#include file="include/SessionHandler.inc.asp" -->
 
 <!-- #include file="ShadowUpload.asp" -->
 <%
 
 DepotID = Request("DepotId")
-
 
 
 ' Check folder
@@ -29,13 +28,10 @@ dim fs, fo, ts, f
 
 set fs=Server.CreateObject("Scripting.FileSystemObject")
 %>
-<!DOCTYPE html>
-<HTML>
-<HEAD>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
-<TITLE>Upload File</TITLE>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
+<TITLE>Upload File</TITLE>
+
 <script type="text/javascript">
     function CloseWindow() {
         
@@ -45,6 +41,13 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 </script>
 </head>
 <body leftmargin="0" topmargin="0">
+
+
+<!-- #include file ="include/Master.inc.asp" -->
+
+
+<div id="Content">
+
 
       <table width="600" height="400" border="0" cellspacing="0" cellpadding="2" class="Normal">
         <tr>
@@ -100,7 +103,7 @@ End If
 
 If Request("action") <> "1" Then
 %>
-<form action="Uploading.asp?action=1&DepotID=<%=DepotID%>" enctype="multipart/form-data" method="POST">
+<form action="Uploading.asp?sid=<%=sessionid%>&action=1&DepotID=<%=DepotID%>" enctype="multipart/form-data" method="POST">
 
 
 File:&nbsp;&nbsp;&nbsp;<input type="file" name="file1" />
@@ -125,10 +128,8 @@ File:&nbsp;&nbsp;&nbsp;<input type="file" name="file1" />
 
 </td>
    </tr>
-
-<tr><td align=center valign=center>
-   <INPUT TYPE="BUTTON" VALUE="      Close Window" onclick="javascript: return CloseWindow();" />
-</td></tr>
      </table>
+
+</div>
  </body>
     </html>

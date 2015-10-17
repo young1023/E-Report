@@ -89,7 +89,8 @@ function listToAray(fullString, separator) {
 
 %>
 
-         
+            <!--#include file="include/remove_comma.inc.asp" -->
+
    
 <%
     
@@ -169,8 +170,8 @@ function listToAray(fullString, separator) {
  
          end if
 
- 
-    fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
+
+         fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
 
 
 
