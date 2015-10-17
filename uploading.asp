@@ -13,17 +13,9 @@ DepotID = Request("DepotId")
       
        SQL1 = "select * from ReconDepotFolder where DepotId="&depotId
 
- 
        Set Rs1 = Conn.Execute(SQL1)
 
-
             sFolder = Trim(Rs1("DepotFolder"))
-
-
-           'response.write sFolder
-
-
-
 
 dim fs, fo, ts, f
 
@@ -50,7 +42,7 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
         <tr>
           <td align="middle">
 
-Upload file to <% = Rs1("DepotName") %> - <% = Rs1("Market") %>
+Upload file to <% =SFolder %>
           </td>
 
         </tr>
@@ -58,6 +50,8 @@ Upload file to <% = Rs1("DepotName") %> - <% = Rs1("Market") %>
           <td align="middle">
 
 <%
+
+'Response.Write Trim(Rs1("FileType"))
 
 Dim objUpload
 
@@ -76,16 +70,28 @@ If Request("action")="1" Then
         For x=0 To objUpload.FileCount-1
 
             Response.Write("file name: "&objUpload.File(x).FileName&"<br /><br />")
-            Response.Write("file type: "&objUpload.File(x).ContentType&"<br /><br />")
             Response.Write("file size: "&objUpload.File(x).Size&"<br /><br />")
-           
+
+            
+        
             If (objUpload.File(x).ImageWidth>200) Or (objUpload.File(x).ImageHeight>200) Then
 
-                Response.Write("File to big, not saving!")
+                Response.Write("image to big, not saving!")
+
+            Elseif Trim(Rs1("FileType")) <> Trim(Right(objUpload.File(x).FileName, 3)) Then
+              
+
+               Response.Write("<font color=red><b>Wrong file Type!</b></font>")
 
             Else  
 
                 Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+
+                    
+                    SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
+
+                    Conn.Execute(SQL4)
+               
 
                 Response.Write("file saved successfully!")
 
@@ -93,38 +99,22 @@ If Request("action")="1" Then
 
             Response.Write("<hr />")
         Next
-        'Response.Write("thank you, "&objUpload("name"))
+
+
     End If
 End If
 
 
-If Request("action") <> "1" Then
+Set objUpload = Nothing
+
+
+
 %>
-<form action="Uploading.asp?action=1&DepotID=<%=DepotID%>" enctype="multipart/form-data" method="POST">
 
-
-File:&nbsp;&nbsp;&nbsp;<input type="file" name="file1" />
-
-<br /><br /><br /><br />
-
-<button type="submit">Upload</button>
-</form>
-
-
-<% End If %>
 
 </td>
   </tr>
  
-
-
-<tr>
-<td align="middle">
-
-
-
-</td>
-   </tr>
 
 <tr><td align=center valign=center>
    <INPUT TYPE="BUTTON" VALUE="      Close Window" onclick="javascript: return CloseWindow();" />

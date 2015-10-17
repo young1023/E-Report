@@ -169,39 +169,10 @@ for i=Year_starting to Year_ending
 
 			</select> </td>
      
-      <td width="20%">Period To:</td> 
-      <td width="27%">
- 			<select name="ToMonth" class="common">            	
-					<option value="1" <% if Search_To_Month=1 then response.write "selected"%>>Jan</option>
-					<option value="2" <% if Search_To_Month=2 then response.write "selected"%>>Feb</option>
-					<option value="3" <% if Search_To_Month=3 then response.write "selected"%>>Mar</option>
-					<option value="4" <% if Search_To_Month=4 then response.write "selected"%>>Apr</option>
-					<option value="5" <% if Search_To_Month=5 then response.write "selected"%>>May</option>
-					<option value="6" <% if Search_To_Month=6 then response.write "selected"%>>Jun</option>
-					<option value="7" <% if Search_To_Month=7 then response.write "selected"%>>Jul</option>
-					<option value="8" <% if Search_To_Month=8 then response.write "selected"%>>Aug</option>
-					<option value="9" <% if Search_To_Month=9 then response.write "selected"%>>Sep</option>
-					<option value="10" <% if Search_To_Month=10 then response.write "selected"%>>Oct</option>
-					<option value="11" <% if Search_To_Month=11 then response.write "selected"%>>Nov</option>
-					<option value="12" <% if Search_To_Month=12 then response.write "selected"%>>Dec</option>
-			</select>
-
-
-			<select name="ToYear" class="common">   
-<% 
-
-
-Year_starting = Year(DateAdd("yyyy", -2, Now()))
-year_ending = Year(Now())
-
-for i=Year_starting to Year_ending
-%>			         
-			<option value="<%=i%>" <% if clng(i)=clng(Search_To_Year) then response.write "selected"%>><%=i%></option>
-
-<% next %>
-
-			</select>
-			</td>
+     <td width="20%"></td> 
+      <td></td>   
+ 	     
+	
     
     </tr>
     
@@ -228,7 +199,42 @@ for i=Year_starting to Year_ending
  	     
     </tr>
     
- 		
+ 		 <tr> 
+
+    <td width="20%">ISIN Code:</td> 
+	<td width="30%">
+	 
+	<select size="1" name="Market" class="common">
+			<option value="" <% if Search_Market="" then response.write "selected" %> >All</option>
+			<%
+					do while (  Not rsMarket.EOF)
+			%>
+					<option value="<%=rsMarket("Market")%>" <% if Search_Market=rsMarket("Market") then response.write "selected" %> ><%=rsMarket("Market")%></option>
+			
+			<%
+					rsMarket.movenext
+					Loop
+			%>
+	</select></td>
+	<td width="20%">Sedol:</td> 
+	<td width="30%">
+	 
+	<select size="1" name="Market" class="common">
+			<option value="" <% if Search_Market="" then response.write "selected" %> >All</option>
+			<%
+					do while (  Not rsMarket.EOF)
+			%>
+					<option value="<%=rsMarket("Market")%>" <% if Search_Market=rsMarket("Market") then response.write "selected" %> ><%=rsMarket("Market")%></option>
+			
+			<%
+					rsMarket.movenext
+					Loop
+			%>
+	</select></td>
+	
+     
+    </tr>
+    
 		
 		<tr> 
 			<td></td>
@@ -254,13 +260,11 @@ for i=Year_starting to Year_ending
     ' Start the queries
 ' *****************
       
-       fsql = "select * from StockReconciliation s left join ReconDepotFolder r on s.depotid = "
+       fsql = "select * from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
 
-       fsql = fsql & "r.depotid" 
+       fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.ISINCode = I.ISIN "
 
-       'fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on"
-
-       'fsql = fsql & " S.ISINCode = I.ISIN "
+       'fsql = fsql & " "
 
        fsql = fsql & " Where 1 = 1 "
 
@@ -288,7 +292,7 @@ for i=Year_starting to Year_ending
 
       fsql = fsql & " order by r.DepotID desc"
 
-        response.write fsql
+        ' response.write fsql
         'response.end
 
         set frs=createobject("adodb.recordset")
@@ -388,7 +392,7 @@ i=0
 
 
 <td><% = frs("DepotName") %></td>
-<td><% = frs("Market") %></td>
+<td><% = frs("iMarket") %></td>
 <td><% = frs("CustodianID") %></td>
 <td><% = frs("TradeDate") %></td>
 <td><% = frs("ISINCode") %></td>

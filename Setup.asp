@@ -123,7 +123,7 @@ document.fm1.submit();
   If PwdEnglish = "" Then
      PwdEnglish = 1
   End If
-
+  ArchiveFolder            = Request.form("ArchiveFolder")
 	
 	if SystemIdleTimeout = "" then
 					'first visit of page
@@ -227,6 +227,12 @@ document.fm1.submit();
 							PwdNumber = rs20("SettingValue")
 					end if
 
+	               set rs21= Conn.Execute ("Exec Get_SystemSetting 'ArchiveFolder' ") 
+					If Not Rs21.EoF Then
+							ArchiveFolder = rs21("SettingValue")
+					end if
+
+
 
 					Session("SystemMessage") = ""
 	Else
@@ -325,6 +331,7 @@ document.fm1.submit();
 					set rs18= Conn.Execute ("Exec Update_SystemSetting 'PwdCapital', '"&PwdCapital&"' ") 
 					set rs19= Conn.Execute ("Exec Update_SystemSetting 'PwdEnglish', '"&PwdEnglish&"' ") 
 					set rs20= Conn.Execute ("Exec Update_SystemSetting 'PwdNumber', '"&PwdNumber&"' ") 
+ 	                set rs21= Conn.Execute ("Exec Update_SystemSetting 'ArchiveFolder', '"&ArchiveFolder&"' ") 
  
 				
 					Session("SystemMessage") = "System settings updated"
@@ -553,25 +560,18 @@ Characters</td>
 ¡@</td>
     </tr>
 
-     <tr> 
+   <tr> 
       <td width="43%"><b>Stock Reconciliation Setup:</b></td> 
       <td width="55%">
 ¡@</td>
     </tr>
-<% ArchiveFolder = "E:\Data\Recon\Archive\" %>
-     <tr> 
-      <td width="43%">Archive Folder:</td> 
-      <td width="55%"><input name="ArchiveFoler" type=text value="<% = ArchiveFolder %>" size="36">
-¡@</td>
-    </tr>
-	
-<input name="NoChangeEmailBody2" type=hidden value="<% = NoChangeEmailBody %>" size="5000">	
 
      <tr> 
-      <td width="43%">¡@</td> 
-      <td width="55%">
+      <td width="43%">Archive Folder:</td> 
+      <td width="55%"><input name="ArchiveFolder" type=text value="<% = ArchiveFolder %>" size="36">
 ¡@</td>
     </tr>
+
 <tr> 
 <td colspan="2" align="center"> 
 
@@ -596,6 +596,9 @@ Characters</td>
 '      End of the main Content 
 '
 '-----------------------------------------------------------------------------
+
+
+
 %>
 </div>
             

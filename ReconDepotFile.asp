@@ -1,4 +1,4 @@
-
+<% Response.Buffer = False %>
 <!--#include file="include/SessionHandler.inc.asp" -->
 <%
 if session("shell_power")="" then
@@ -38,13 +38,9 @@ if trim(request("action_button")) = "deleteFile" then
 
     sql1 = "Update ReconDepotFolder set ReadyToConvert = 0 where DepotID = "&delete_depotid
 
-    sql2 = "Update ReconDepotFolder set FileCleaned = 0 where DepotID = "&delete_depotid
-
-
     Conn.Execute(sql1)
 
-    Conn.Execute(sql2)
-
+  
 
 	
 end if
@@ -152,8 +148,7 @@ function doUpload(what)
 <table border="1" cellpadding="6" cellspacing="0" class="normal" width="99%">
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
-<td width="30%"><font color="#FFFFFF">Folder</font></td>
-<td width="40%"><font color="#FFFFFF">Status</font></td> 
+<td width="70%"><font color="#FFFFFF">Status</font></td> 
 <td width="10%"><font color="#FFFFFF">Action</font></td>     
 </tr>
 
@@ -166,11 +161,9 @@ function doUpload(what)
 %>
 <tr <% If Trim(delete_depotid) = Trim(Rs1("DepotID")) then%>bgcolor="#ffccff"<% end if%>>
 <td width="20%">
-<% = Rs1("DepotID") %>. <% = Rs1("Market") %> - <% = Rs1("DepotName") %>
+<% = Rs1("DepotID") %>. <% = Rs1("DepotName") %>
 </td>
-<td>
-<% = Rs1("DepotFolder") %>
-</td>
+
 <td>
 
 <%
@@ -179,7 +172,6 @@ function doUpload(what)
 
  FileExists = False
 
- ReadyToConvert = True
 
  sFolder = Server.MapPath(Rs1("DepotFolder"))
 
@@ -235,68 +227,32 @@ function doUpload(what)
 
 ' ---------------------------------------------------------
 '                                                          
-' Check file extension                  
-'
-' ---------------------------------------------------------
-
-     If trim(Right(x.Name,3)) <> Trim(Rs1("FileType")) Then
-
-     Response.Write "Wrong file type. <br/><br/>"
-
-        ReadyToConvert = False
-
-     End if
-' ---------------------------------------------------------
-'                                                          
 ' Check file date                 
 '
 ' ---------------------------------------------------------
 
 ' Remove comma in sting
 
-  'response.write Rs1("FileCleaned")
-
-  If Rs1("FileCleaned") = 0 then
-%>
-
- <!--#include file="include/remove_comma.inc.asp" -->
-<%
-
-       
-   SQL_FC = "Update ReconDepotFolder Set FileCleaned = 1 Where DepotID ="&Rs1("DepotID")
-
-   Conn.Execute(SQL_FC)
-
-  End IF
+  If Trim(Rs1("ReadyToConvert")) = "True" then
 
 %>
 
+    <!--#include file="include/remove_comma.inc.asp" -->
 
+<%  
+    
+     response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
+   End If
 
-<%
+ 
 
            FileExists = True
 
           'Print the name of file in the test folder
            Response.write(x.Name)
 
-        
-
-
-
-
-
-
-
-     
-
-
-
-
-
-
-
+ 
 
 
 ' ---------------------------------------------------------
@@ -344,20 +300,7 @@ else
 
 end if
 
-   Response.write "<br/>" & ReadyToConvert
-
-
-   If ReadyToConvert = False Then
-
-       SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 0 Where DepotID ="&Rs1("DepotID")
-
-   Else
-       
-       SQL4 = "Update ReconDepotFolder Set ReadyToConvert = 1 Where DepotID ="&Rs1("DepotID")
-
-   End If
-
-       Conn.Execute(SQL4)
+ 
 
 %>
 
@@ -397,8 +340,7 @@ set fs=nothing
 
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF"></font></td>
-<td width="30%"><font color="#FFFFFF"></font></td>
-<td width="40%"><font color="#FFFFFF"></font></td> 
+<td width="70%"><font color="#FFFFFF"></font></td> 
 <td width="10%">
 
 

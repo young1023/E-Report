@@ -1,4 +1,4 @@
-
+<% Response.Buffer = False %>
 <!--#include file="include/SessionHandler.inc.asp" -->
 <%
 if session("shell_power")="" then
@@ -14,11 +14,13 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 
 Title = "Depot File Conversion"
 
+DepotID = trim(Request("DepotID"))
+
 
 ' Retrieve Folder
 '****************
 
-   SQL1 = "select * from ReconDepotFolder order by DepotName Asc"
+   SQL1 = "select * from ReconDepotFolder where depotid="&DepotID
    Set Rs1 = Conn.Execute(SQL1)
 
    
@@ -71,12 +73,7 @@ function listToAray(fullString, separator) {
 
 
 <%
-      	If Not Rs1.EoF Then
-
-             		Rs1.MoveFirst
-
- 
-			Do While Not Rs1.EoF
+      
 
        ' Get the folder
       sFolder = Trim(Server.MapPath(Rs1("DepotFolder")))
@@ -90,27 +87,65 @@ function listToAray(fullString, separator) {
 
             for each x in fo.files  
 
-      
+%>
 
+         
+   
+<%
+    
             Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
+   
 
-                'set f=fs.OpenTextFile(sFolder&"\"&x.Name,1)
+          ' Check if view exist
+     sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&DepotID&"'"
 
-                  ' read line
-   'Do While Not f.AtEndOfStream
+    'response.write sql
+
+     Set Rs = Conn.Execute(sql)
+
+     If Rs("count1") = 1 then
+
+         sqv_d = "drop view vw_"&DepotID&""
+
+          Conn.Execute(sqv_d)
+
+     End if
+
+    
+
+	
+     Sql2 = "Select f.depotid, fieldname from  (ReconDepotFolder f join reconfileorder o "
+
+     Sql2 = Sql2 & "on f.depotid = o.depotid) join ReconFile r on o.fieldid = r.fieldid "
+
+     Sql2 = Sql2 & " and f.depotid=" &DepotID
+
+     Sql2 = Sql2 & "order by f.depotid, o.priority desc"
+
+     Set Rs2 = Conn.Execute(Sql2)
+
+     Do While Not Rs2.EoF
+
+     FieldName =  Rs2("fieldname") & "," & FieldName
+
+     Rs2.MoveNext
+
+     Loop 
+
+     FieldName =  Left(FieldName,Len(FieldName)-1) 
+   
+
+     sqv = "create view vw_"&DepotID&" as select depotid, ImportFileName, "&FieldName&" from StockReconciliation"
+
+     Conn.Execute(sqv)
 
 
-    'strReadLineText = Rs1("DepotID") & f.ReadLine
+     SQL5 = "Update ReconDepotFolder Set ReadyToConvert = 0 Where DepotID ="&Rs1("DepotID")
 
-    'response.Write(strReadLineText & "<br>")
-
-      
+     Conn.Execute(SQL5)
 
 
 
-   'Loop
-
-     
 
     Sql3 = "bulk insert vw_"&Rs1("DepotID")
 
@@ -122,14 +157,21 @@ function listToAray(fullString, separator) {
 
     Sql3 = Sql3 & " ROWTERMINATOR = '\n')"
 
-    'response.write Sql3 & "<br/>"
+    response.write Sql3 & "<br/>"
 
     Conn.Execute(Sql3)
-
-    'response.write sFolder &"\" &x.Name  & "<br>"
    
 
-    
+         ' Check if distinction file exists
+         If fs.FileExists("E:\Data\Recon\Archive\"&x.Name)  Then
+
+              fs.DeleteFile("E:\Data\Recon\Archive\"&x.Name)
+ 
+         end if
+
+ 
+    fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
+
 
 
      next
@@ -146,26 +188,20 @@ function listToAray(fullString, separator) {
 
 
 <%
-	Rs1.movenext 
-
-	   loop 
- 
-	End If
 
 
-set fs=nothing
+  set fs=nothing
 
+  response.redirect "ReconDepotFile.asp?sid="&sessionid
+
+
+  
 
 %>
 
 
-
-
 </td>
-   
-  <tr>
-    <td align="center" height="50"><br><a href="MoveFile.asp?sid=<%=sessionid%>">Return</a></td>
-  </tr>
+
 </table>
             
 </div>        

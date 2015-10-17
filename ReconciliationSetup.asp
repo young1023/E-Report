@@ -39,7 +39,7 @@ if trim(request("action_button")) = "add depot" then
 		
 		DepotFolder1 = trim(request(replace("DepotFolder1","'","''")))
 
-        Market = trim(request(replace("Market","'","''")))
+        'Market = trim(request(replace("Market","'","''")))
 
         FileType1 = trim(request(replace("FileType1","'","''")))
 
@@ -48,9 +48,9 @@ if trim(request("action_button")) = "add depot" then
 
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (Market, DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert, FileCleaned) "
+		sql1 = "insert into ReconDepotFolder (DepotName, DepotFolder, FileType, FirstRow,delimiter , ReadyToConvert, FileCleaned) "
 
-        sql1 = sql1 & "values ('"& Market &"', '"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 0, 0)"
+        sql1 = sql1 & "values ('"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" , 0, 0)"
 
 		Conn.Execute sql1
 
@@ -365,9 +365,10 @@ if trim(request("action_button")) = "CreateProfile" then
 
      Loop 
 
-     FieldName = Left(FieldName,Len(FieldName)-1) 
+     FieldName = "DepotID, ImportFileName," & Left(FieldName,Len(FieldName)-1) 
 
      'Response.write FieldName
+     'response.end
 
      sqv = "create view vw_"&DepotID&" as select "&FieldName&" from StockReconciliation"
 
@@ -696,30 +697,6 @@ function createProfile()
 <table width="80%" border="0" cellpadding="4" class="normal">
 
 
-<% 'Market
-
-   set RsMarket = server.createobject("adodb.recordset")
-   RsMarket.open ("Exec Retrieve_AvailableMarket") ,  StrCnn,3,1
-
-%>
-
- <tr>
-	<td >Market:</td> 
-	<td >
-	 
-	<select size="1" name="Market" class="common">
-			<%
-					do while (Not rsMarket.EOF)
-			%>
-					<option value="<%=rsMarket("Market")%>"><%=rsMarket("Market")%></option>
-			
-			<%
-					rsMarket.movenext
-					Loop
-			%>
-	</select></td>
- </tr>
- 
     
  <tr> 
       <td width="27%">
@@ -841,7 +818,7 @@ Delimiter</td>
 		
 %>
 <tr> 
-	<td width="20%"><% = Rs4("Market") %> - <% = Rs4("DepotName") %>
+	<td width="20%"><% = Rs4("DepotName") %>
 			¡@</td>
 <td width="20%">
 <Input type="text" name="DepotFolder2" value="<% = Rs4("DepotFolder") %>" size="40">
