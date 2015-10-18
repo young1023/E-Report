@@ -7,7 +7,6 @@
 %>
 
 <div id="Header">
-<img alt="UOB Kay Hian" align="left" src="images/Logo.gif"/>
 </div>
 
 

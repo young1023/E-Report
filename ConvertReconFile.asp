@@ -23,7 +23,6 @@ DepotID = trim(Request("DepotID"))
    SQL1 = "select * from ReconDepotFolder where depotid="&DepotID
    Set Rs1 = Conn.Execute(SQL1)
 
-   
 
 %>   
 
@@ -82,6 +81,9 @@ function listToAray(fullString, separator) {
             set fo=fs.GetFolder(sFolder)
 
             for each x in fo.files  
+
+            'Audit Log
+            Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
 
 %>
 
@@ -146,7 +148,7 @@ function listToAray(fullString, separator) {
 
     Sql3 = Sql3 & " WITH (FIRSTROW = "& Rs1("FirstRow") &", "
 
-    Sql3 = Sql3 & " ERRORFILE = '" & sFolder & "\log.txt' , "
+    Sql3 = Sql3 & " ERRORFILE = '" & sFolder & "\Errorlog.txt' , "
 
     Sql3 = Sql3 & " MAXERRORS = 1000 , "
 

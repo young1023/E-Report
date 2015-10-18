@@ -19,11 +19,6 @@ DepotID = Request("DepotId")
             sFolder = Trim(Rs1("DepotFolder"))
 
 
-           'response.write sFolder
-
-
-
-
 dim fs, fo, ts, f
 
 set fs=Server.CreateObject("Scripting.FileSystemObject")
@@ -49,7 +44,7 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 <div id="Content">
 
 
-      <table width="600" height="400" border="0" cellspacing="0" cellpadding="2" class="Normal">
+      <table width="96%" height="400" border="0" cellspacing="0" cellpadding="2" class="Normal">
         <tr>
           <td align="middle">
 

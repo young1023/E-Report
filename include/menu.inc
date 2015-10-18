@@ -57,7 +57,7 @@
           <td height=28   class="NaviBar">&nbsp;&nbsp;&nbsp;&nbsp;<a href="sa_group.asp" style="TEXT-DECORATION: none">User Group</a></td>
         </tr>
 <% end if %>
-<%  if session("shell_power") > 5 then %>   
+<%  if session("shell_power") = 8 then %>   
        <tr>
           <td height=28   class="NaviBar">&nbsp;&nbsp;&nbsp;&nbsp;<a href="sa_member.asp?id=1" style="TEXT-DECORATION: none">Member</a> </td>
         </tr>

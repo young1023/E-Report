@@ -41,7 +41,7 @@ RsSession.open ("Exec Validate_User '"&Session("id")&"',  '"&Sessionid&"','"&ipa
 					session("id") = ""
 					response.redirect "logout.asp?r=1"
 'for each x in session.Contents
-' Response.Write(x & "=" & session.Contents(x) & "   ")
+ 'Response.Write(x & "=" & session.Contents(x) & "   ")
 'next					
 			else		
 				'Session("SessionID") = RsSession("SessionID")
@@ -49,7 +49,7 @@ RsSession.open ("Exec Validate_User '"&Session("id")&"',  '"&Sessionid&"','"&ipa
 			'Session("Sessionid") = RsSession("SessionID")
 '			response.write ("Exec Validate_User '"&Session("id")&"',  '"&Sessionid&"','"&ipaddress&"'")
 'for each x in session.Contents
-' Response.Write(x & "=" & session.Contents(x) & "   ")
+ 'Response.Write(x & "=" & session.Contents(x) & "   ")
 'next
 			end if
 	end if

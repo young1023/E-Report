@@ -20,32 +20,10 @@ end if
 <head>
 	
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
-<title><% = Title %></title>
+<title>Report</title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
 <SCRIPT language=JavaScript>
 <!--
-
-function datevalidate(inDay, inMonth, inYear){
-	
-		var myDayStr = inDay;
-		var myMonthStr = inMonth;
-		var myYearStr = inYear;	
-		var myMonth = new Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'); 
-		var myDateStr = myDayStr + ' ' + myMonth[myMonthStr] + ' ' + myYearStr;
-
-
-		var myDate = new Date();
-		myDate.setFullYear( myYearStr, myMonthStr, myDayStr );
-
-		if ( myDate.getMonth() != myMonthStr ) {
-		  alert( myDateStr + ' is NOT a valid date.' );
-		  return false;
-		}
-
-		return true;
-}
-
-
 
 function dosubmit(){
   
@@ -77,31 +55,15 @@ function dosubmit(){
 Dim Search_From_Day
 Dim Search_From_Month
 Dim Search_From_Year
-Dim Search_To_Day
-Dim Search_To_Month
-Dim Search_To_Year
 Dim Search_Market
 Dim Search_Instrument
 
 
 Search_From_Month       = Request.form("FromMonth")
 Search_From_Year        = Request.form("FromYear")
-Search_To_Month         = Request.form("ToMonth")
-Search_To_Year          = Request.form("ToYear")
 Search_Market           = Request.form("Market")
 Search_Instrument       = Request.form("Instrument")
 
-
-
-
-
-' If User enter From value only, change the "To" value to "From"
-if Search_ClientTo = "" then
-   Search_ClientTo = Search_ClientFrom
-end if
-if Search_AETo = "" then
-   Search_AETo = Search_AEFrom
-end if
 
 
 ' Retrieve page to show or default to the first
@@ -111,6 +73,9 @@ If Request.form("page") = "" Then
 	Search_Direction = "ASC"
 	Search_From_Day = day(Session("DBLastModifiedDateValue"))
 	Search_From_Month = month(Session("DBLastModifiedDateValue"))
+      If len(Search_From_Month) = 1 Then
+           Search_From_Month = "0" & Search_From_Month
+      End if
 	Search_From_Year = year(Session("DBLastModifiedDateValue"))
 	Search_To_Day = day(Session("DBLastModifiedDateValue"))
 	Search_To_Month = month(Session("DBLastModifiedDateValue"))
@@ -122,9 +87,7 @@ Else
 End If
 
 
-Search_Date = "01/" & Search_From_Month & "/" & Search_From_Year
 
-Search_NDate = "01/" & Search_To_Month + 1 & "/" & Search_To_Year
 
 
 set RsMarket = server.createobject("adodb.recordset")
@@ -139,15 +102,15 @@ RsMarket.open ("Exec Retrieve_AvailableMarket ") ,  StrCnn,3,1
       <td width="20%">Period From:</td> 
       <td>
 			<select name="FromMonth" class="common">            	
-					<option value="1" <% if Search_From_Month=1 then response.write "selected"%>>Jan</option>
-					<option value="2" <% if Search_From_Month=2 then response.write "selected"%>>Feb</option>
-					<option value="3" <% if Search_From_Month=3 then response.write "selected"%>>Mar</option>
-					<option value="4" <% if Search_From_Month=4 then response.write "selected"%>>Apr</option>
-					<option value="5" <% if Search_From_Month=5 then response.write "selected"%>>May</option>
-					<option value="6" <% if Search_From_Month=6 then response.write "selected"%>>Jun</option>
-					<option value="7" <% if Search_From_Month=7 then response.write "selected"%>>Jul</option>
-					<option value="8" <% if Search_From_Month=8 then response.write "selected"%>>Aug</option>
-					<option value="9" <% if Search_From_Month=9 then response.write "selected"%>>Sep</option>
+					<option value="01" <% if Search_From_Month=01 then response.write "selected"%>>Jan</option>
+					<option value="02" <% if Search_From_Month=02 then response.write "selected"%>>Feb</option>
+					<option value="03" <% if Search_From_Month=03 then response.write "selected"%>>Mar</option>
+					<option value="04" <% if Search_From_Month=04 then response.write "selected"%>>Apr</option>
+					<option value="05" <% if Search_From_Month=05 then response.write "selected"%>>May</option>
+					<option value="06" <% if Search_From_Month=06 then response.write "selected"%>>Jun</option>
+					<option value="07" <% if Search_From_Month=07 then response.write "selected"%>>Jul</option>
+					<option value="08" <% if Search_From_Month=08 then response.write "selected"%>>Aug</option>
+					<option value="09" <% if Search_From_Month=09 then response.write "selected"%>>Sep</option>
 					<option value="10" <% if Search_From_Month=10 then response.write "selected"%>>Oct</option>
 					<option value="11" <% if Search_From_Month=11 then response.write "selected"%>>Nov</option>
 					<option value="12" <% if Search_From_Month=12 then response.write "selected"%>>Dec</option>
@@ -158,7 +121,7 @@ RsMarket.open ("Exec Retrieve_AvailableMarket ") ,  StrCnn,3,1
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -2, Now()))
+Year_starting = Year(DateAdd("yyyy", -1 , Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -254,10 +217,11 @@ for i=Year_starting to Year_ending
 <%
 
 
+Search_Date =  Search_From_Month & Right(Search_From_Year,2)
 
+'response.write Search_Date
 
 ' Start the Queries
-    ' Start the queries
 ' *****************
       
        fsql = "select * from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
@@ -275,24 +239,16 @@ for i=Year_starting to Year_ending
        
        'fsql = fsql & " and Coupon_Number LIKE '%"&Barcode&"%' " 
 
-       
-
-   
-
- 
+  
   ' Search by Date
   ' **************
 
 
-      'fsql = fsql & " and  TradeDate >=   Convert(datetime, '" & Search_Date &"', 105) " 
+        fsql = fsql & " and left(Importfilename,4) =   '" &Search_Date& "' " 
 
-  
-      'fsql = fsql & " and  TradeDate < DATEADD(dd,DATEDIFF(dd,0, Convert(datetime, '" & Search_NDate &"', 105)),0) + 1 " 
+        fsql = fsql & " order by s.CreateDate desc"
 
-
-      fsql = fsql & " order by r.DepotID desc"
-
-        ' response.write fsql
+         response.write fsql
         'response.end
 
         set frs=createobject("adodb.recordset")
@@ -337,7 +293,6 @@ for i=Year_starting to Year_ending
           findrecord=frs.recordcount
 
           response.write "Total <font color=red>"&findrecord&"</font> Records ;"
-
   
          frs.PageSize = 100
 
