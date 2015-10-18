@@ -202,14 +202,14 @@ window.open("ConvertLog.asp?ConvertLog=" + ConvertLog + "&sid=<%=sessionid%>");
 function gtpage(what)
 {
 document.fm1.pageid.value=what;
-document.fm1.action="Audit.asp?sid=<%=SessionID%>"
+document.fm1.action="ReconLog.asp?sid=<%=SessionID%>"
 document.fm1.submit();
 }
 
 function findenum()
 {
 document.fm1.pageid.value=1;
-document.fm1.action="Audit.asp"
+document.fm1.action="ReconLog.asp"
 document.fm1.submit();
 }
 //-->
@@ -252,19 +252,7 @@ end if
                                                          
  </td>
                               </tr>
-                              <tr> 
-                                <td valign="top">Delete logs which are longer than¡@<input name="DeleteLog" type=text value="" size="2" class="Normal"> 
-								days   
-          <input id="Submit1" type="Button" value=" Submit" onClick="doDelete();" class="Normal">&nbsp;&nbsp; </td>
-                              </tr>
-                              <tr> 
-                                <td valign="top">Convert to Excel files for logs 
-								which are longer than
-      	     
-<input id="ConvertLog" name="ConvertLog" type=text value="" size="2"> days   
-           <input id="Submit2" type="button" value="  Convert" onClick="doConvert();" class="Normal"> </td>
-                              </tr>
-                              
+                           
 
                             </table>
                           </form>

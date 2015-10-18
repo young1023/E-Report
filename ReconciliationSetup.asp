@@ -1056,7 +1056,7 @@ Field Length</td>
                              If DepotID = "" Then
 
                              DepotID = Rs8("DepotID")
-
+  
                              End If
 
 							do while not Rs8.eof
@@ -1066,12 +1066,16 @@ Field Length</td>
 <option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %></option>
 
                   <%
-
+                               
+                               Delimiter3 = Rs8("Delimiter")
+   
                                Rs8.movenext
 
 							loop
 						
 						End if
+
+ 
 					%>
 </select>
 
@@ -1081,9 +1085,9 @@ Field Length</td>
 
 	<tr> 
 			
-			<td width="35%" align="center" bgcolor="#FFFFCC">Field available</td>
-            <td width="35%" align="center" bgcolor="#FFFFCC">Current Field</td>
-            <td width="30%" align="center" bgcolor="#FFFFCC"></td>
+			<td width="35%" align="center" bgcolor="#FFFFCC">Available Fields</td>
+            <td width="35%" align="center" bgcolor="#FFFFCC">Fields on import file</td>
+            <td width="30%" colspan="2" align="center" bgcolor="#FFFFCC"></td>
 	</tr>
 
 
@@ -1138,8 +1142,6 @@ Field Length</td>
 
          sql10 = sql10 & " order by o.priority asc"
 
-         'response.write sql10
-
          Set Rs10 = Conn.Execute(sql10)
 
          
@@ -1152,6 +1154,8 @@ Field Length</td>
         <select size="20" name="RemoveField" id="removefield" class="common">
 
 <%
+                     y = 0
+
                         If Not Rs10.EoF Then
                           
                          Rs10.MoveFirst
@@ -1164,6 +1168,8 @@ Field Length</td>
 <%
 
                    Rs10.movenext
+
+                       y = y + 1
 
 							loop
 						
@@ -1185,12 +1191,12 @@ Field Length</td>
 
 
 </td>
+<td>
+
+
+</td>
 	</tr>
-<tr> 
-      <td colspan="3">
-      </td> 
-      
-    </tr>
+
 <tr> 
       <td align="center">
 			<input type="button" value="Append Field to Depot" onClick="appendField();">
@@ -1200,18 +1206,15 @@ Field Length</td>
 			<input type="button" value="Remove Field from Depot" onClick="removeField();">
 ¡@</td>
   <td></td>
+  <td></td>
     </tr>
-	<tr> 
-      <td colspan="3">
-      </td> 
-      
-    </tr>
+
 <tr> 
 <tr> 
       <td>
 			
       </td> 
-      <td colspan="2">
+      <td colspan="3">
 
 			<input type="button" value="  Create Profile  " onClick="createProfile();">
 ¡@</td>
@@ -1221,7 +1224,7 @@ Field Length</td>
 <tr> 
       <td colspan="2" align =center><font color="red"><% = Message %></font></td> 
       <td >
-¡@</td>
+¡@</td><td></td>
     </tr>
 	
      

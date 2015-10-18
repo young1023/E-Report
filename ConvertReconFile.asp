@@ -6,7 +6,7 @@ if session("shell_power")="" then
 end if
 
 response.expires=0
-flag=trim(request.form("whatTodo"))
+
 
 dim fs, fo, ts, f
 
@@ -82,8 +82,10 @@ function listToAray(fullString, separator) {
 
             for each x in fo.files  
 
+      
             'Audit Log
             Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
+         
 
 %>
 
@@ -91,15 +93,16 @@ function listToAray(fullString, separator) {
 
    
 <%
-    
-            Response.write("<br/>"&"Converting "&x.Name& "<br/><br/>")
-   
+ 
+            ' Delete imported record if exists, delete view if exists
+             Conn.Execute "Exec ConvertReconFile '" & DepotID & "', '" & x.Name & "'"
 
-          ' Check if view exist
+
+     
+     ' Check if view exist
      sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&DepotID&"'"
 
     'response.write sql
-
      Set Rs = Conn.Execute(sql)
 
      If Rs("count1") = 1 then
@@ -110,7 +113,6 @@ function listToAray(fullString, separator) {
 
      End if
 
-    
 
 	
      Sql2 = "Select f.depotid, fieldname from  (ReconDepotFolder f join reconfileorder o "
@@ -134,13 +136,21 @@ function listToAray(fullString, separator) {
      FieldName =  Left(FieldName,Len(FieldName)-1) 
    
 
-     sqv = "create view vw_"&DepotID&" as select depotid, ImportFileName, "&FieldName&" from StockReconciliation"
+     sqv = "create view vw_"&DepotID&" as select top 1 depotid, ImportFileName, "&FieldName&" from StockReconciliation"
 
-     Conn.Execute(sqv)
+     response.write sqv
+Conn.Execute(sqv)
+
+     'sqd_v = "delete from view vw_"&DepotID
+
+     'Conn.Execute(sqd_v)
 
 
-
-
+       ' Set Error situation
+            Err.Clear
+            On Error Resume Next
+  
+    'response.end
 
     Sql3 = "bulk insert vw_"&Rs1("DepotID")
 
@@ -148,7 +158,7 @@ function listToAray(fullString, separator) {
 
     Sql3 = Sql3 & " WITH (FIRSTROW = "& Rs1("FirstRow") &", "
 
-    Sql3 = Sql3 & " ERRORFILE = '" & sFolder & "\Errorlog.txt' , "
+    Sql3 = Sql3 & " ERRORFILE = '" & sFolder & "\Errorlog.log' , "
 
     Sql3 = Sql3 & " MAXERRORS = 1000 , "
 
@@ -159,6 +169,16 @@ function listToAray(fullString, separator) {
     response.write Sql3 & "<br/>"
 
     Conn.Execute(Sql3)
+
+     If Err.Number <> 0 Then
+  
+  
+         'Audit Log
+         Conn.Execute "Exec AddReconLog 'convert error " & Err.Description & " on file " & x.Name & " ','" & Session("MemberID") & "'"
+         
+             End If
+
+     On Error GoTo 0
    
 
          ' Check if distinction file exists

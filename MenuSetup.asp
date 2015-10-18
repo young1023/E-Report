@@ -43,7 +43,7 @@ if trim(request("action_button")) = "add" then
 		set acres=conn.execute(strsql)
 	    if acres.eof then
 	    
-			strsql="insert into Menu (MenuName, PageLink) values ('"& MenuName & "', '"& PageLink & "')"
+			strsql="insert into Menu (MenuName, PageLink, OrderID) values ('"& MenuName & "', '"& PageLink & "', 1)"
 		
 			conn.execute strsql
 		else
@@ -141,6 +141,7 @@ if trim(request("action_button")) = "MenuUp" then
 
         conn.execute(sql4)
 
+   
 	
 end if
 
@@ -170,6 +171,8 @@ if trim(request("action_button")) = "MenuDown" then
         sql4="Update Menu set OrderID = OrderID - 1 where ID="&Rs2("ID")
 
         conn.execute(sql4)
+
+     
 
 	
 end if
@@ -650,7 +653,7 @@ Page Link</td>
 		   
     %>
 
-<option value="<%=acres("ID")%>" >&nbsp;&nbsp;&nbsp;&nbsp;<% = acres("MenuName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
+<option value="<%=acres("ID")%>" <%If Trim(MenuID)=Trim(acres("ID")) Then%>selected<%End If%> >&nbsp;&nbsp;&nbsp;&nbsp;<% = acres("MenuName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
 
 <%
 
