@@ -10,8 +10,6 @@ Search_Instrument       = Request.form("Instrument")
 
 
 ' Retrieve page to show or default to the first
-pageid=trim(request.form("pageid"))
-	
 If Request.form("pageid") = "" Then
 	Pageid = 1
 	Search_From_Month = month(Session("DBLastModifiedDateValue"))
@@ -28,7 +26,7 @@ RsMarket.open ("Exec Retrieve_AvailableMarket ") ,  StrCnn,3,1
 
 On Error resume Next
 
-
+response.write "Page id " & pageid
 
 if session("shell_power")="" then
   response.redirect "logout.asp?r=1"
@@ -53,7 +51,7 @@ end if
 
 function dosubmit(){
  
- document.fm1.action="ReconReport.asp?sid=<%=SessionID%>";
+ document.fm1.action="ReconReport?sid=<%=SessionID%>";
  document.fm1.submit();
 	
 }
@@ -225,14 +223,20 @@ for i=Year_starting to Year_ending
 
         fsql = fsql & " order by s.CreateDate desc"
 
-        response.write fsql
+         response.write fsql
+        'response.end
+
         set frs=createobject("adodb.recordset")
 		frs.cursortype=1
 		frs.locktype=1
         frs.open fsql,conn
+
+
  
 %>   
-  
+
+ 
+   
 <div id="reportbody1" >
 
    
@@ -311,7 +315,7 @@ i=0
 <tr bgcolor="#FFFFCC"> 
 
 
-<td><% = i & ". " & frs("DepotName") %></td>
+<td><% = frs("DepotName") %></td>
 <td><% = frs("iMarket") %></td>
 <td><% = frs("CustodianID") %></td>
 <td><% = frs("TradeDate") %></td>
@@ -367,7 +371,13 @@ end if
 			 end if
 	         response.write "&nbsp;&nbsp;"
 	 end if
-
+%>
+</span>
+                                </td>
+                              </tr>
+                      <tr> 
+                                <td height="28" align="center"> 
+<%
 if frs.recordcount>0 then
   response.write "<input type=hidden value='' name=whatdo>"
   response.write "<input type=hidden value="&pageid&" name=pageid>"
@@ -377,10 +387,10 @@ end if
 			  conn.close
 			  set conn=nothing
 %>
-
-</span>
-   </td>
-     </tr>                             
+                                                         
+ </td>
+                              </tr>
+                              <tr> 
 </table>
 </form>  
 

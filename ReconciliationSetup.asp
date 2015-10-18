@@ -156,9 +156,6 @@ if trim(request("action_button")) = "modify field" then
         Message =  "Done."
 
 	next
-
-
-
 	
 end if
 
@@ -267,6 +264,9 @@ if trim(request("action_button")) = "MenuUp" then
 	FieldID = trim(request("RemoveField"))
 
     DepotID = trim(Request("DepotID"))
+
+    'response.write depotid
+    'response.write fieldid
 	
         sql1 = "Select Priority - 1 as Priority From ReconFileOrder Where FieldID="&FieldID&" and DepotID="&DepotID
 
@@ -377,6 +377,51 @@ if trim(request("action_button")) = "CreateProfile" then
      Conn.Execute(sqv)
   
      Message = "Profile Created."
+	
+end if
+
+
+' Modify Fixed field
+'*******************
+if trim(request("action_button")) = "edit fixed field" then
+
+	FixedFieldID = split(trim(request.form("FixedFieldID")),",")
+  
+	FieldLength3 = split(trim(request.form("FieldLength3")),",")
+    
+	Depotid = trim(request.form("DepotID"))
+
+
+	for i=0 to ubound(FixedFieldID)
+	
+		sql_f="Update ReconFileOrder set FixedLength = "&  FieldLength3(i) &" where FieldID = "&  FixedFieldID(i) &" and DepotID="& DepotID
+		
+	    conn.execute sql_f 
+
+        Message =  "Done."
+
+	next
+	
+end if
+
+' Delete Fixed field
+'*******************
+if trim(request("action_button")) = "delete fixed field" then
+
+	ID7 = split(trim(request.form("id7")),",")
+     
+	Depotid = trim(request.form("DepotID"))
+
+
+	for i=0 to ubound(ID7)
+	
+		sql_d="Delete From ReconFileOrder where FieldID = "&  ID7(i) &" and DepotID="& DepotID
+		
+	    conn.execute sql_d 
+
+        Message =  "Done."
+
+	next
 	
 end if
 
@@ -638,6 +683,54 @@ function createProfile()
 	
 }
 
+function EditFixedField()
+{
+	
+		{
+		document.fm1.action_button.value="edit fixed field";
+		document.fm1.submit();
+		}
+}
+
+
+function DeleteFixedField(){
+k=0;
+document.fm1.action="ReconciliationSetup.asp?sid=<%=SessionID%>&FunctionID=<%=FunctionID%>&UserLevel=<%=UserLevel%>";
+	if (document.fm1.id7!=null)
+	{
+		for(i=0;i<document.fm1.id7.length;i++)
+		{
+			if(document.fm1.id7[i].checked)
+			  {
+			  k=1;
+			  i=1;
+			  break;
+			  }
+		}
+		if(i==0)
+		{
+			if (!document.fm1.id7.checked)
+               k=0;
+			else
+               k=1;
+		}
+	}
+
+if (k==0)
+  alert("You must select at least one record!");	
+else if (k==1)
+ {
+  var msg = "Are you sure ?";
+  if (confirm(msg)==true)
+   {
+    document.fm1.action_button.value="delete fixed field";
+    document.fm1.submit();
+   }
+ }
+
+}
+
+
 //-->
 </SCRIPT>
 </head>
@@ -659,21 +752,24 @@ function createProfile()
  <table width="90%" border="0" class="normal">
 
     <tr> 
-      <td  class="BlueClr" <% If FunctionID <> 1 Then %>bgcolor="#C0C0C0"<% End If %> width="20%">
+      <td  class="BlueClr" <% If FunctionID <> 1 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=1">Depot Folder and Import File Information
       </a>
       </td> 
-      <td  class="BlueClr" width="20%" <% If FunctionID <> 2 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
+      <td  class="BlueClr"  <% If FunctionID <> 2 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=2">Edit/Delete Depot Folder and File Info
       </a></td>
-      <td  class="BlueClr" width="20%" <% If FunctionID <> 3 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
+      <td  class="BlueClr"  <% If FunctionID <> 3 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=3">Add Field in Master Table
       </a></td>
-      <td  class="BlueClr" width="20%" <% If FunctionID <> 4 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
+      <td  class="BlueClr"  <% If FunctionID <> 4 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Delete field in Master Table
       </a></td>
-      <td  class="BlueClr" width="20%" <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="25%">
+      <td  class="BlueClr"  <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="20%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds mapping
+      </a></td>
+     <td  class="BlueClr"  <% If FunctionID <> 6 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=6">Fixed Fileds Setup
       </a></td>
     </tr>
 
@@ -946,7 +1042,7 @@ Field Length</td>
 
 	<tr> 
 			<td width="30%" bgcolor="#FFFFCC">Field Name</td>
-            <td width="30%" bgcolor="#FFFFCC">Field Name</td>  
+            <td width="30%" bgcolor="#FFFFCC">Field Type</td>  
 			<td width="20%" bgcolor="#FFFFCC">Length</td>
             <td width="20%" bgcolor="#FFFFCC">Delete</td>
 	</tr>
@@ -1067,8 +1163,7 @@ Field Length</td>
 
                   <%
                                
-                               Delimiter3 = Rs8("Delimiter")
-   
+                     
                                Rs8.movenext
 
 							loop
@@ -1163,7 +1258,7 @@ Field Length</td>
 							do while not Rs10.eof
 %>
 
-     <option value="<%=Rs10("FieldID")%>" >&nbsp;&nbsp;<% = Rs10("FieldName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
+     <option value="<%=Rs10("FieldID")%>" <%If Trim(FieldID)=Trim(Rs10("FieldID")) Then%>Selected<%End If%>>&nbsp;&nbsp;<% = Rs10("FieldName") %>&nbsp;&nbsp;&nbsp;&nbsp;</option>
 
 <%
 
@@ -1191,9 +1286,7 @@ Field Length</td>
 
 
 </td>
-<td>
-
-
+<td valign="Top">
 </td>
 	</tr>
 
@@ -1236,6 +1329,133 @@ Field Length</td>
               
 
 <% '---- End of Depot Vs File Setup ----- %>
+
+
+<%   '---- Start of Fixed Field ---- %>
+
+
+  <% If FunctionID <> 6 Then %>		
+  		
+  <div style="display:none" align=center>
+  		
+  <% End If %>
+
+
+<%
+ 
+        DepotID = Request("DepotID")
+        
+		sql8 = " Select * From ReconDepotFolder where delimiter = 3 order by DepotName Asc"
+	   
+		set Rs8 = conn.execute(sql8)
+		 
+        
+%>
+
+<select name="FixedDepotID" class="common"  size="1" onchange="doChange(1)">
+          <% 
+                             If Not Rs8.EoF Then
+
+                        Rs8.MoveFirst
+
+                             If DepotID = "" Then
+
+                             DepotID = Rs8("DepotID")
+  
+                             End If
+
+							do while not Rs8.eof
+
+           %>               
+
+<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %></option>
+
+                  <%
+                               
+  
+                               Rs8.movenext
+
+							loop
+						
+						End if
+
+ 
+					%>
+</select>
+
+<br/>
+  
+<table width="90%" border="0" class="normal">
+
+	<tr> 
+			<td width="30%" bgcolor="#FFFFCC">Field Name</td>
+      		<td width="20%" bgcolor="#FFFFCC">Fixed Length</td>
+            <td width="20%" bgcolor="#FFFFCC">Delete</td>
+	</tr>
+
+
+
+<%
+        
+		sql12 = " Select * From ReconFileOrder r left Join ReconFile f on "
+
+        sql12 = sql12 & " r.FieldID = f.FieldID where depotID ="&DepotID&" order by Priority Asc"
+
+			Set Rs12 = Conn.Execute(sql12)
+				 
+%>
+
+<%		
+		If Not Rs12.EoF Then
+
+             		
+			Do While Not Rs12.EoF
+
+      
+		
+%>
+<tr> 
+	<td width="30%"><% = Rs12("FieldID") %>. <% = Rs12("FieldName") %>
+			¡@</td>
+
+<td width="20%">
+
+
+<input type=text name="FieldLength3" value ="<%= Rs12("FixedLength") %>">
+			¡@</td>
+<td><input type="radio" name="id7" value="<% = Rs12("FieldID") %>"></td> 
+<input type=hidden name="FixedFieldID" value ="<%= Rs12("FieldID") %>">
+	</tr>
+<%
+	Rs12.movenext 
+
+      
+
+	   loop 
+ 
+	End If
+%>
+
+
+<tr> 
+      <td colspan="2" align =center><font color="red"><% = Message %></font></td> 
+      <td >
+¡@</td>
+    </tr>
+	
+      <tr> 
+      <td></td>
+      <td width="30%"><input type="button" value=" Edit " onClick="EditFixedField();"></td>
+      <td width="30%">
+      <input type="button" value=" Delete " onClick="DeleteFixedField();"></td>
+    </tr>
+
+</table> 
+
+</div>
+              
+
+<% '---- End of modify fixed Field ----- %>
 
 </form>
 

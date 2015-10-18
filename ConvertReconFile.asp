@@ -179,17 +179,22 @@ Conn.Execute(sqv)
              End If
 
      On Error GoTo 0
-   
+
+             
+         'Get Archive Folder
+         set RsFd = server.createobject("adodb.recordset")
+         RsFd.open ("Exec Get_SystemSetting 'ArchiveFolder'") ,  conn,3,1
+
 
          ' Check if distinction file exists
-         If fs.FileExists("E:\Data\Recon\Archive\"&x.Name)  Then
+         If fs.FileExists(RsFd("SettingValue") & x.Name)  Then
 
-              fs.DeleteFile("E:\Data\Recon\Archive\"&x.Name)
+              fs.DeleteFile(RsFd("SettingValue") & x.Name)
  
          end if
 
 
-         fs.movefile sFolder&"\"&x.Name , "E:\Data\Recon\Archive\"
+         fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
 
 
 

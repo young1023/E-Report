@@ -196,7 +196,7 @@ function doUpload(what)
 
      If Not Rs2.EoF Then
 
-     Response.Write "The Latest import file " & Rs2("ImportFileName") & " was imported on "& Rs2("CreateDate")
+     Response.Write "Latest import file " & Rs2("ImportFileName") & " was imported on "& Rs2("CreateDate")
 
      Else
 
@@ -248,7 +248,7 @@ function doUpload(what)
 
            ReadyToConvert = True
 
- 
+           
 
 
 ' ---------------------------------------------------------

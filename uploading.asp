@@ -1,11 +1,10 @@
 <!--#include file="include/SessionHandler.inc.asp" -->
-
 <!-- #include file="ShadowUpload.asp" -->
 <%
 
 DepotID = Request("DepotId")
 
-
+Response.write Month(Session("DBLastModifiedDate")) 
 
 ' Check folder
     
@@ -21,19 +20,23 @@ dim fs, fo, ts, f
 
 set fs=Server.CreateObject("Scripting.FileSystemObject")
 %>
-<!DOCTYPE html>
+
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
 <TITLE>Upload File</TITLE>
-<script type="text/javascript">
-    function CloseWindow() {
-        
-        window.opener.location.reload();
-        window.close();
-    }
-</script>
+<SCRIPT language=JavaScript>
+<!--
+
+  function doReturn(){
+  alert("You must select a record!");
+  document.fm1.action="ReconDepotFile.asp?sid=<%=sessionid%>;
+  document.fm1.submit();
+  }
+
+//-->
+</SCRIPT>
 </head>
 <body leftmargin="0" topmargin="0">
 
@@ -44,11 +47,11 @@ set fs=Server.CreateObject("Scripting.FileSystemObject")
 <div id="Content">
 
 
-      <table width="600" height="400" border="0" cellspacing="0" cellpadding="2" class="Normal">
+      <table width="98%" height="400" border="1" cellspacing="0" cellpadding="2" class="Normal">
         <tr>
-          <td align="middle">
+          <td align="middle" height="50">
 
-Upload file to <% =SFolder %>
+Upload file to <% = Rs1("Depotname") %>
           </td>
 
         </tr>
@@ -71,7 +74,6 @@ If Request("action")="1" Then
 
     Else  
 
-        Response.Write("found "&objUpload.FileCount&" files...<br /><br/>")
 
         For x=0 To objUpload.FileCount-1
 
@@ -85,13 +87,24 @@ If Request("action")="1" Then
                 Response.Write("image to big, not saving!")
 
             Elseif Trim(Rs1("FileType")) <> Trim(Right(objUpload.File(x).FileName, 3)) Then
+
+%>
               
 
-               Response.Write("<font color=red><b>Wrong file Type!</b></font>")
+       <font color=red><b>Wrong file Type!</b></font><br/><br/>
+
+      <a href="ReconDepotFile.asp?sid=<%=sessionid%>">Return</a>
+              
+<%
+
+            'Elseif  Trim(Left(objUpload.File(x).FileName, 4)) =  Then
+
 
             Else  
 
                 Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+
+    response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
    
             End If
@@ -105,9 +118,8 @@ End If
 
 Set objUpload = Nothing
 
-response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
-
+      
 
 %>
 
