@@ -36,6 +36,8 @@ if trim(request("action_button")) = "add depot" then
 
 
 		DepotName1 = trim(request(replace("DepotName1","'","''")))
+
+	    DepotCode1 = trim(request(replace("DepotCode1","'","''")))	
 		
 		DepotFolder1 = trim(request(replace("DepotFolder1","'","''")))
 
@@ -48,9 +50,9 @@ if trim(request("action_button")) = "add depot" then
 
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (DepotName, DepotFolder, FileType, FirstRow,delimiter ) "
+		sql1 = "insert into ReconDepotFolder (DepotName, DepotCode, DepotFolder, FileType, FirstRow,delimiter ) "
 
-        sql1 = sql1 & "values ('"& DepotName1 & "', '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" )"
+        sql1 = sql1 & "values ('"& DepotName1 & "', "& DepotCode1 & ", '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" )"
 
 		Conn.Execute sql1
 
@@ -168,11 +170,17 @@ if trim(request("action_button")) = "delete depot" then
 
 	for j=0 to ubound(delid)
 	
-		sql4 = "Delete ReconDepotFolder where DepotID="& trim(delid(j))
+		sql4 = "Delete From ReconDepotFolder where DepotID="& trim(delid(j))
 	
 	    conn.execute sql4 
-	next
+
+        sql_dd = "Delete from ReconFileOrder where DepotID="& trim(delid(j))
+
+        conn.execute sql_dd
 	
+	next
+
+       
 end if
 
 ' Delete Field
@@ -389,13 +397,14 @@ if trim(request("action_button")) = "edit fixed field" then
   
 	FieldLength3 = split(trim(request.form("FieldLength3")),",")
     
-	Depotid = trim(request.form("DepotID"))
+	Depotid = trim(request.form("FixedDepotID"))
 
 
 	for i=0 to ubound(FixedFieldID)
 	
 		sql_f="Update ReconFileOrder set FixedLength = "&  FieldLength3(i) &" where FieldID = "&  FixedFieldID(i) &" and DepotID="& DepotID
 		
+        'response.write sql_f
 	    conn.execute sql_f 
 
         Message =  "Done."
@@ -410,7 +419,7 @@ if trim(request("action_button")) = "delete fixed field" then
 
 	ID7 = split(trim(request.form("id7")),",")
      
-	Depotid = trim(request.form("DepotID"))
+	Depotid = trim(request.form("FixedDepotID"))
 
 
 	for i=0 to ubound(ID7)
@@ -803,6 +812,15 @@ Depot Name</td>
 
 
  <tr> 
+<tr> 
+      <td width="27%">
+Depot Code</td> 
+      <td width="69%">
+      <Input name="DepotCode1" type=text value="" size="50"></td>
+    </tr>
+
+
+ <tr> 
       <td width="27%">
 Depot Folder</td> 
       <td width="69%">
@@ -885,11 +903,12 @@ Delimiter</td>
 	<tr> 
             
 			<td width="30%" bgcolor="#FFFFCC">Depot Name</td> 
-			<td width="30%" bgcolor="#FFFFCC">Folder</td>
+  			<td width="10%" bgcolor="#FFFFCC">Depot Code</td> 
+			<td width="25%" bgcolor="#FFFFCC">Folder</td>
          	<td width="10%" bgcolor="#FFFFCC">File Extension</td>
 	        <td width="10%" bgcolor="#FFFFCC">First Row</td>
      	    <td width="10%" bgcolor="#FFFFCC">Delimiter</td>
-            <td width="10%" bgcolor="#FFFFCC">Delete</td>
+            <td width="5%" bgcolor="#FFFFCC">Delete</td>
 	</tr>
 
 
@@ -914,10 +933,12 @@ Delimiter</td>
 		
 %>
 <tr> 
-	<td width="20%"><% = Rs4("DepotName") %>
+	<td width="20%"><% = Rs4("DepotID") %>. <% = Rs4("DepotName") %>
+			¡@</td>
+<td ><% = Rs4("DepotCode") %>
 			¡@</td>
 <td width="20%">
-<Input type="text" name="DepotFolder2" value="<% = Rs4("DepotFolder") %>" size="40">
+<Input type="text" name="DepotFolder2" value="<% = Rs4("DepotFolder") %>" size="30">
 			¡@</td>
 <td>
 <Input type="text" name="FileType2" value="<% = Rs4("FileType") %>" size="3">
@@ -961,7 +982,7 @@ Delimiter</td>
     </tr>
 	
       <tr> 
-      <td colspan=4></td> 
+      <td colspan=5></td> 
       <td >
       <input type="button" value="Edit" onClick="EditDepot();"></td>
       <td >
@@ -1159,7 +1180,7 @@ Field Length</td>
 
            %>               
 
-<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %></option>
+<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %> (<% =trim(Rs8("DepotCode")) %>)</option>
 
                   <%
                                
@@ -1345,35 +1366,35 @@ Field Length</td>
  
         DepotID = Request("DepotID")
         
-		sql8 = " Select * From ReconDepotFolder where delimiter = 3 order by DepotName Asc"
+		sql81 = " Select * From ReconDepotFolder where delimiter = 3 order by DepotName Asc"
 	   
-		set Rs8 = conn.execute(sql8)
+		set Rs81 = conn.execute(sql81)
 		 
-        
+        FixedDepotID = Request.Form("FixedDepotID")
 %>
 
 <select name="FixedDepotID" class="common"  size="1" onchange="doChange(1)">
           <% 
-                             If Not Rs8.EoF Then
+                             If Not Rs81.EoF Then
 
-                        Rs8.MoveFirst
+                        Rs81.MoveFirst
 
-                             If DepotID = "" Then
+                             If FixedDepotID = "" Then
 
-                             DepotID = Rs8("DepotID")
+                             FixedDepotID = Rs81("DepotID")
   
                              End If
 
-							do while not Rs8.eof
+							do while not Rs81.eof
 
            %>               
 
-<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %></option>
+<option value="<% =Rs81("DepotID") %>" <%If Trim(Request("FixedDepotID"))=trim(Rs81("DepotID")) Then%>Selected<%End If%>><% =trim(Rs81("DepotID")) %>. <% =trim(Rs81("DepotName")) %></option>
 
                   <%
                                
   
-                               Rs8.movenext
+                               Rs81.movenext
 
 							loop
 						
@@ -1396,38 +1417,44 @@ Field Length</td>
 
 
 <%
-        
-		sql12 = " Select * From ReconFileOrder r left Join ReconFile f on "
+     
+		sql63 = " Select * From ReconFileOrder r left Join ReconFile f on "
 
-        sql12 = sql12 & " r.FieldID = f.FieldID where depotID ="&DepotID&" order by Priority Asc"
+        sql63 = sql63 & " r.FieldID = f.FieldID where  "
+    
+        sql63 = sql63 & "depotID ="&FixedDepotID
 
-			Set Rs12 = Conn.Execute(sql12)
+        sql63 = sql63 & " order by Priority Asc"
+
+		Set Rs63 = Conn.Execute(sql63)
+
+        'response.write sql63
 				 
 %>
 
 <%		
-		If Not Rs12.EoF Then
+		If Not Rs63.EoF Then
 
              		
-			Do While Not Rs12.EoF
+			Do While Not Rs63.EoF
 
       
 		
 %>
 <tr> 
-	<td width="30%"><% = Rs12("FieldID") %>. <% = Rs12("FieldName") %>
+	<td width="30%"><% = Rs63("FieldID") %>. <% = Rs63("FieldName") %>
 			¡@</td>
 
 <td width="20%">
 
 
-<input type=text name="FieldLength3" value ="<%= Rs12("FixedLength") %>">
+<input type=text name="FieldLength3" value ="<%= Rs63("FixedLength") %>">
 			¡@</td>
-<td><input type="radio" name="id7" value="<% = Rs12("FieldID") %>"></td> 
-<input type=hidden name="FixedFieldID" value ="<%= Rs12("FieldID") %>">
+<td><input type="radio" name="id7" value="<% = Rs63("FieldID") %>"></td> 
+<input type=hidden name="FixedFieldID" value ="<%= Rs63("FieldID") %>">
 	</tr>
 <%
-	Rs12.movenext 
+	Rs63.movenext 
 
       
 

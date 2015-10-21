@@ -5,7 +5,6 @@ Set objFile = fs.OpenTextFile(sFolder&"\"&x.Name, 1)
 Do Until objFile.AtEndOfStream
     strLine = objFile.ReadLine
     strLine = replace(strLine,"'","")
-    strLine = replace(strLine,"""","")
     strLine = Rs1("DepotID") & "," & x.Name  & "," & strLine
 
     intLength = Len(strLine)
@@ -33,6 +32,7 @@ Do Until objFile.AtEndOfStream
 
     strNewContents = strNewContents & strNewCharacters & vbCrLf
     strNewCharacters = ""
+    strNewContents = replace(strNewContents,"""","")
 
     'response.Write(i & ". " &strNewContents & "<br/><br/>")
 

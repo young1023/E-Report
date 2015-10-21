@@ -144,7 +144,9 @@ function doUpload(what)
 <table border="1" cellpadding="6" cellspacing="0" class="normal" width="99%">
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
-<td width="65%"><font color="#FFFFFF">Status</font></td> 
+<td width="5%"><font color="#FFFFFF">Code</font></td>
+<td width="5%"><font color="#FFFFFF">Market</font></td>
+<td width="55%"><font color="#FFFFFF">Status</font></td> 
 <td width="15%"><font color="#FFFFFF">Action</font></td>     
 </tr>
 
@@ -159,7 +161,12 @@ function doUpload(what)
 <td width="20%">
 <% = Rs1("DepotID") %>. <% = Rs1("DepotName") %>
 </td>
-
+<td >
+<% = Rs1("DepotCode") %>
+</td>
+<td >
+<% = Rs1("Market") %>
+</td>
 <td>
 
 <%
@@ -244,11 +251,30 @@ function doUpload(what)
            FileExists = True
 
           'Print the name of file in the test folder
-           Response.write(x.Name)
+           'Response.write(x.Name)
 
            ReadyToConvert = True
 
-           
+   ' Browse Error Log     
+
+      
+           If Left(x.Name,3) = "Err" Then
+
+    'response.write (sFolder & x.Name)
+
+     Set objFile = fs.OpenTextFile((sFolder & "\" & x.Name),1,True)
+
+	Err_Msg = objFile.ReadAll
+
+    response.write Err_Msg & "<br/>"
+
+   
+    'Audit Log
+    Conn.Execute "Exec AddReconLog 'Error message : <b>" & Err_Msg & "</b> on converting file <b>" & x.Name & "</b>','" & Session("MemberID") & "'"
+         
+
+
+           End If
 
 
 ' ---------------------------------------------------------
@@ -338,7 +364,7 @@ set fs=nothing
 
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF"></font></td>
-<td ><font color="#FFFFFF"></font></td> 
+<td colspan ="3"><font color="#FFFFFF"></font></td> 
 <td ></td>     
 </tr>
 

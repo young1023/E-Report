@@ -83,8 +83,8 @@ function listToAray(fullString, separator) {
             for each x in fo.files  
 
       
-            'Audit Log
-            Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
+      'Audit Log
+      Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
          
 
 %>
@@ -93,7 +93,7 @@ function listToAray(fullString, separator) {
 
    
 <%
- 
+            'response.end
             ' Delete imported record if exists, delete view if exists
              Conn.Execute "Exec ConvertReconFile '" & DepotID & "', '" & x.Name & "'"
 
