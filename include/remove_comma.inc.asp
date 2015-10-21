@@ -5,7 +5,10 @@ Set objFile = fs.OpenTextFile(sFolder&"\"&x.Name, 1)
 Do Until objFile.AtEndOfStream
     strLine = objFile.ReadLine
     strLine = replace(strLine,"'","")
+
+    If FileType <> "txt" Then
     strLine = Rs1("DepotID") & "," & x.Name  & "," & strLine
+    End If
 
     intLength = Len(strLine)
 

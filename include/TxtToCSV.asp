@@ -1,26 +1,47 @@
-Const strSourceFile = "c:\test.txt"
-Const strTargetFile = "c:\test.csv"
+<%
+
+
+
+If FileType  = "txt" then
+
+'Const strSourceFile = sFolder & x.Name
+ strTargetFile = sFolder &"\"&  Left(x.Name, Len(x.Name) - 4) & ".csv"
  
 Dim strData
  
 Dim objFSO, objSourceFile, objTargetFile
 Set objFSO = CreateObject("Scripting.FileSystemObject")
  
-Set objSourceFile = objFSO.OpenTextFile(strSourceFile, 1, True)
-Set objTargetFile = objFSO.CreateTextFile(strTargetFile, True)
+Set objSourceFile = objFSO.OpenTextFile(sFolder&"\"&x.Name, 1)
+'Set objTargetFile = objFSO.CreateTextFile(strTargetFile, True)
  
 Do While Not objSourceFile.AtEndOfStream
 	strData = objSourceFile.ReadLine
-	'msgbox strData
+
+    intLength = Len(strData)
+
+    response.write intLength & "<br>"
 	
-	Dim strName, strAddress, strCity, strState, strZip
+    If intLength = 80 then
 	
-	strName = Trim(Mid(strData, 1, 20))
-	strAddress = Trim(Mid(strData, 21, 20))
-	strCity = Trim(Mid(strData, 41, 20))
-	strState = Trim(Mid(strData, 61, 2))
-	strZip = Trim(Mid(strData, 63 5))
-	
-	objTargetFile.WriteLine("""" & strName & """,""" & strAddress & """,""" & strCity & """,""" & strState & """,""" & strZip & """")
+	strName1 = Trim(Mid(strData, 1, 36))
+	strName2 = Trim(Mid(strData, 37, 12))
+	strName3 = Trim(Mid(strData, 50, 15))
+  	
+    sql_i1 = "Insert into StockReconciliation (DepotID, ImportFileName, ISINCode, UnitHeld) Values (" & DepotID & ", '" & x.Name & "' , '" & strName2 & "' , '" & strName3 &"')"
+
+    response.write sql_i1
+    Conn.Execute(sql_i1)
+
+	'objTargetFile.WriteLine( DepotID & "," & x.Name & "," & strName1 & "," & strName2 & "," & strName3 )
+
+    End If
 
 Loop
+
+
+
+End If
+
+
+%>

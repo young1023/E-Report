@@ -23,6 +23,9 @@ DepotID = trim(Request("DepotID"))
    SQL1 = "select * from ReconDepotFolder where depotid="&DepotID
    Set Rs1 = Conn.Execute(SQL1)
 
+FileType = Rs1("FileType")
+
+
 
 %>   
 
@@ -91,8 +94,12 @@ function listToAray(fullString, separator) {
 
             <!--#include file="include/remove_comma.inc.asp" -->
 
+            <!--#include file="include/TxtToCsv.asp" -->
+
    
 <%
+
+            If FileType <> "txt" Then
             'response.end
             ' Delete imported record if exists, delete view if exists
              Conn.Execute "Exec ConvertReconFile '" & DepotID & "', '" & x.Name & "'"
@@ -139,13 +146,9 @@ function listToAray(fullString, separator) {
      sqv = "create view vw_"&DepotID&" as select top 1 depotid, ImportFileName, "&FieldName&" from StockReconciliation"
 
      response.write sqv
-Conn.Execute(sqv)
+     Conn.Execute(sqv)
 
-     'sqd_v = "delete from view vw_"&DepotID
-
-     'Conn.Execute(sqd_v)
-
-
+ 
        ' Set Error situation
             Err.Clear
             On Error Resume Next
@@ -180,7 +183,9 @@ Conn.Execute(sqv)
 
      On Error GoTo 0
 
-             
+      
+     End If ' FileType <> txt 
+      
          'Get Archive Folder
          set RsFd = server.createobject("adodb.recordset")
          RsFd.open ("Exec Get_SystemSetting 'ArchiveFolder'") ,  conn,3,1
