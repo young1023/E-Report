@@ -69,7 +69,7 @@ document.fm1.submit();
 function findenum()
 {
 document.fm1.pageid.value=1;
-document.fm1.action="Audit.asp?sid=<%=SessionID%>"
+document.fm1.action="ReconReport.asp?sid=<%=SessionID%>"
 document.fm1.submit();
 }
 //-->
@@ -155,35 +155,10 @@ for i=Year_starting to Year_ending
  		 <tr> 
 
     <td width="20%">ISIN Code:</td> 
-	<td width="30%">
-	 
-	<select size="1" name="Market" class="common">
-			<option value="" <% if Search_Market="" then response.write "selected" %> >All</option>
-			<%
-					do while (  Not rsMarket.EOF)
-			%>
-					<option value="<%=rsMarket("Market")%>" <% if Search_Market=rsMarket("Market") then response.write "selected" %> ><%=rsMarket("Market")%></option>
-			
-			<%
-					rsMarket.movenext
-					Loop
-			%>
-	</select></td>
+	<td width="30%"></td>
 	<td width="20%">Sedol:</td> 
 	<td width="30%">
-	 
-	<select size="1" name="Market" class="common">
-			<option value="" <% if Search_Market="" then response.write "selected" %> >All</option>
-			<%
-					do while (  Not rsMarket.EOF)
-			%>
-					<option value="<%=rsMarket("Market")%>" <% if Search_Market=rsMarket("Market") then response.write "selected" %> ><%=rsMarket("Market")%></option>
-			
-			<%
-					rsMarket.movenext
-					Loop
-			%>
-	</select></td>
+</td>
 	
      
     </tr>
@@ -211,41 +186,24 @@ for i=Year_starting to Year_ending
 ' *****************
                 set frs = server.createobject("adodb.recordset")
                 
-                'response.Write ("exec Rpt_InstDepBal_PositionByDepot '31 aug 2015', 'AUs', 'AUs', '', '',  '',  '' ")
-
-      			frs.open ("exec Rpt_InstDepBal_PositionByDepot '31 aug 2015', 'AUs', 'AUs', '', '',  '',  '' ") ,  StrCnn,3,1
-
+                 fsql = "select I.Instrument as 'Local Code', S.Instrument as 'Stock Code', InstrumentName, UnitHeld, TotalQTY "
+                 
+                 fsql = fsql & "  from ReconMonthly M Join UOBKHHKEQPRO.dbo.Instrument I on M.Instrument = I.Instrument  "
+                 
+                 fsql = fsql & " join ReconDepotFolder r on M.depot = Cast(r.depotCode as varchar)  Join StockReconciliation S "
+                 
+                 fsql = fsql & " on  r.DepotID = S.DepotID "
+                 
+                 fsql = fsql & " and ( I.Instrument = S.Instrument or  I.ISIN = S.ISINCode "
+                 
+                 fsql = fsql & " or   I.Sedol = S.CommonCode ) "
       
-      ' fsql = "select  "
+                'response.write fsql
+                set frs=createobject("adodb.recordset")
+		        frs.cursortype=1
+		        frs.locktype=1
+                frs.open fsql,conn
 
-      ' fsql = fsql & " Description,SecurityName,ISINCode,UnitHeld,CustodianID, TradeDate"
-
-       'fsql = fsql & " ,CommonCode,TotalAmount,  BSRD , Without_BSRD, NotYetSettle, Instrument  "
-
-       'fsql = fsql & " from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
-
-       'fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.ISINCode = I.ISIN "
-
-       'fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.CommonCode = I.Instrument "
-
-
-      ' fsql = fsql & " Where 1 = 1 "
-
-   
-  ' Search by Date
-  ' **************
-
-
-       ' fsql = fsql & " and left(Importfilename,4) =   '" &Search_From_Month & Right(Search_From_Year,2)& "' " 
-
-       ' fsql = fsql & " order by s.SecurityName "
-
-        'response.write fsql
-       ' set frs=createobject("adodb.recordset")
-		'frs.cursortype=1
-		'frs.locktype=1
-       ' frs.open fsql,conn
- 
 %>   
   
 <div id="reportbody1" >
@@ -256,7 +214,7 @@ for i=Year_starting to Year_ending
 <table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">¡@</td>
-      <td align="center">Stock Reconciliation Exception Report</td> 
+      <td align="center">Reconciliation Exception Report</td> 
       <td align="right" width="20%">
 						
 <a href="javascript:window.doConvert()">Excel</a>
@@ -269,25 +227,56 @@ for i=Year_starting to Year_ending
 
 <%
 
-       ' if frs.RecordCount=0 then
+        if frs.RecordCount=0 then
 
            'response.write "<tr bgcolor=#ffffff align=center><td colspan=7><font color=red>No Record</font></td></tr>"
  
-      '  else
+        else
 
 
-         ' findrecord=frs.recordcount
+          findrecord=frs.recordcount
 
           response.write "Total <font color=red>"&findrecord&"</font> Records ;"
   
-        ' frs.PageSize = 100
+         frs.PageSize = 100
 
-        ' call countpage(frs.PageCount,pageid)
+         call countpage(frs.PageCount,pageid)
 
-       '  end if
+         end if
 
 %>
 </td>
+</tr>
+</table>
+<br>
+
+<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
+
+<tr bgcolor="#ADF3B6" align="center">
+
+      <td width="10%" >Market: </td>
+      <td width="10%" bgcolor="#FFFFCC">
+      <% 
+           If Search_Market = "" Then
+               
+               Response.Write "ALL"
+
+           Else
+
+               Response.Write frs("Market") 
+
+           End If
+       %></td>
+      <td width="30%">Depot Code</td>
+      <td bgcolor="#FFFFCC"><%
+           If Search_Market <> "" Then
+
+               Response.Write frs("DepotCode") 
+
+           End If
+           %>
+      </td>
+       
 </tr>
 </table>
 <br>
@@ -297,9 +286,9 @@ for i=Year_starting to Year_ending
 
 <tr bgcolor="#ADF3B6" align="center">
 
-      <td width="20%" >STOCK Code</td>
-      <td width="20%">Local Code</td>
-      <td>Instrument Name</td>
+      <td width="10%" >STOCK Code</td>
+      <td width="10%">Local Code</td>
+      <td width="30%">Instrument Name</td>
       <td>Status</td>
       <td>HK Position</td>
       <td>Custodian Position</td>
@@ -307,9 +296,9 @@ for i=Year_starting to Year_ending
 </tr>
 <%		
     i=0
-' if frs.recordcount>0 then
- ' frs.AbsolutePage = pageid
-  do while not frs.eoF '(frs.PageSize-i)
+ if frs.recordcount>0 then
+  frs.AbsolutePage = pageid
+  do while (frs.PageSize-i)
    if frs.eof then exit do
    i=i+1
 		
@@ -317,38 +306,28 @@ for i=Year_starting to Year_ending
 <tr bgcolor="#FFFFCC"> 
 <td width="7%">
 <%
-    If frs("Instrument") <> "" Then
+   
+        Response.Write frs("Stock Code")
 
-        Response.Write frs("Instrument")
 
-    End If
-
-    Sql_I = "Select ShortName from UOBKHHKEQPRO.dbo.Instrument where Instrument = '"&frs("Instrument")&"'"
-    Set Rs_I = Conn.Execute(Sql_I)
-
-    ShortName = Rs_I("ShortName")
  
 %>
 </td>
-<td><% '= frs("Sedol") %></td>
+<td><% = frs("Local Code") %></td>
 <td>
 <% 
 
- If frs("InstrumentName") <> "" Then
+
 
         Response.Write frs("InstrumentName")
- Else
 
-        Response.Write ShortName
- 
- End If
 %>
 </td>
 
-<td>Active</td>
+<td></td>
 <td><% = formatnumber(frs("UnitHeld"),0) %></td>
-<td><% = formatnumber(frs("SUMTotalQTY"),0)%></td>
-<td><% = formatnumber(frs("UnitHeld"),0) - formatnumber(frs("SUMTotalQTY"),0) %></td>
+<td ><% = formatnumber(frs("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(frs("UnitHeld"),0) - formatnumber(frs("TotalQTY"),0)),0)   %></td>
  
 
 
@@ -364,7 +343,7 @@ for i=Year_starting to Year_ending
 				
 		loop
 	
-'end if	
+end if	
 
 %>
 
@@ -376,8 +355,8 @@ for i=Year_starting to Year_ending
 
 <span class="noprint">
  <%
-	 if frs.recordcount>0 then
-             call countpage(frs.PageCount,pageid)
+	 if   findrecord >0 then
+             call countpage(PageSize ,pageid)
 			 response.write "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			 if Clng(pageid)<>1 then
                  response.write " <a href=javascript:gtpage('1') style='cursor:hand' >First</a> "
@@ -396,7 +375,7 @@ for i=Year_starting to Year_ending
 	         response.write "&nbsp;&nbsp;"
 	 end if
 
-if frs.recordcount>0 then
+if   findrecord>0 then
   response.write "<input type=hidden value='' name=whatdo>"
   response.write "<input type=hidden value="&pageid&" name=pageid>"
 end if

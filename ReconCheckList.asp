@@ -4,26 +4,25 @@
 
 Search_From_Month       = Request.form("FromMonth")
 Search_From_Year        = Request.form("FromYear")
-Search_Market           = Request.form("Market")
-Search_Instrument       = Request.form("Instrument")
+Search_DepotID          = trim(request.form("Depot"))
+Search_FileName         = request("FileName")
 
 
+If len(Search_From_Month) = 1 Then
+           Search_From_Month = "0" & Search_From_Month
+      End if
+
+'response.write Search_DepotID
 
 ' Retrieve page to show or default to the first
 pageid=trim(request.form("pageid"))
 	
 If Request.form("pageid") = "" Then
 	Pageid = 1
-	Search_From_Month = month(Session("DBLastModifiedDateValue"))
-      If len(Search_From_Month) = 1 Then
-           Search_From_Month = "0" & Search_From_Month
-      End if
-	Search_From_Year = year(Session("DBLastModifiedDateValue"))
+'	Search_From_Month = month(Session("DBLastModifiedDateValue"))
+      
+'	Search_From_Year = year(Session("DBLastModifiedDateValue"))
 End If
-
-' Market pull down menu
-'set RsMarket = server.createobject("adodb.recordset")
-'RsMarket.open ("Exec Retrieve_AvailableMarket ") ,  StrCnn,3,1
 
 
 On Error resume Next
@@ -122,23 +121,59 @@ for i=Year_starting to Year_ending
 
 			</select> </td>
      
-     <td width="20%"></td> 
+     <td ></td> 
       <td></td>   
  	     
 	
     
     </tr>
+
+     <%
+
+            sql = "Select DepotID, DepotCode, DepotName From ReconDepotFolder order by depotID "
+
+            set rs = Conn.Execute(sql)
+
+     %>
+
     
+<tr> 
+	<td width="20%">Depot:</td> 
+	<td width="50%">
+	 
+	<select size="1" name="Depot" class="common">
+			<option value="">All</option>
+			<%
+                    If Not rs.Eof then
+
+                        rs.MoveFirst
 
 
-    
+
+					do while (Not rs.EOF)
+			%>
+	
+<option value="<%=rs("DepotID")%>" <% if trim(Search_DepotID)=trim(rs("DepotID")) then response.write "selected" end if %> ><% =rs("DepotCode")%>.<%=rs("DepotName")%></option>
+			
+			<%
+
+					rs.movenext
+					Loop
+
+                   End If
+			%>
+	</select></td>
+	
+      <td >File Name:</td> 
+      <td>
+     <input name="FileName" type=text value="<%= Search_FileName %>" size="15">   
+ 	     </td>
+    </tr> 
+
 		
 		<tr> 
 			<td></td>
 			<td colspan="3">
-  	<input type=hidden   value="<%=iPageCurrent%>"   name="page"> 
- 	<input type=hidden   value="<%=Search_Order%>"   name="Order"> 
- 	<input type=hidden   value="<%=Search_Direction%>"   name="Direction"> 
  	<input type=hidden   name="submitted"> 
 
           <input id="Submit1" type="button" value="Submit" onClick="dosubmit();"></td>
@@ -170,6 +205,18 @@ for i=Year_starting to Year_ending
 
 
        fsql = fsql & " Where 1 = 1 "
+
+       If Search_DepotID <> "" then
+
+       fsql = fsql & " and s.DepotID = "&Search_DepotID
+
+       end if
+
+      If Search_FileName <> "" then
+
+       fsql = fsql & " and s.ImportFileName like '%"&Search_FileName&"%'"
+
+       end if
 
    
   ' Search by Date
@@ -220,7 +267,7 @@ for i=Year_starting to Year_ending
 
           response.write "Total <font color=red>"&findrecord&"</font> Records ;"
   
-         frs.PageSize = 20
+         frs.PageSize = 100
 
          call countpage(frs.PageCount,pageid)
 
@@ -237,8 +284,8 @@ for i=Year_starting to Year_ending
 
 <tr bgcolor="#ADF3B6" align="center">
 
-      <td width="30%">Depot</td>
-      <td >Market</td>
+      <td width="40%">Depot</td>
+      <td>Market</td>
       <td>Month</td>
       <td>Local Exchange Symbol</td>
       <td>Instrument Name</td>
@@ -254,7 +301,7 @@ for i=Year_starting to Year_ending
 		
 %>
 <tr bgcolor="#FFFFCC"> 
-<td width="7%"><% =frs("DepotName")%>
+<td ><% = i & ". "%><% =frs("DepotName")%>
 </td>
 <td><% = frs("Market") %></td>
 <td>
