@@ -132,6 +132,8 @@ function listToAray(fullString, separator) {
 
      Set Rs2 = Conn.Execute(Sql2)
 
+     If Not Rs2.EoF Then
+
      Do While Not Rs2.EoF
 
      FieldName =  Rs2("fieldname") & "," & FieldName
@@ -139,6 +141,15 @@ function listToAray(fullString, separator) {
      Rs2.MoveNext
 
      Loop 
+
+     Else
+
+     Response.write "Profile not set."
+
+     
+
+
+     End If 
 
      FieldName =  Left(FieldName,Len(FieldName)-1) 
    
@@ -205,6 +216,9 @@ function listToAray(fullString, separator) {
 
      next
 
+     'sql4 = "Delete from StockReconciliation where (UnitHeld is null or UnitHeld  = ' - ' )"
+     
+     'Conn.execute(sql4)
 
 
 %>

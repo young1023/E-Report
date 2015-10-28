@@ -8,9 +8,7 @@ Search_DepotID          = trim(request.form("Depot"))
 Search_FileName         = request("FileName")
 
 
-If len(Search_From_Month) = 1 Then
-           Search_From_Month = "0" & Search_From_Month
-      End if
+
 
 'response.write Search_DepotID
 
@@ -19,12 +17,17 @@ pageid=trim(request.form("pageid"))
 	
 If Request.form("pageid") = "" Then
 	Pageid = 1
-'	Search_From_Month = month(Session("DBLastModifiedDateValue"))
-      
-'	Search_From_Year = year(Session("DBLastModifiedDateValue"))
+End If
+If Search_From_Month = "" Then
+	Search_From_Month = month(Session("DBLastModifiedDateValue")) -1
+End If
+If Search_From_Year = "" Then
+  	Search_From_Year = year(Session("DBLastModifiedDateValue"))
 End If
 
-
+If len(Search_From_Month) = 1 Then
+           Search_From_Month = "0" & Search_From_Month
+End if
 On Error resume Next
 
 
@@ -193,16 +196,7 @@ for i=Year_starting to Year_ending
       
        fsql = "select  * "
 
-      ' fsql = fsql & " Description,SecurityName,ISINCode,UnitHeld,CustodianID, TradeDate"
-
-       'fsql = fsql & " ,CommonCode,TotalAmount,  BSRD , Without_BSRD, NotYetSettle, Instrument  "
-
        fsql = fsql & " from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
-
-       'fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.ISINCode = I.ISIN "
-
-       'fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.CommonCode = I.Instrument "
-
 
        fsql = fsql & " Where 1 = 1 "
 
@@ -227,7 +221,7 @@ for i=Year_starting to Year_ending
 
         fsql = fsql & " order by r.DepotCode "
 
-        response.write fsql
+        'response.write fsql
         set frs=createobject("adodb.recordset")
 		frs.cursortype=1
 		frs.locktype=1

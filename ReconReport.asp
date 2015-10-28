@@ -6,6 +6,20 @@ Search_From_Month       = Request.form("FromMonth")
 Search_From_Year        = Request.form("FromYear")
 Search_Market           = Request.form("Market")
 Search_Instrument       = Request.form("Instrument")
+Search_ISIN             = Request.form("ISIN")
+Search_Sedol            = Request.form("Sedol")
+Search_Match            = Request.form("Match")
+whatdo                  = Request.form("whatdo")
+
+If whatdo = "1" then
+
+
+   set RsABC = server.createobject("adodb.recordset")
+   RsABC.open ("Exec Process_ReconMonthly") ,  StrCnn,3,1
+
+
+End if
+
 
 
 
@@ -14,11 +28,18 @@ pageid=trim(request.form("pageid"))
 	
 If Request.form("pageid") = "" Then
 	Pageid = 1
-	Search_From_Month = month(Session("DBLastModifiedDateValue"))
+End if
+
+If Search_From_Month = "" Then
+     Search_From_Month = month(Session("DBLastModifiedDateValue")) - 1
+ End If
+ 
       If len(Search_From_Month) = 1 Then
            Search_From_Month = "0" & Search_From_Month
       End if
-	Search_From_Year = year(Session("DBLastModifiedDateValue"))
+
+If Search_From_Year = "" Then      
+	Search_From_Year = year(Session("DBLastModifiedDateValue"))  
 End If
 
 ' Market pull down menu
@@ -54,6 +75,14 @@ end if
 function dosubmit(){
  
  document.fm1.action="ReconReport.asp?sid=<%=SessionID%>";
+ document.fm1.submit();
+	
+}
+
+function doRetrieve(){
+ 
+ document.fm1.action="ReconReport.asp?sid=<%=SessionID%>";
+ document.fm1.whatdo.value=1;
  document.fm1.submit();
 	
 }
@@ -123,7 +152,8 @@ for i=Year_starting to Year_ending
 			</select> </td>
      
      <td width="20%"></td> 
-      <td></td>   
+      <td><input id="Retrieve" type="button" value=" Retrieve last month data from ABC " onClick="doRetrieve();"></td>
+  
  	     
 	
     
@@ -155,16 +185,36 @@ for i=Year_starting to Year_ending
  		 <tr> 
 
     <td width="20%">ISIN Code:</td> 
-	<td width="30%"></td>
+	<td width="30%"> <input name="ISIN" type=text value="<%= Search_ISIN %>" size="15">&nbsp;   
+ 	</td>
 	<td width="20%">Sedol:</td> 
-	<td width="30%">
+	<td width="30%"> <input name="Sedol" type=text value="<%= Search_Sedol %>" size="15">&nbsp;   
+ 	
 </td>
 	
      
     </tr>
     
-		
-		<tr> 
+
+ <tr> 
+
+    <td width="20%">Status:</td> 
+	<td width="30%">	
+    
+            <select size="1" name="Match" class="common">
+			<option value="" <% if Search_Match ="" then response.write "selected" %> >ALL</option>
+		    <option value="1" <% if Search_Match="1" then response.write "selected" %> >Match</option>
+            <option value="2" <% if Search_Match="2" then response.write "selected" %> >No Match</option>
+	       </select>    
+ 	</td>
+	<td width="20%"></td> 
+	<td width="30%">   
+ 	
+</td>
+	
+     
+    </tr>
+    <tr> 
 			<td></td>
 			<td colspan="3">
   	<input type=hidden   value="<%=iPageCurrent%>"   name="page"> 
@@ -176,6 +226,8 @@ for i=Year_starting to Year_ending
 
 		</tr>    
 
+  
+
     </table>
   
 
@@ -186,7 +238,9 @@ for i=Year_starting to Year_ending
 ' *****************
                 set frs = server.createobject("adodb.recordset")
                 
-                 fsql = "select I.Instrument as 'Local Code', S.Instrument as 'Stock Code', InstrumentName, UnitHeld, TotalQTY "
+                 fsql = "select r.DepotName as 'DepotName', I.Market as 'Market', M.Location, r.DepotCode as 'DepotCode', "
+
+                 fsql = fsql & "I.Instrument as 'Local Code', S.Instrument as 'Instrument', S.ISINCode as 'ISIN', S.Sedol as 'Sedol', InstrumentName, UnitHeld, TotalQTY "
                  
                  fsql = fsql & "  from ReconMonthly M Join UOBKHHKEQPRO.dbo.Instrument I on M.Instrument = I.Instrument  "
                  
@@ -196,8 +250,43 @@ for i=Year_starting to Year_ending
                  
                  fsql = fsql & " and ( I.Instrument = S.Instrument or  I.ISIN = S.ISINCode "
                  
-                 fsql = fsql & " or   I.Sedol = S.CommonCode ) "
-      
+                 fsql = fsql & " or   I.Sedol = S.Sedol ) "
+
+                 If Search_Match = "1" Then
+
+                 fsql = fsql & " and Cast(Cast(UnitHeld as float) as decimal) = Cast(Cast(totalQTY as float) as decimal)"
+
+                 ElseIf Search_Match = "2" then
+
+                 fsql = fsql & " and cast(Cast(UnitHeld as float) as decimal) <> Cast(Cast(totalQTY as float) as decimal)"
+
+                 End If
+                 
+                 If Search_Market <> "" Then
+                 
+                 fsql = fsql & " and I.Market = '"& Search_Market &"'"
+                 
+                 End If
+
+                 If Search_Market <> "" Then
+                 
+                 fsql = fsql & " and I.Market = '"& Search_Market &"'"
+                 
+                 End If
+
+                 If Search_Market <> "" Then
+                 
+                 fsql = fsql & " and I.Market = '"& Search_Market &"'"
+                 
+                 End If
+
+                 If Search_Market <> "" Then
+                 
+                 fsql = fsql & " and I.Market = '"& Search_Market &"'"
+                 
+                 End If
+
+             
                 'response.write fsql
                 set frs=createobject("adodb.recordset")
 		        frs.cursortype=1
@@ -267,14 +356,9 @@ for i=Year_starting to Year_ending
 
            End If
        %></td>
-      <td width="30%">Depot Code</td>
-      <td bgcolor="#FFFFCC"><%
-           If Search_Market <> "" Then
-
-               Response.Write frs("DepotCode") 
-
-           End If
-           %>
+      <td width="30%" bgcolor="#FFFFCC"></td>
+      <td bgcolor="#FFFFCC">
+           
       </td>
        
 </tr>
@@ -285,12 +369,15 @@ for i=Year_starting to Year_ending
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
 <tr bgcolor="#ADF3B6" align="center">
-
-      <td width="10%" >STOCK Code</td>
-      <td width="10%">Local Code</td>
+      
+      <td width="20%" >Depot</td>
+      <td width="7%" >Depot Code</td>
+      <td width="7%" >Location</td>
+      <td width="7%" >STOCK Code</td>
+      <td width="7%">Local Code</td>
       <td width="30%">Instrument Name</td>
       <td>Status</td>
-      <td>HK Position</td>
+      <td>ABC Position</td>
       <td>Custodian Position</td>
       <td>Difference</td>    
 </tr>
@@ -304,10 +391,49 @@ for i=Year_starting to Year_ending
 		
 %>
 <tr bgcolor="#FFFFCC"> 
-<td width="7%">
+<td>
 <%
    
-        Response.Write frs("Stock Code")
+        Response.Write frs("DepotName")
+
+
+ 
+%>
+</td>
+<td>
+<%
+   
+        Response.Write frs("DepotCode")
+
+
+ 
+%>
+</td>
+
+<td>
+<%
+   
+        Response.Write frs("Location")
+
+
+ 
+%>
+</td>
+<td>
+<%
+       If frs("Instrument") <> "" Then
+       
+        Response.Write frs("Instrument")
+        
+       Elseif frs("ISIN") <> "" Then
+       
+        Response.Write frs("ISIN")
+        
+       Else
+       
+        Response.Write frs("Sedol")
+        
+       End If
 
 
  

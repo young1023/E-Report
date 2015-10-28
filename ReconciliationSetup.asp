@@ -898,7 +898,7 @@ Delimiter</td>
   		
   <% End If %>
   
-<table width="90%" border="0" class="normal">
+<table width="90%" border="1" class="normal">
 
 	<tr> 
             
@@ -915,7 +915,7 @@ Delimiter</td>
 
 <%
         
-		sql4 = " Select * From ReconDepotFolder order by DepotName Asc"
+		sql4 = " Select * From ReconDepotFolder order by DepotCode Asc"
 
 	            set Rs4 = Conn.Execute(sql4)
 			
@@ -933,7 +933,7 @@ Delimiter</td>
 		
 %>
 <tr> 
-	<td width="20%"><% = Rs4("DepotID") %>. <% = Rs4("DepotName") %>
+	<td width="20%"><% = Rs4("DepotName") %>
 			¡@</td>
 <td ><% = Rs4("DepotCode") %>
 			¡@</td>
@@ -1157,7 +1157,7 @@ Field Length</td>
 
         DepotID = Request("DepotID")
         
-		sql8 = " Select * From ReconDepotFolder order by DepotName Asc"
+		sql8 = " Select * From ReconDepotFolder order by DepotCode Asc"
 	   
 		set Rs8 = conn.execute(sql8)
 		 
@@ -1180,7 +1180,7 @@ Field Length</td>
 
            %>               
 
-<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotID")) %>. <% =trim(Rs8("DepotName")) %> (<% =trim(Rs8("DepotCode")) %>)</option>
+<option value="<% =Rs8("DepotID") %>" <%If DepotID=trim(Rs8("DepotID")) Then%>Selected<%End If%>><% =trim(Rs8("DepotName")) %> (<% =trim(Rs8("DepotCode")) %>)</option>
 
                   <%
                                

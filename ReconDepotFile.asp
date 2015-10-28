@@ -131,7 +131,7 @@ function doUpload(what)
     
 ' *****************
       
-       SQL1 = "select * from ReconDepotFolder order by DepotName Asc"
+       SQL1 = "select * from ReconDepotFolder order by Depotcode Asc"
        Set Rs1 = Conn.Execute(SQL1)
 
 
@@ -159,7 +159,7 @@ function doUpload(what)
 %>
 <tr <% If Trim(delete_depotid) = Trim(Rs1("DepotID")) then%>bgcolor="#ffccff"<% end if%>>
 <td width="20%">
-<% = Rs1("DepotID") %>. <% '= Rs1("DepotName") %>
+<% = Rs1("DepotName") %>
 </td>
 <td >
 <% = Rs1("DepotCode") %>
