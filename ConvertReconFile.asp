@@ -92,25 +92,34 @@ function listToAray(fullString, separator) {
 
 %>
 
+          
+
             <!--#include file="include/remove_comma.inc.asp" -->
 
-            <!--#include file="include/TxtToCsv.asp" -->
+            
 
    
 <%
-
-            If FileType <> "txt" Then
-            'response.end
+           
+            
             ' Delete imported record if exists, delete view if exists
              Conn.Execute "Exec ConvertReconFile '" & DepotID & "', '" & x.Name & "'"
 
+%>
 
+              <!--#include file="include/TxtToCsv.asp" -->
+
+<%
+
+      If FileType <> "txt" Then
+           
      
      ' Check if view exist
      sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&DepotID&"'"
 
-    'response.write sql
+     'response.write sql
      Set Rs = Conn.Execute(sql)
+
 
      If Rs("count1") = 1 then
 
@@ -132,6 +141,8 @@ function listToAray(fullString, separator) {
 
      Set Rs2 = Conn.Execute(Sql2)
 
+     'response.write sql2 
+
      If Not Rs2.EoF Then
 
      Do While Not Rs2.EoF
@@ -142,31 +153,24 @@ function listToAray(fullString, separator) {
 
      Loop 
 
-     Else
-
-     Response.write "Profile not set."
-
-     
-
-
      End If 
 
      FieldName =  Left(FieldName,Len(FieldName)-1) 
    
-
      sqv = "create view vw_"&DepotID&" as select top 1 depotid, ImportFileName, "&FieldName&" from StockReconciliation"
 
-     response.write sqv
+     'response.write sqv
+
+    
      Conn.Execute(sqv)
 
- 
        ' Set Error situation
-            Err.Clear
-            On Error Resume Next
+            'Err.Clear
+         'On Error Resume Next
   
     'response.end
 
-    Sql3 = "bulk insert vw_"&Rs1("DepotID")
+    Sql3 = "bulk insert vw_"&DepotID
 
     Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
 
@@ -180,11 +184,15 @@ function listToAray(fullString, separator) {
 
     Sql3 = Sql3 & " ROWTERMINATOR = '\n')"
 
-    response.write Sql3 & "<br/>"
+    'response.write Sql3 & "<br/>"
 
+
+    'response.end
     Conn.Execute(Sql3)
 
-     If Err.Number <> 0 Then
+
+            ' REcord if there is error
+            If Err.Number <> 0 Then
   
   
          'Audit Log
@@ -195,7 +203,8 @@ function listToAray(fullString, separator) {
      On Error GoTo 0
 
       
-     End If ' FileType <> txt 
+     
+     
       
          'Get Archive Folder
          set RsFd = server.createobject("adodb.recordset")
@@ -208,13 +217,21 @@ function listToAray(fullString, separator) {
               fs.DeleteFile(RsFd("SettingValue") & x.Name)
  
          end if
-
+           
+         response.write x.Name
 
          fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
+    
 
+         End If ' FileType <> txt 
+
+       
 
 
      next
+
+
+
 
      'sql4 = "Delete from StockReconciliation where (UnitHeld is null or UnitHeld  = ' - ' )"
      
@@ -229,9 +246,13 @@ function listToAray(fullString, separator) {
 
   set fs=nothing
 
-  response.redirect "ReconDepotFile.asp?sid="&sessionid
+  response.redirect "ReconCheckList.asp?depotid="&depotid&"&sid="&sessionid
 
-
+ Rs1.Close
+ set Rs1 = Nothing
+ Conn.Close
+ Set Conn = Nothing
+    
   
 
 %>

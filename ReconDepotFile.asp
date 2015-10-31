@@ -4,44 +4,24 @@
 if session("shell_power")="" then
   response.redirect "logout.asp?r=1"
 end if
-
-
 dim fs, fo, ts, f
-
 set fs=Server.CreateObject("Scripting.FileSystemObject")
-
 Title = "Depot File Reconciliation"
-
-
-
 ' Delete File
 '***************
 if trim(request("action_button")) = "deleteFile" then
-
 	delete_depotid = trim(request("depotid"))
-
        'response.write depotid
-
         sql = "Select DepotFolder from ReconDepotFolder where DepotId="&delete_depotid
-
         Set Rs = Conn.Execute(sql)
-
          'response.write Rs("DepotFolder")
-
   	     set fo=fs.GetFolder(Server.MapPath(Rs("DepotFolder")))
-
                for each x in fo.files
  
                 fs.DeleteFile(Server.MapPath(Rs("DepotFolder"))&"\"&x.Name)
-
                next
-
-
 	
 end if
-
-
-
 %>
 
 <html>
@@ -67,17 +47,14 @@ function doConvert(what){
 document.fm1.action="ConvertReconFile.asp?sid=<%=sessionid%>&depotid="+what;
 document.fm1.submit();
 }
-
 function doDelete(what){
 document.fm1.action="ReconDepotFile.asp?sid=<%=sessionid%>&depotid="+what;
 document.fm1.action_button.value="deleteFile";
 document.fm1.submit();
 }
-
 function setFocus(){
     document.getElementById("getFocus").focus();
 }
-
 function doUpload(what)
 {
   document.fm1.action="upload_file.asp?sid=<%=sessionid%>&depotid="+what;
@@ -100,7 +77,6 @@ function doUpload(what)
 '      Main Content of the page is inserted here
 '
 '-----------------------------------------------------------------------------
-
 %>
   <TABLE border=0 cellPadding=0 cellSpacing=0 height=100% width=99%>
     <TBODY> 
@@ -126,15 +102,12 @@ function doUpload(what)
 		if pageid="" then
 		  pageid=1
 		end if
-
 ' Start the Queries
     
 ' *****************
       
        SQL1 = "select * from ReconDepotFolder order by Depotcode Asc"
        Set Rs1 = Conn.Execute(SQL1)
-
-
 	  %>
                                 </td>
                               </tr>
@@ -154,7 +127,6 @@ function doUpload(what)
       	If Not Rs1.EoF Then
              		
 			Do While Not Rs1.EoF
-
  
 %>
 <tr <% If Trim(delete_depotid) = Trim(Rs1("DepotID")) then%>bgcolor="#ffccff"<% end if%>>
@@ -171,57 +143,23 @@ function doUpload(what)
 
 <%
 
- FileIsEmpty = False
-
+ FolderIsEmpty = False
  FileExists = False
-
+ ProFileSet = True
 
  sFolder = Server.MapPath(Rs1("DepotFolder"))
-
-
 ' ---------------------------------------------------------
 '                                                          
 ' Check folder exists                    
 '
 ' ---------------------------------------------------------
+ If fs.FolderExists(sFolder) = False then
 
- If fs.FolderExists(sFolder)=True then
+  response.write("Folder "& Rs1("DepotFolder") &" does not exist!")
 
-
-' ---------------------------------------------------------
-'                                                          
-' Check file exists when folder exists                   
-'
-' ---------------------------------------------------------
-
-  If fs.GetFolder(sFolder).Files.Count  = 0 then
-
-
-     Sql2 = "Select top 1 ImportFileName, CreateDate from StockReconciliation where depotid ="&Rs1("DepotID")&" order by CreateDate desc"
-
-     Set Rs2 = Conn.Execute(Sql2)
-
-     If Not Rs2.EoF Then
-
-     Response.Write "Latest import file " & Rs2("ImportFileName") & " was imported on "& Rs2("CreateDate")
-
-     Else
-
-     Response.Write "No File was imported before."
-
-     End If
-
-     FileIsEmpty = True
-
-     ReadyToConvert = False
-
-
-  Else
-
-
-    set fo=fs.GetFolder(sFolder)
-
-  for each x in fo.files
+  
+   
+ Else
 
 
 ' ---------------------------------------------------------
@@ -229,106 +167,83 @@ function doUpload(what)
 ' Check if Depot has set up                  
 '
 ' ---------------------------------------------------------
-
   
      ' Check if view exist
      sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&Rs1("DepotID")&"'"
-
      'response.write sql
-
      Set Rs = Conn.Execute(sql)
 
-     If Rs("count1") = 1 then
+     If Rs("count1") = 0 then
+
+        Response.Write "Depot's profile not created."
+
+        ProFileSet = False
+
+     End If
 
 
+
+' ---------------------------------------------------------
+'                                                          
+' Check file exists              
+'
+' ---------------------------------------------------------
+  If fs.GetFolder(sFolder).Files.Count  > 0 then
+
+
+      set fo=fs.GetFolder(sFolder)
+  For each x in fo.files
 ' ---------------------------------------------------------
 '                                                          
 ' Check file date                 
 '
 ' ---------------------------------------------------------
-
-
            FileExists = True
-
           'Print the name of file in the test folder
-           'Response.write(x.Name)
-
-           ReadyToConvert = True
-
+          'Response.write(x.Name)
+          
    ' Browse Error Log     
-
       
            If Left(x.Name,3) = "Err" Then
-
     'response.write (sFolder & x.Name)
-
      Set objFile = fs.OpenTextFile((sFolder & "\" & x.Name),1,True)
-
 	Err_Msg = objFile.ReadAll
-
     response.write Err_Msg & "<br/>"
-
    
     'Audit Log
     Conn.Execute "Exec AddReconLog 'Error message : <b>" & Err_Msg & "</b> on converting file <b>" & x.Name & "</b>','" & Session("MemberID") & "'"
-         
+    
+            End if
+
+  Next
+
+   Else   ' If no file exists
 
 
-           End If
+     Sql2 = "Select top 1 ImportFileName, CreateDate from StockReconciliation where depotid ="&Rs1("DepotID")&" order by CreateDate desc"
+     Set Rs2 = Conn.Execute(Sql2)
 
+     If Not Rs2.EoF Then
+     Response.Write "Latest import file " & Rs2("ImportFileName") & " was imported on "& Rs2("CreateDate")
+     Else
+     Response.Write "No File was imported before."
+     End If
 
-' ---------------------------------------------------------
-'                                                          
-'  End of checking depot's field                
-'
-' ---------------------------------------------------------
+     FolderIsEmpty = True
 
-
-     Else 
-
-        Response.Write "Depot's profile not created."
-
-        ReadyToConvert = False
-
-     End if
-
-' ---------------------------------------------------------
-'                                                          
-'  Next file in folder               
-'
-' ---------------------------------------------------------
-   
-  next
-
-' ---------------------------------------------------------
-'                                                          
-'  End of Check if file exists              
-'
-' ---------------------------------------------------------
 
  End If 
 
-' ---------------------------------------------------------
-'                                                          
-'  End of folder does not exist            
-'
-' ---------------------------------------------------------
- 
-else
 
-  response.write("Folder "& Rs1("DepotFolder") &" does not exist!")
-
-  ReadyToConvert = False
-
-end if
-
+End If ' FolderExist
  
 
+ 
 %>
 
 </td>
 <td>
-<% If FileIsEmpty = True then %>
+<% If FolderIsEmpty = True and ProFileSet = True then %>
            
                <input type="Button" value=" Upload " onClick="doUpload(<%=Rs1("DepotID")%>);" class="Normal">
 
@@ -338,8 +253,6 @@ end if
            
                <input type="Button" value=" Delete " onClick="doDelete(<%=Rs1("DepotID")%>);" class="Normal">&nbsp;
 
-               <input type="Button" value=" Convert " onClick="doConvert(<%=Rs1("DepotID")%>);" class="Normal">
-
                <input type="hidden" name="DepotID" value="<% = Rs1("DepotID") %>">  
 
 <% End If %>
@@ -347,19 +260,12 @@ end if
 </tr>
 
 <%
-
     
-
 	Rs1.movenext 
-
 	   loop 
  
 	End If
-
-
 set fs=nothing
-
-
 %>
 
 <tr bgcolor="#006699">

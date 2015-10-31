@@ -7,6 +7,12 @@ Search_From_Year        = Request.form("FromYear")
 Search_DepotID          = trim(request.form("Depot"))
 Search_FileName         = request("FileName")
 
+If Search_DepotID = "" Then
+
+     Search_DepotID = Trim(Request("DepotID"))
+
+End If
+
 
 
 
@@ -169,7 +175,7 @@ for i=Year_starting to Year_ending
 	
       <td >File Name:</td> 
       <td>
-     <input name="FileName" type=text value="<%= Search_FileName %>" size="15">   
+     <input name="FileName" type=text value="<%= Search_FileName %>" size="30">   
  	     </td>
     </tr> 
 
@@ -219,7 +225,7 @@ for i=Year_starting to Year_ending
 
         fsql = fsql & " and left(Importfilename,4) =   '" &Search_From_Month & Right(Search_From_Year,2)& "' " 
 
-        fsql = fsql & " order by r.DepotCode "
+        fsql = fsql & " order by r.DepotCode"
 
         'response.write fsql
         set frs=createobject("adodb.recordset")
@@ -238,10 +244,7 @@ for i=Year_starting to Year_ending
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">¡@</td>
       <td align="center">Broker Statement Crosscheck List</td> 
-      <td align="right" width="20%">
-						
-<a href="javascript:window.doConvert()">Excel</a>
-					   	
+      <td align="right" width="20%">	   	
 			</td>
 </tr>
 
@@ -261,7 +264,7 @@ for i=Year_starting to Year_ending
 
           response.write "Total <font color=red>"&findrecord&"</font> Records ;"
   
-         frs.PageSize = 100
+         frs.PageSize = 300
 
          call countpage(frs.PageCount,pageid)
 
@@ -338,7 +341,8 @@ for i=Year_starting to Year_ending
 
 %></td>
 <td><% = Rs_I("ShortName") %></td>
-<td><% = formatnumber(frs("UnitHold"),0)%></td>
+
+<td><% = formatnumber(frs("UnitHeld"),0) %></td>
  
 
 
