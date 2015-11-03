@@ -389,27 +389,24 @@ if trim(request("action_button")) = "CreateProfile" then
 end if
 
 
-' Modify Fixed field
+' Modify InstrumentCode
 '*******************
-if trim(request("action_button")) = "edit fixed field" then
+if trim(request("action_button")) = "EditInstrument" then
 
-	FixedFieldID = split(trim(request.form("FixedFieldID")),",")
+	InID2 = trim(request.form("InID2"))
   
-	FieldLength3 = split(trim(request.form("FieldLength3")),",")
+	InstrumentCode = trim(request.form("InstrumentCode"))
     
-	Depotid = trim(request.form("FixedDepotID"))
 
 
-	for i=0 to ubound(FixedFieldID)
 	
-		sql_f="Update ReconFileOrder set FixedLength = "&  FieldLength3(i) &" where FieldID = "&  FixedFieldID(i) &" and DepotID="& DepotID
-		
-        'response.write sql_f
+		sql_f="Update InstrumentMapTable set InstrumentCode = '"&  InstrumentCode &"' where ID = "& InID2
+		'response.write sql_f
 	    conn.execute sql_f 
 
         Message =  "Done."
 
-	next
+
 	
 end if
 
@@ -692,24 +689,24 @@ function createProfile()
 	
 }
 
-function EditFixedField()
+function EditInstrument()
 {
 	
 		{
-		document.fm1.action_button.value="edit fixed field";
+		document.fm1.action_button.value="EditInstrument";
 		document.fm1.submit();
 		}
 }
 
 
-function DeleteFixedField(){
+function DeleteInstrument(){
 k=0;
 document.fm1.action="ReconciliationSetup.asp?sid=<%=SessionID%>&FunctionID=<%=FunctionID%>&UserLevel=<%=UserLevel%>";
-	if (document.fm1.id7!=null)
+	if (document.fm1.InID2!=null)
 	{
-		for(i=0;i<document.fm1.id7.length;i++)
+		for(i=0;i<document.fm1.InID2.length;i++)
 		{
-			if(document.fm1.id7[i].checked)
+			if(document.fm1.InID2[i].checked)
 			  {
 			  k=1;
 			  i=1;
@@ -718,7 +715,7 @@ document.fm1.action="ReconciliationSetup.asp?sid=<%=SessionID%>&FunctionID=<%=Fu
 		}
 		if(i==0)
 		{
-			if (!document.fm1.id7.checked)
+			if (!document.fm1.InID2.checked)
                k=0;
 			else
                k=1;
@@ -732,7 +729,7 @@ else if (k==1)
   var msg = "Are you sure ?";
   if (confirm(msg)==true)
    {
-    document.fm1.action_button.value="delete fixed field";
+    document.fm1.action_button.value="delete Instrument";
     document.fm1.submit();
    }
  }
@@ -778,7 +775,7 @@ else if (k==1)
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds mapping
       </a></td>
      <td  class="BlueClr"  <% If FunctionID <> 6 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
-      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=6">Fixed Fileds Setup
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=6">Instrument Map Table
       </a></td>
     </tr>
 
@@ -1364,32 +1361,26 @@ Field Length</td>
 
 <%
  
-        DepotID = Request("DepotID")
         
-		sql81 = " Select * From ReconDepotFolder where delimiter = 3 order by DepotName Asc"
+        
+		sql81 = " Select * From instrumentmaptable order by InstrumentName"
 	   
 		set Rs81 = conn.execute(sql81)
 		 
-        FixedDepotID = Request.Form("FixedDepotID")
+        
 %>
 
-<select name="FixedDepotID" class="common"  size="1" onchange="doChange(1)">
+<select name="InstrumentID" class="common"  size="1" onchange="doChange(1)">
           <% 
                              If Not Rs81.EoF Then
 
-                        Rs81.MoveFirst
-
-                             If FixedDepotID = "" Then
-
-                             FixedDepotID = Rs81("DepotID")
-  
-                             End If
+                                 Rs81.MoveFirst
 
 							do while not Rs81.eof
 
            %>               
 
-<option value="<% =Rs81("DepotID") %>" <%If Trim(Request("FixedDepotID"))=trim(Rs81("DepotID")) Then%>Selected<%End If%>><% =trim(Rs81("DepotID")) %>. <% =trim(Rs81("DepotName")) %></option>
+<option value="<% = Rs81("ID") %>" <%If Trim(Request("InstrumentID"))=trim(Rs81("ID")) Then%>Selected<%End If%>><% =trim(Rs81("InstrumentName")) %></option>
 
                   <%
                                
@@ -1409,59 +1400,34 @@ Field Length</td>
 <table width="90%" border="0" class="normal">
 
 	<tr> 
-			<td width="30%" bgcolor="#FFFFCC">Field Name</td>
-      		<td width="20%" bgcolor="#FFFFCC">Fixed Length</td>
+			<td width="30%" bgcolor="#FFFFCC">InstrumentName</td>
+      		<td width="20%" bgcolor="#FFFFCC">Instrument Code</td>
             <td width="20%" bgcolor="#FFFFCC">Delete</td>
 	</tr>
 
-
-
 <%
-     
-		sql63 = " Select * From ReconFileOrder r left Join ReconFile f on "
+             If Request("InstrumentID") <> "" Then
 
-        sql63 = sql63 & " r.FieldID = f.FieldID where  "
-    
-        sql63 = sql63 & "depotID ="&FixedDepotID
+  
+              Sql_I1 = "Select * from instrumentmaptable where ID = "&Request("InstrumentID")
 
-        sql63 = sql63 & " order by Priority Asc"
+              Set RsI1 = Conn.Execute(Sql_I1)
 
-		Set Rs63 = Conn.Execute(sql63)
 
-        'response.write sql63
-				 
-%>
+              If Not RsI1.EoF Then %>
 
-<%		
-		If Not Rs63.EoF Then
-
-             		
-			Do While Not Rs63.EoF
-
-      
-		
-%>
 <tr> 
-	<td width="30%"><% = Rs63("FieldID") %>. <% = Rs63("FieldName") %>
+	<td width="30%"><% = RsI1("InstrumentName") %>
 			¡@</td>
 
 <td width="20%">
 
 
-<input type=text name="FieldLength3" value ="<%= Rs63("FixedLength") %>">
+<input type=text name="InstrumentCode" value ="<% = RsI1("InstrumentCode") %>">
 			¡@</td>
-<td><input type="radio" name="id7" value="<% = Rs63("FieldID") %>"></td> 
-<input type=hidden name="FixedFieldID" value ="<%= Rs63("FieldID") %>">
+<td><input type="radio" name="InID1" value="<% = RsI1("ID") %>"></td> 
+<input type=hidden name="InID2" value ="<%= RsI1("ID") %>">
 	</tr>
-<%
-	Rs63.movenext 
-
-      
-
-	   loop 
- 
-	End If
-%>
 
 
 <tr> 
@@ -1472,10 +1438,19 @@ Field Length</td>
 	
       <tr> 
       <td></td>
-      <td width="30%"><input type="button" value=" Edit " onClick="EditFixedField();"></td>
+      <td width="30%"><input type="button" value=" Edit " onClick="EditInstrument();"></td>
       <td width="30%">
-      <input type="button" value=" Delete " onClick="DeleteFixedField();"></td>
     </tr>
+
+<% 
+
+    End If 
+
+
+    End If
+
+
+%>
 
 </table> 
 

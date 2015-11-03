@@ -24,11 +24,11 @@ End if
 
 
 ' Retrieve page to show or default to the first
-pageid=trim(request.form("pageid"))
-	
-If Request.form("pageid") = "" Then
-	Pageid = 1
-End if
+If Request.form("page") = "" Then
+	iPageCurrent = 1
+Else
+	iPageCurrent = Clng(Request.form("page"))
+End If
 
 If Search_From_Month = "" Then
      Search_From_Month = month(Session("DBLastModifiedDateValue")) - 1
@@ -72,9 +72,10 @@ end if
 <SCRIPT language=JavaScript>
 <!--
 
-function dosubmit(){
+function dosubmit(what){
  
  document.fm1.action="ReconReport.asp?sid=<%=SessionID%>";
+ document.fm1.page.value=what;
  document.fm1.submit();
 	
 }
@@ -210,7 +211,7 @@ for i=Year_starting to Year_ending
  	<input type=hidden   value="<%=Search_Direction%>"   name="Direction"> 
  	<input type=hidden   name="submitted"> 
 
-          <input id="Submit1" type="button" value="Submit" onClick="dosubmit();"></td>
+          <input id="Submit1" type="button" value="Submit" onClick="dosubmit(1);"></td>
 
 		</tr>    
 
@@ -226,9 +227,9 @@ for i=Year_starting to Year_ending
 ' *****************
      set Rs1 = server.createobject("adodb.recordset")
 
-    response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") 
+    response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") 
               
-	Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") ,  conn,3,1
+	Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") ,  conn,3,1
 
 
 
@@ -256,10 +257,10 @@ for i=Year_starting to Year_ending
 <%
 
 	'assign total number of pages
-	iPageCount = Rs1("Tcount")
+	iRecordCount = Rs1("Tcount")
 
 
-  if iPageCount <= 0 then
+  if iRecordCount <= 0 then
 
 
 		'no record found
@@ -268,9 +269,12 @@ for i=Year_starting to Year_ending
 	else
 
 		'record found
-        response.write "Total <font color=red>"&iPageCount&"</font> Records ;"
+        response.write "Total <font color=red>"&iRecordCount&"</font> Records ;"
   
 		
+        'cal total no of pages
+		iPageCount = int(iRecordCount / 100) + 1
+
 		'move to next recordset
   	Set Rs1 = Rs1.NextRecordset() 
 
@@ -279,7 +283,7 @@ for i=Year_starting to Year_ending
  <td bgcolor="#FFFFCC" colspan="2" align="right" >
 
 <%
-response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
+response.write (iPageCurrent & " Page of " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
 
 'First button
 %>
@@ -536,7 +540,7 @@ end if
 <SCRIPT language=JavaScript>
 <!--
 function doConvert(){
-window.open("ReconExcelReport.asp?Search_Instrument=<%=Search_Instrument%>&Search_Market=<%=Search_Market%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>&To_Month=<%=Search_To_Month%>&To_Year=<%=Search_To_Year%>"); 
+window.open("ReconExcelReport.asp?Search_Match=<%=Search_Match%>&Search_Market=<%=Search_Market%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>"); 
 
 }
 

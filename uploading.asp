@@ -97,15 +97,42 @@ If Request("action")="1" Then
               
 <%
 
-            'Elseif  Trim(Left(objUpload.File(x).FileName, 4)) =  Then
+            'Elseif  CInt(Left(objUpload.File(x).FileName, 2)) <>  CInt(Month(now())) - 3 Then
+ 
+               'Response.Write "Only file from last month is allowed.<br/><br/>"
 
 
             Else  
 
-                Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+              
 
-    response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
+         ' Check if distinction file exists
+         If fs.FileExists(Server.MapPath(sFolder) & objUpload.File(x).FileName)  Then
+
+              fs.DeleteFile(Server.MapPath(sFolder) & objUpload.File(x).FileName)
+ 
+         end if
+    
+                'txt file. use different method
+                If Trim(Right(objUpload.File(x).FileName, 3)) = "txt" Then
+
+
+                      Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+
+  response.redirect "ConvertTxTFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
+
+                Else
+
+                       Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+
+  response.redirect "ConvertReconFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
+
+                End If
+
+    
    
             End If
 

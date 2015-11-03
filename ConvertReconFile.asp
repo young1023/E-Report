@@ -78,7 +78,9 @@ function listToAray(fullString, separator) {
       
 
        ' Get the folder
-      sFolder = Trim(Server.MapPath(Rs1("DepotFolder")))
+       sFolder = Trim(Server.MapPath(Rs1("DepotFolder")))
+
+     
 
    
             set fo=fs.GetFolder(sFolder)
@@ -105,14 +107,8 @@ function listToAray(fullString, separator) {
             ' Delete imported record if exists, delete view if exists
              Conn.Execute "Exec ConvertReconFile '" & DepotID & "', '" & x.Name & "'"
 
-%>
 
-              <!--#include file="include/TxtToCsv.asp" -->
 
-<%
-
-      If FileType <> "txt" Then
-           
      
      ' Check if view exist
      sql = "Select count(*) as count1 FROM sys.views WHERE name = 'vw_"&DepotID&"'"
@@ -223,19 +219,13 @@ function listToAray(fullString, separator) {
          fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
     
 
-         End If ' FileType <> txt 
-
-       
+        
 
 
      next
 
 
 
-
-     'sql4 = "Delete from StockReconciliation where (UnitHeld is null or UnitHeld  = ' - ' )"
-     
-     'Conn.execute(sql4)
 
 
 %>

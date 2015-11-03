@@ -1,8 +1,8 @@
 <!--#include file="include/SQLConn.inc.asp" -->
 <%
 ' Tells the browser to open excel
-'Response.ContentType = "application/vnd.ms-excel" 
-'Response.addHeader "content-disposition","attachment;filename=Transaction.xls"
+Response.ContentType = "application/vnd.ms-excel" 
+Response.addHeader "content-disposition","attachment;filename=Convert_Report_"&Request("From_Month")&Right(Request("From_Year"),2)&".xls"
 
 
 if session("shell_power")="" then
@@ -11,9 +11,12 @@ end if
 
 
 Search_From_Month       = Request("From_Month")
-Search_From_Year        = Request("From_Year")
-Search_Market           = Request("Market")
+Search_From_Year        = Right(Request("From_Year"),2)
+Search_Market           = Request("Search_Market")
 Search_Instrument       = Request("Instrument")
+Search_ISIN             = Request("ISIN")
+Search_Sedol            = Request("Sedol")
+Search_Match            = Request("Search_Match")
 
 
 On Error resume Next
@@ -52,77 +55,107 @@ TD.caption
 
 <%
 
-
+     
 ' Start the Queries
 ' *****************
-      
-       fsql = "select * from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
+     set Rs1 = server.createobject("adodb.recordset")
 
-       fsql = fsql & "left join UOBKHHKEQPRO.dbo.Instrument I on S.ISINCode = I.ISIN "
+     response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") 
+              
+	 Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") ,  conn,3,1
 
-       fsql = fsql & " Where 1 = 1 "
-
-   
-  ' Search by Date
-  ' **************
-
-
-        fsql = fsql & " and left(Importfilename,4) =   '" &Search_From_Month & Right(Search_From_Year,2)& "' " 
-
-        fsql = fsql & " order by s.CreateDate desc"
-
-        response.write fsql
-        set frs=conn.execute(fsql)
-        'set frs=createobject("adodb.recordset")
-		'frs.cursortype=1
-		'frs.locktype=1
-        'frs.open fsql,conn
+     Set Rs1 = Rs1.NextRecordset() 
  
 %>   
   
-
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
 <tr bgcolor="#ADF3B6" align="center">
-
-      <td width="10">Depot</td>
-      <td width="10">Market</td>
-      <td>Custodian ID</td>
-      <td>Trade Date</td>
-      <td>ISINCode</td>
-      <td>Common Code</td>
-      <td>Security Name</td>
-      <td>Description</td>
-      <td>Unit Held</td>
-      <td>Total Amount</td>
- 
+      
+      <td width="20%" >Depot</td>
+      <td width="7%" >Depot Code</td>
+      <td width="7%" >Location</td>
+      <td width="7%" >STOCK Code</td>
+      <td width="7%">Local Code</td>
+      <td width="30%">Instrument Name</td>
+      <td>Status</td>
+      <td>ABC Position</td>
+      <td>Custodian Position</td>
+      <td>Difference</td>    
 </tr>
+<%		
+    i=0
+  do while Not Rs1.EoF
 
-<%
-    i =0
+   if Rs1.eof then exit do
 
-   If Not frs.Eof Then
-
-  do while not frs.EoF
-
-     i=i+1
-   
+   i=i+1
+		
 %>
-
-
 <tr bgcolor="#FFFFCC"> 
+<td>
+<%
+   
+        Response.Write Rs1("DepotName")
 
 
-<td><% = i & ". " & frs("DepotName") %></td>
-<td><% = frs("iMarket") %></td>
-<td><% = frs("CustodianID") %></td>
-<td><% = frs("TradeDate") %></td>
-<td><% = frs("ISINCode") %></td>
-<td><% = frs("CommonCode") %></td>
-<td><% = frs("SecurityName") %></td>
-<td><% = frs("Description") %></td>
-<td><% = frs("UnitHeld") %></td>
-<td><% = frs("TotalAmount") %></td>
+ 
+%>
+</td>
+<td>
+<%
+   
+        Response.Write Rs1("DepotCode")
+
+
+ 
+%>
+</td>
+
+<td>
+<%
+   
+        Response.Write Rs1("Location")
+
+
+ 
+%>
+</td>
+<td>
+<%
+       If Rs1("Instrument") <> "" Then
+       
+        Response.Write Rs1("Instrument")
+        
+       Elseif Rs1("ISIN") <> "" Then
+       
+        Response.Write Rs1("ISIN")
+        
+       Else
+       
+        Response.Write Rs1("Sedol")
+        
+       End If
+
+
+ 
+%>
+</td>
+<td><% = Rs1("Local Code") %></td>
+<td>
+<% 
+
+
+
+        Response.Write Rs1("InstrumentName")
+
+%>
+</td>
+
+<td></td>
+<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
+<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td>
  
 
 
@@ -134,11 +167,13 @@ TD.caption
 
 				
 					
-				frs.movenext
+				Rs1.movenext
 				
 		loop
 	
-end if	
+	
+
+'End if
 
 %>
          

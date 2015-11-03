@@ -250,6 +250,9 @@ End If ' FolderExist
 <% End If %>
 
 <% If FileExists = True then %>
+
+               <input type="Button" value=" Upload " onClick="doUpload(<%=Rs1("DepotID")%>);" class="Normal">
+
            
                <input type="Button" value=" Delete " onClick="doDelete(<%=Rs1("DepotID")%>);" class="Normal">&nbsp;
 

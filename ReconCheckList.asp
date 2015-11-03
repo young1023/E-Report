@@ -204,7 +204,7 @@ for i=Year_starting to Year_ending
 
        fsql = fsql & " from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
 
-       fsql = fsql & " Where 1 = 1 "
+       fsql = fsql & " Where s.UnitHeld is not null and ISNUMERIC(s.UnitHeld) = 1  "
 
        If Search_DepotID <> "" then
 
@@ -315,32 +315,42 @@ for i=Year_starting to Year_ending
 
     Sql_I = Sql_I & "and ISIN = '"&frs("ISINCode")&"'"
 
-    End If
 
-    If frs("CommonCode") <> "" Then
+    ElseIf  frs("Sedol") <> "" Then
 
-        Response.write  frs("CommonCode")
+        Response.write  frs("Sedol")
 
-    Sql_I = Sql_I & "and Sedol= '"&frs("CommonCode")&"'"
+    Sql_I = Sql_I & "and Sedol= '"&frs("Sedol")&"'"
 
 
-    End If
-
-    If frs("Instrument") <> "" Then
+    ElseIf frs("Instrument") <> "" Then
 
         Response.write frs("Instrument")
 
         Sql_I = Sql_I & "and  Instrument = '"&frs("Instrument")&"'"
-   
 
+    Else
+
+        Sql_I = Sql_I & " and 1 = 2 "
+   
     End If
 
-     
+    'response.Write sql_I
 
     Set Rs_I = Conn.Execute(Sql_I)
 
 %></td>
-<td><% = Rs_I("ShortName") %></td>
+<td>
+
+<% 
+   
+   
+          Response.Write Rs_I("ShortName") 
+
+   
+
+%>
+</td>
 
 <td><% = formatnumber(frs("UnitHeld"),0) %></td>
  
