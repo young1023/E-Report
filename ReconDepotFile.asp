@@ -117,10 +117,9 @@ function doUpload(what)
 <table border="1" cellpadding="6" cellspacing="0" class="normal" width="99%">
 <tr bgcolor="#006699">
 <td width="20%"><font color="#FFFFFF">Depot</font></td>
-<td width="5%"><font color="#FFFFFF">Code</font></td>
-<td width="5%"><font color="#FFFFFF">Market</font></td>
-<td width="55%"><font color="#FFFFFF">Status</font></td> 
-<td width="15%"><font color="#FFFFFF">Action</font></td>     
+<td width="10%"><font color="#FFFFFF">Code</font></td>
+<td width="50%"><font color="#FFFFFF">Status</font></td> 
+<td width="20%"><font color="#FFFFFF">Action</font></td>     
 </tr>
 
 <%
@@ -135,9 +134,6 @@ function doUpload(what)
 </td>
 <td >
 <% = Rs1("DepotCode") %>
-</td>
-<td >
-<% = Rs1("Market") %>
 </td>
 <td>
 

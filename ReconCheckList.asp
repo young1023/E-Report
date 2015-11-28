@@ -6,6 +6,8 @@ Search_From_Month       = Request.form("FromMonth")
 Search_From_Year        = Request.form("FromYear")
 Search_DepotID          = trim(request.form("Depot"))
 Search_FileName         = request("FileName")
+whatdo                  = Request.form("whatdo")
+filename                = Request.form("FileName")
 
 If Search_DepotID = "" Then
 
@@ -15,8 +17,26 @@ End If
 
 
 
+if whatdo = "del_file" then
 
-'response.write Search_DepotID
+ 
+   sql_d = "Delete from stockreconciliation where importfilename = '"&FileName&"'"
+
+   Conn.execute(sql_d)
+
+elseif whatdo = "del_record" then
+
+
+   delid=split(trim(request.form("mid")),",")
+   
+   for i=0 to Ubound(delid)
+     sql="Delete from StockReconciliation where id ="&trim(delid(i))
+     conn.execute(sql)
+	 response.write sql&"<br>"
+   next
+
+
+end if
 
 ' Retrieve page to show or default to the first
 pageid=trim(request.form("pageid"))
@@ -79,6 +99,52 @@ function findenum()
 document.fm1.pageid.value=1;
 document.fm1.action="ReconCheckList.asp?sid=<%=SessionID%>"
 document.fm1.submit();
+}
+
+function doDelete(){
+ 
+ document.fm1.action="ReconCheckList.asp?sid=<%=SessionID%>";
+ document.fm1.whatdo.value="del_file"
+ document.fm1.submit();
+	
+}
+
+
+function delcheck(){
+k=0;
+document.fm1.action="ReconCheckList.asp?sid=<%=SessionID%>";
+	if (document.fm1.mid!=null)
+	{
+		for(i=0;i<document.fm1.mid.length;i++)
+		{
+			if(document.fm1.mid[i].checked)
+			  {
+			  k=1;
+			  i=1;
+			  break;
+			  }
+		}
+		if(i==0)
+		{
+			if (!document.fm1.mid.checked)
+               k=0;
+			else
+               k=1;
+		}
+	}
+
+if (k==0)
+  alert("You must select at least one record!");	
+else if (k==1)
+ {
+  var msg = "Are you sure ?";
+  if (confirm(msg)==true)
+   {
+    document.fm1.whatdo.value="del_record";
+    document.fm1.submit();
+   }
+ }
+
 }
 //-->
 </script>
@@ -175,7 +241,14 @@ for i=Year_starting to Year_ending
 	
       <td >File Name:</td> 
       <td>
-     <input name="FileName" type=text value="<%= Search_FileName %>" size="30">   
+     <input name="FileName" type=text value="<%= Search_FileName %>" size="30">
+
+<% if Search_fileName <> "" then %>
+
+     <input id="Submit2" type="button" value="  Delete " onClick="doDelete();">
+
+
+<% End if %>   
  	     </td>
     </tr> 
 
@@ -202,7 +275,7 @@ for i=Year_starting to Year_ending
       
        fsql = "select  * "
 
-       fsql = fsql & " from StockReconciliation s left join ReconDepotFolder r on s.depotid = r.depotid "
+       fsql = fsql & " from StockReconciliation s join ReconDepotFolder r on s.depotid = r.depotid "
 
        fsql = fsql & " Where s.UnitHeld is not null and ISNUMERIC(s.UnitHeld) = 1  "
 
@@ -280,13 +353,14 @@ for i=Year_starting to Year_ending
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
 <tr bgcolor="#ADF3B6" align="center">
-
+      
       <td width="40%">Depot</td>
-      <td>Market</td>
       <td>Month</td>
       <td>Local Exchange Symbol</td>
       <td>Instrument Name</td>
       <td>Total Holding</td>
+      <td>Import File Name</td>
+      <td>Delete</td>
 </tr>
 <%		
     i=0
@@ -297,10 +371,10 @@ for i=Year_starting to Year_ending
    i=i+1
 		
 %>
-<tr bgcolor="#FFFFCC"> 
+<tr bgcolor="#FFFFCC">
+
 <td ><% = i & ". "%><% =frs("DepotName")%>
 </td>
-<td><% = frs("Market") %></td>
 <td>
 <% = MonthName(Left(frs("ImportFileName"),2)) & " " & Mid(frs("ImportFileName"),3,2) %>
 </td>
@@ -355,7 +429,9 @@ for i=Year_starting to Year_ending
 <td><% = formatnumber(frs("UnitHeld"),0) %></td>
  
 
+<td><% = frs("ImportFileName") %></td>
 
+<td><input type="checkbox" name="mid" value="<% = frs("ID") %>"></td>
 
 </tr>
 
@@ -403,6 +479,7 @@ end if
 if frs.recordcount>0 then
   response.write "<input type=hidden value='' name=whatdo>"
   response.write "<input type=hidden value="&pageid&" name=pageid>"
+  response.write "<input type='button' value='   Delete   ' onClick='delcheck();' class='common'>&nbsp;"
 end if
 			  frs.close
 			  set frs=nothing

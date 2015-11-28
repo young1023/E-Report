@@ -6,20 +6,18 @@ Search_From_Month       = Request.form("FromMonth")
 Search_From_Year        = Request.form("FromYear")
 Search_Market           = Request.form("Market")
 Search_Instrument       = Request.form("Instrument")
+Search_DepotCode        = Request.form("DepotCode")
 Search_ISIN             = Request.form("ISIN")
 Search_Sedol            = Request.form("Sedol")
 Search_Match            = Request.form("Match")
-whatdo                  = Request.form("whatdo")
 
-If whatdo = "1" then
+'response.write search_DepotCode
 
+if Search_DepotCode = "" then
 
-   set RsABC = server.createobject("adodb.recordset")
-   RsABC.open ("Exec Process_ReconMonthly") ,  StrCnn,3,1
-
-
-End if
-
+  Search_DepotCode = "105"
+  
+end if
 
 
 
@@ -69,6 +67,8 @@ end if
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <title>Report</title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
+<link rel="stylesheet" type="text/css" media="print" href="include/print.css" />
+
 <SCRIPT language=JavaScript>
 <!--
 
@@ -107,13 +107,14 @@ document.fm1.submit();
 
 </head>
 
-<body leftmargin="0" topmargin="0" OnLoad="document.fm1.submitted.value=0;document.fm1.Instrument.focus();">
+<body leftmargin="0" topmargin="0">
 
+
+<span class="noprint">
 <!-- #include file ="include/Master.inc.asp" -->
+</span>
 
 <div id="Content">
-
-
 
 
 <form name="fm1" method="post" action="">
@@ -153,8 +154,10 @@ for i=Year_starting to Year_ending
 			</select> </td>
      
      <td width="20%"></td> 
-      <td><input id="Retrieve" type="button" value=" Retrieve last month data from ABC " onClick="doRetrieve();"></td>
-  
+      <td>
+<span class="noprint">
+<input id="Retrieve" type="button" value=" Retrieve last month data from ABC " onClick="doRetrieve();"></td>
+</span> 
  	     
 	
     
@@ -177,10 +180,33 @@ for i=Year_starting to Year_ending
 			%>
 	</select></td>
 	
-      <td width="20%"></td> 
+      <td width="20%">Depot</td> 
       <td>
-   	     
-    </tr>
+<%
+      
+       Sql_d = "Select DepotCode from ReconDepotfolder order by DepotCode asc"
+
+       Set Rs_d = Conn.Execute(Sql_d)
+
+%>
+
+<select size="1" name="DepotCode" class="common">
+			<option value="" <% if Search_Depot="" then response.write "selected" %> >All</option>
+			<%
+					do while (  Not Rs_d.EOF)
+			%>
+					<option value="<%=Rs_d("DepotCode")%>" <% if Trim(Search_DepotCode)=Trim(Rs_d("DepotCode")) then response.write "selected" %> ><%=Rs_d("DepotCode")%></option>
+			
+			<%
+					    Rs_d.movenext
+					Loop
+			%>
+	</select>
+
+
+</td>
+
+</tr>
     
  
     
@@ -191,7 +217,7 @@ for i=Year_starting to Year_ending
 	<td width="30%">	
     
             <select size="1" name="Match" class="common">
-			<option value="" <% if Search_Match ="" then response.write "selected" %> >ALL</option>
+	        <option value="" <% if Search_Match="" then response.write "selected" %> >ALL</option>
 		    <option value="1" <% if Search_Match="1" then response.write "selected" %> >Match</option>
             <option value="2" <% if Search_Match="2" then response.write "selected" %> >Not Match</option>
 	       </select>    
@@ -227,9 +253,9 @@ for i=Year_starting to Year_ending
 ' *****************
      set Rs1 = server.createobject("adodb.recordset")
 
-    response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") 
+    'response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") 
               
-	Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") ,  conn,3,1
+	Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") ,  conn,3,1
 
 
 
@@ -241,18 +267,20 @@ for i=Year_starting to Year_ending
 <br>
 
 <table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
+<span class="noprint">
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">　</td>
       <td align="center">Reconciliation Exception Report</td> 
       <td align="right" width="20%">
 						
-<a href="javascript:window.doConvert()">Excel</a>
+<a href="javascript:window.doConvert()">Excel</a>&nbsp;<a href="javascript:window.print()">Friendly Print</a>
 					   	
 			</td>
 </tr>
 
 <tr>
-   <td bgcolor="#FFFFCC" >
+</span>
+   <td>
 
 <%
 
@@ -268,19 +296,17 @@ for i=Year_starting to Year_ending
 						
 	else
 
-		'record found
-        response.write "Total <font color=red>"&iRecordCount&"</font> Records ;"
-  
+		
 		
         'cal total no of pages
-		iPageCount = int(iRecordCount / 100) + 1
+		iPageCount = int(iRecordCount / 200) + 1
 
 		'move to next recordset
   	Set Rs1 = Rs1.NextRecordset() 
 
 %>
 </td>
- <td bgcolor="#FFFFCC" colspan="2" align="right" >
+ <td  colspan="2" align="right" >
 
 <%
 response.write (iPageCurrent & " Page of " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
@@ -329,14 +355,13 @@ End If
       
       <td width="20%" >Depot</td>
       <td width="7%" >Depot Code</td>
-      <td width="7%" >Location</td>
       <td width="7%" >STOCK Code</td>
-      <td width="7%">Local Code</td>
       <td width="30%">Instrument Name</td>
-      <td>Status</td>
-      <td>ABC Position</td>
       <td>Custodian Position</td>
-      <td>Difference</td>    
+      <td>ABC Position</td>
+      <td>Difference</td> 
+      
+        
 </tr>
 <%		
     i=0
@@ -350,7 +375,7 @@ End If
 <tr bgcolor="#FFFFCC"> 
 <td>
 <%
-   
+        Response.write i & ".&nbsp;"
         Response.Write Rs1("DepotName")
 
 
@@ -367,17 +392,7 @@ End If
 %>
 </td>
 
-<td>
-<%
-   
-        Response.Write Rs1("Location")
-
-
- 
-%>
-</td>
-<td>
-<%
+<td><%
        If Rs1("Instrument") <> "" Then
        
         Response.Write Rs1("Instrument")
@@ -394,9 +409,7 @@ End If
 
 
  
-%>
-</td>
-<td><% = Rs1("Local Code") %></td>
+%></td>
 <td>
 <% 
 
@@ -407,11 +420,199 @@ End If
 %>
 </td>
 
-<td></td>
+
 <td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
 <td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
-<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
+
+
+
+</tr>
+
+
+<%
+
+				
+					
+				Rs1.movenext
+				
+		loop
+	
+
+
+%>
+
+<%		
+
+    If Search_Match => 2 Then
+
+   Set rs1 = rs1.NextRecordset() 
+    
+
+  do while Not Rs1.EoF
+
+   if Rs1.eof then exit do
+
+   i=i+1
+		
+%>
+<tr bgcolor="#FFFFCC"> 
+<td>
+<%
+        Response.write i & ".&nbsp;"
+        Response.Write Rs1("DepotName")
+
+
  
+%>
+</td>
+<td>
+<%
+   
+        Response.Write Rs1("DepotCode")
+
+
+ 
+%>
+</td>
+
+<td><%
+       If Rs1("Instrument") <> "" Then
+       
+        Response.Write Rs1("Instrument")
+        
+       Elseif Rs1("ISIN") <> "" Then
+       
+        Response.Write Rs1("ISIN")
+        
+       Else
+       
+        Response.Write Rs1("Sedol")
+        
+       End If
+
+
+ 
+%></td>
+<td>
+<% 
+
+        sql2 = "Select ShortName from UOBKHHKEQPRO.dbo.Instrument where "
+        
+        If Trim(Rs1("Instrument")) <> "" then
+
+        sql2 = sql2 & " Instrument = '" & Trim(Rs1("Instrument")) & "'"
+        
+        Elseif Trim(Rs1("ISIN")) <> "" then
+        
+        sql2 = sql2 & " ISIN = '" & Trim(Rs1("ISIN")) & "'"
+        
+        Else 
+        
+        sql2 = sql2 & " Sedol = '" & Trim(Rs1("Sedol")) &"'"
+        
+        End if
+             
+        'response.write sql2
+
+        Set Rs2 = Conn.execute(sql2)
+        
+        If not Rs2.Eof then
+
+        Response.Write Rs2("ShortName")
+        
+        Else
+        
+        Response.write "Instrument name cannot be found."
+        
+        End if
+
+%>
+</td>
+
+
+<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
+<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
+
+
+
+</tr>
+
+
+<%
+
+				
+					
+				Rs1.movenext
+				
+		loop
+	
+
+
+ Set rs1 = rs1.NextRecordset() 
+
+    
+
+  do while Not Rs1.EoF
+
+   if Rs1.eof then exit do
+
+   i=i+1
+		
+%>
+<tr bgcolor="#FFFFCC"> 
+<td>
+<%
+        Response.write i & ".&nbsp;"
+        Response.Write Rs1("DepotName")
+
+
+ 
+%>
+</td>
+<td>
+<%
+   
+        Response.Write Rs1("DepotCode")
+
+
+ 
+%>
+</td>
+
+<td><%
+       If Rs1("Instrument") <> "" Then
+       
+        Response.Write Rs1("Instrument")
+        
+       Elseif Rs1("ISIN") <> "" Then
+       
+        Response.Write Rs1("ISIN")
+        
+       Else
+       
+        Response.Write Rs1("Sedol")
+        
+       End If
+
+
+ 
+%></td>
+<td>
+<% 
+
+
+
+        Response.Write Rs1("InstrumentName")
+
+%>
+</td>
+
+
+<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
+<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
 
 
 
@@ -430,17 +631,27 @@ End If
 
 End if
 
+End If
+
 %>
 
                               <tr bgcolor="#FFFFCC"> 
-                                <td align="right" colspan="10" height="28"> 
+                                <td align="left" colspan="10" height="28"> 
 
 
 
 
 <span class="noprint">
  <%
+
+
+      'record found
+      response.write "Total <font color=red>"& i &"</font> Records "
+  
 	 if   findrecord >0 then
+               
+      
+
              call countpage(PageSize ,pageid)
 			 response.write "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			 if Clng(pageid)<>1 then
@@ -476,7 +687,7 @@ end if
 </table>
 </form>  
 
-
+<br/>
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 	<tr bgcolor="#FFFFCC"> 
       <td width="99%" height="18" align="center">End of Report</td>
@@ -540,7 +751,7 @@ end if
 <SCRIPT language=JavaScript>
 <!--
 function doConvert(){
-window.open("ReconExcelReport.asp?Search_Match=<%=Search_Match%>&Search_Market=<%=Search_Market%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>"); 
+window.open("ReconExcelReport.asp?DepotCode=<%=Search_DepotCode%>&Search_Match=<%=Search_Match%>&Search_Market=<%=Search_Market%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>"); 
 
 }
 

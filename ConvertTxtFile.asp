@@ -149,39 +149,57 @@ Do While Not objSourceFile.AtEndOfStream
 
     intLength = Len(strData)
 
-    response.write intLength & "<br>"
-    response.write strData
+    'response.write intLength & "<br>"
+    'response.write strData
     
     
     If intLength = 75 and DepotID = 48 then
 	
 	strName2 = Trim(Mid(strData, 1, 29))
-	strName3 = Trim(Mid(strData, 65, 15))
+	strName3 = replace(replace(Trim(Mid(strData, 65, 15)),",",""),".","")
 
-    sql_c1 = "Select * from InstrumentMapTable where InstrumentName = '"&Trim(strName1)&"'"
+    sql_c1 = "Select * from InstrumentMapTable where InstrumentName = '"&Trim(strName2)&"'"
     Set rs_c1 = Conn.Execute(sql_c1)
 
      If rs_c1.EoF Then
 
-     sql_c2 = "Insert into InstrumentMapTable (InstrumentName) Values ('"&Trim(strName1)&"')"  
+     sql_c2 = "Insert into InstrumentMapTable (InstrumentName) Values ('"&Trim(strName2)&"')"  
 
      Conn.execute(sql_c2)
      
+     Else
+     
+      If rs_c1("InstrumentCode") <> "" then
+      
+         InstrumentCode = rs_c1("InstrumentCode")
+         
+      Else
+      
+         InstrumentCode = "NA"
+         
+      End if
+     
+     sql_i1 = "Insert into StockReconciliation (DepotID, ImportFileName, Instrument, UnitHeld) Values (" & DepotID & ", '" & x.Name & "' , '" & InstrumentCode & "' , '" & strName3 &"')"
+
+     
      End If
  
-     ElseIf intLength = 80  and DepotID = 42 then
+     ElseIf intLength = 80  and DepotID = 23 then
 
 
     strName1 = Trim(Mid(strData, 1, 9))
 	strName2 = Trim(Mid(strData, 37, 15))
-	strName3 = Trim(Mid(strData, 50, 15))
+	strName3 = replace(replace(Trim(Mid(strData, 50, 15)),",",""),".","")
+	
+   sql_i1 = "Insert into StockReconciliation (DepotID, ImportFileName, ISINCode, UnitHeld) Values (" & DepotID & ", '" & x.Name & "' , '" & strName2 & "' , '" & strName3 &"')"
+
 
     End If
     
   	
-    sql_i1 = "Insert into StockReconciliation (DepotID, ImportFileName, ISINCode, UnitHeld) Values (" & DepotID & ", '" & x.Name & "' , '" & strName2 & "' , '" & strName3 &"')"
-
-    'response.write sql_i1 & "<br>"
+  
+    response.write sql_i1 & "<br>"
+    'response.end
     Conn.Execute(sql_i1)
   
 

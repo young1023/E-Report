@@ -25,7 +25,7 @@ DepotID = trim(Request("DepotID"))
 
 FileType = Rs1("FileType")
 
-
+DepotCode = Rs1("DepotCode")
 
 %>   
 
@@ -198,10 +198,13 @@ function listToAray(fullString, separator) {
 
      On Error GoTo 0
 
-      
-     
-     
-      
+
+       ' Replace Depot code for multi market files
+        Conn.Execute "Exec Replace_ReconDepot '" & DepotCode & "', '" & x.Name & "'"
+
+
+
+ 
          'Get Archive Folder
          set RsFd = server.createobject("adodb.recordset")
          RsFd.open ("Exec Get_SystemSetting 'ArchiveFolder'") ,  conn,3,1
@@ -218,9 +221,6 @@ function listToAray(fullString, separator) {
 
          fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
     
-
-        
-
 
      next
 

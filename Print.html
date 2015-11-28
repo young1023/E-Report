@@ -1,0 +1,47 @@
+<html>
+<script language="JavaScript">
+DA = (document.all) ? 1 : 0
+function handle_error()
+{
+		alert("\nNothing was printed. \n\nIf you do want to print this page, then\nclick on the printer icon in the toolbar above.")
+		return true;
+}
+</script>
+<body onload="window.print();">
+
+<script language="VBScript">
+sub window_onunload
+		on error resume next
+		set WB = nothing
+		on error goto 0
+end sub
+sub print
+		OLECMDID_PRINT = 6
+		OLECMDEXECOPT_DONTPROMPTUSER = 2
+		OLECMDEXECOPT_PROMPTUSER = 1
+
+		on error resume next
+		if DA then
+			  call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
+		else
+			  call WB.IOleCommandTarget.Exec(OLECMDID_PRINT ,OLECMDEXECOPT_DONTPROMPTUSER,"","","")
+		end if
+	if err.number <> 0 then
+		 if DA then 
+					 alert "Nothing Printed :" & err.number & " : " & err.description
+		 else
+			 handle_error 
+		 end if
+	end if
+	on error goto 0
+end sub
+ 
+if DA then
+		wbvers="8856F961-340A-11D0-A96B-00C04FD705A2"
+else
+		wbvers="EAB22AC3-30C1-11CF-A7EB-0000C05BAE0B"
+end if
+document.write  "<OBJECT ID=""WB"" WIDTH=0 HEIGHT=0 CLASSID=""CLSID:"
+document.write wbvers & """> </OBJECT>"
+</script>
+</body>

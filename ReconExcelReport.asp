@@ -11,12 +11,14 @@ end if
 
 
 Search_From_Month       = Request("From_Month")
-Search_From_Year        = Right(Request("From_Year"),2)
+Search_From_Year        = Request("From_Year")
 Search_Market           = Request("Search_Market")
 Search_Instrument       = Request("Instrument")
 Search_ISIN             = Request("ISIN")
 Search_Sedol            = Request("Sedol")
 Search_Match            = Request("Search_Match")
+Search_DepotCode        = Request("DepotCode")
+
 
 
 On Error resume Next
@@ -60,9 +62,10 @@ TD.caption
 ' *****************
      set Rs1 = server.createobject("adodb.recordset")
 
-     response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") 
+     'response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '1' ") 
+
               
-	 Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_Match&"' ") ,  conn,3,1
+	 Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '1' ") ,  conn,3,1
 
      Set Rs1 = Rs1.NextRecordset() 
  
@@ -171,12 +174,179 @@ TD.caption
 				
 		loop
 	
-	
+		
 
-'End if
+    If Search_Match => 2 Then
+
+   Set rs1 = rs1.NextRecordset() 
+    i=0
+
+  do while Not Rs1.EoF
+
+   if Rs1.eof then exit do
+
+   i=i+1
+		
+%>
+<tr bgcolor="#FFFFCC"> 
+<td>
+<%
+   
+        Response.Write Rs1("DepotName")
+
+
+ 
+%>
+</td>
+<td>
+<%
+   
+        Response.Write Rs1("DepotCode")
+
+
+ 
+%>
+</td>
+
+<td></td>
+
+<td><%
+       If Rs1("Instrument") <> "" Then
+       
+        Response.Write Rs1("Instrument")
+        
+       Elseif Rs1("ISIN") <> "" Then
+       
+        Response.Write Rs1("ISIN")
+        
+       Else
+       
+        Response.Write Rs1("Sedol")
+        
+       End If
+
+
+ 
+%></td>
+<td></td>
+<td>
+<% 
+
+        sql2 = "Select InstrumentName from ReconMonthly where "
+
+        sql2 = sql2 & "(ISIN = '" & Rs1("ISIN") &"' or Instrument = '" & Rs1("Instrument") & "' )"
+
+        Set Rs2 = Conn.execute(sql2)
+
+        Response.Write Rs2("InstrumentName")
 
 %>
-         
+</td>
+<td></td>
+
+<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
+<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
+
+
+
+</tr>
+
+
+<%
+
+				
+					
+				Rs1.movenext
+				
+		loop
+	
+
+
+ Set rs1 = rs1.NextRecordset() 
+
+    i=0
+
+  do while Not Rs1.EoF
+
+   if Rs1.eof then exit do
+
+   i=i+1
+		
+%>
+<tr bgcolor="#FFFFCC"> 
+<td>
+<%
+   
+        Response.Write Rs1("DepotName")
+
+
+ 
+%>
+</td>
+<td>
+<%
+   
+        Response.Write Rs1("DepotCode")
+
+
+ 
+%>
+</td>
+<td></td>
+<td><%
+       If Rs1("Instrument") <> "" Then
+       
+        Response.Write Rs1("Instrument")
+        
+       Elseif Rs1("ISIN") <> "" Then
+       
+        Response.Write Rs1("ISIN")
+        
+       Else
+       
+        Response.Write Rs1("Sedol")
+        
+       End If
+
+
+ 
+%></td>
+<td></td>
+<td>
+<% 
+
+
+
+        Response.Write Rs1("InstrumentName")
+
+%>
+</td>
+
+
+<td></td>
+
+<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
+<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
+<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
+
+</tr>
+
+
+<%
+
+				
+					
+				Rs1.movenext
+				
+		loop
+	
+	
+'End if
+
+End If
+
+%>         
 </table>
               </center>
 

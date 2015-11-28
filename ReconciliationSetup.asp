@@ -38,7 +38,9 @@ if trim(request("action_button")) = "add depot" then
 		DepotName1 = trim(request(replace("DepotName1","'","''")))
 
 	    DepotCode1 = trim(request(replace("DepotCode1","'","''")))	
-		
+
+        Market1 = trim(request(replace("Market1","'","''")))
+      		
 		DepotFolder1 = trim(request(replace("DepotFolder1","'","''")))
 
         'Market = trim(request(replace("Market","'","''")))
@@ -50,9 +52,9 @@ if trim(request("action_button")) = "add depot" then
 
         Delimiter1 = trim(request(replace("Delimiter1",",","\,")))
 
-		sql1 = "insert into ReconDepotFolder (DepotName, DepotCode, DepotFolder, FileType, FirstRow,delimiter ) "
+		sql1 = "insert into ReconDepotFolder (DepotName, DepotCode,  Market, DepotFolder, FileType, FirstRow,delimiter ) "
 
-        sql1 = sql1 & "values ('"& DepotName1 & "', "& DepotCode1 & ", '"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" )"
+        sql1 = sql1 & "values ('"& DepotName1 & "', "& DepotCode1 & ", '"& Market1 &"','"& DepotFolder1 &"', '"& FileType1 &"' , "& FirstRow1 &" ,"& Delimiter1 &" )"
 
 		Conn.Execute sql1
 
@@ -98,6 +100,8 @@ if trim(request("action_button")) = "modify depot" then
 
 	DepotFolder2 = split(trim(request.form("DepotFolder2")),",")
 
+    Market2 = split(trim(request.form("Market2")),",")
+      
     FileType2 = split(trim(request.form("FileType2")),",")
 
     FirstRow2 = split(trim(request.form("FirstRow2")),",")
@@ -112,6 +116,10 @@ if trim(request("action_button")) = "modify depot" then
 		strsql="Update ReconDepotFolder set DepotFolder = '"
 
         strsql= strsql & trim(replace(DepotFolder2(i),"'","''")) 
+
+        strsql= strsql & "' , Market = '" 
+
+        strsql= strsql & trim(replace(Market2(i),"'","''")) 
 
         strsql= strsql & "' , FileType ='"
 
@@ -410,6 +418,32 @@ if trim(request("action_button")) = "EditInstrument" then
 	
 end if
 
+
+' Modify AccountID
+'*******************
+if trim(request("action_button")) = "EditAccountID" then
+
+	AccID3 = trim(request.form("AccID3"))
+  
+	DepotCode3 = trim(request.form("DepotCode3"))
+    
+     sql = "Select DepotID from ReconDepotFolder where depotcode = '"&DepotCode3&"'"
+
+     Set rs = Conn.Execute(sql)
+
+     depotid = rs("depotID")
+
+	
+	sql_Acc="Update ReconAccountID set DepotCode = '"&  depotCode3 &"' , DepotID = "& DepotID &" where AccountID = '"& AccID3 & "'"
+	response.write sql_Acc
+	    conn.execute sql_Acc 
+
+        Message =  "Done."
+
+
+	
+end if
+
 ' Delete Fixed field
 '*******************
 if trim(request("action_button")) = "delete fixed field" then
@@ -430,6 +464,43 @@ if trim(request("action_button")) = "delete fixed field" then
 	next
 	
 end if
+
+
+' Add AccountID
+'***************
+if trim(request("action_button")) = "AddAccount" then
+
+
+		AccID2 = trim(request(replace("AccID2","'","''")))
+
+        DepotCode2 = trim(request(replace("DepotCode2","'","''")))
+
+        sql = "Select DepotID from ReconDepotFolder where depotcode = '"&DepotCode2&"'"
+
+        Set rs = Conn.Execute(sql)
+
+        response.write sql
+
+        If Not rs.EoF Then
+
+         depotid = rs("DepotID")
+
+        End If
+      
+		sql2 = "insert into ReconAccountID (AccountID, DepotCode, DepotID) "
+
+        sql2 = sql2 & "values ( '"& AccID2 & "', '"& DepotCode2 & "', "& DepotID &")"
+
+        response.write sql2
+
+        'Conn.Execute sql2
+
+
+        Message =  "The items were added."
+	
+		set acres=nothing
+end if
+
 
 %>
 
@@ -736,7 +807,23 @@ else if (k==1)
 
 }
 
+function EditAccountID()
+{
+	
+		{
+		document.fm1.action_button.value="EditAccountID";
+		document.fm1.submit();
+		}
+}
 
+function AddAccountID()
+{
+	
+		{
+		document.fm1.action_button.value="AddAccount";
+		document.fm1.submit();
+		}
+}
 //-->
 </SCRIPT>
 </head>
@@ -758,24 +845,27 @@ else if (k==1)
  <table width="90%" border="0" class="normal">
 
     <tr> 
-      <td  class="BlueClr" <% If FunctionID <> 1 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+      <td  class="BlueClr" <% If FunctionID <> 1 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=1">Depot Folder and Import File Information
       </a>
       </td> 
-      <td  class="BlueClr"  <% If FunctionID <> 2 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+      <td  class="BlueClr"  <% If FunctionID <> 2 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=2">Edit/Delete Depot Folder and File Info
       </a></td>
-      <td  class="BlueClr"  <% If FunctionID <> 3 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+      <td  class="BlueClr"  <% If FunctionID <> 3 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=3">Add Field in Master Table
       </a></td>
-      <td  class="BlueClr"  <% If FunctionID <> 4 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+      <td  class="BlueClr"  <% If FunctionID <> 4 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=4">Delete field in Master Table
       </a></td>
-      <td  class="BlueClr"  <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="20%">
+      <td  class="BlueClr"  <% If FunctionID <> 5 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=5">Import File Fileds mapping
       </a></td>
-     <td  class="BlueClr"  <% If FunctionID <> 6 Then %>bgcolor="#C0C0C0"<% End If %> width="16%">
+     <td  class="BlueClr"  <% If FunctionID <> 6 Then %>bgcolor="#C0C0C0"<% End If %> width="12%">
       <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=6">Instrument Map Table
+      </a></td>
+     <td  class="BlueClr"  <% If FunctionID <> 7 Then %>bgcolor="#C0C0C0"<% End If %> width="13%">
+      <a href="ReconciliationSetup.asp?sid=<% =SessionID %>&functionid=7">AccountID Map Table
       </a></td>
     </tr>
 
@@ -814,6 +904,13 @@ Depot Name</td>
 Depot Code</td> 
       <td width="69%">
       <Input name="DepotCode1" type=text value="" size="50"></td>
+    </tr>
+
+<tr> 
+      <td width="27%">
+Market</td> 
+      <td width="69%">
+      <Input name="Market1" type=text value="" size="50"></td>
     </tr>
 
 
@@ -899,8 +996,9 @@ Delimiter</td>
 
 	<tr> 
             
-			<td width="30%" bgcolor="#FFFFCC">Depot Name</td> 
+			<td width="20%" bgcolor="#FFFFCC">Depot Name</td> 
   			<td width="10%" bgcolor="#FFFFCC">Depot Code</td> 
+            <td width="10%" bgcolor="#FFFFCC">Market</td> 
 			<td width="25%" bgcolor="#FFFFCC">Folder</td>
          	<td width="10%" bgcolor="#FFFFCC">File Extension</td>
 	        <td width="10%" bgcolor="#FFFFCC">First Row</td>
@@ -933,6 +1031,9 @@ Delimiter</td>
 	<td width="20%"><% = Rs4("DepotName") %>
 			¡@</td>
 <td ><% = Rs4("DepotCode") %>
+			¡@</td>
+<td >
+<Input type="text" name="Market2" value="<% = Rs4("Market") %>" size="10">
 			¡@</td>
 <td width="20%">
 <Input type="text" name="DepotFolder2" value="<% = Rs4("DepotFolder") %>" size="30">
@@ -1349,7 +1450,7 @@ Field Length</td>
 <% '---- End of Depot Vs File Setup ----- %>
 
 
-<%   '---- Start of Fixed Field ---- %>
+<%   '---- Start of Instrument map table ---- %>
 
 
   <% If FunctionID <> 6 Then %>		
@@ -1363,11 +1464,19 @@ Field Length</td>
  
         
         
-		sql81 = " Select * From instrumentmaptable order by InstrumentName"
+		sql81 = " Select * From instrumentmaptable where 1 = 1 "
+
+         If Trim(Request("Instrument_Match"))="unmatch" Then
+
+        sql81 = sql81 & " and InstrumentCode is null "
+
+         End If 
+
+        sql81 = sql81 & " order by InstrumentName"
 	   
 		set Rs81 = conn.execute(sql81)
 		 
-        
+        'response.write sql81
 %>
 
 <select name="InstrumentID" class="common"  size="1" onchange="doChange(1)">
@@ -1394,6 +1503,15 @@ Field Length</td>
  
 					%>
 </select>
+
+<select name="Instrument_Match" class="common"  size="1" onchange="doChange(1)">
+
+<option value="all" <%If Trim(Request("Instrument_Match"))="all" Then%>Selected<%End If%>>All</option>
+
+<option value="unmatch" <%If Trim(Request("Instrument_Match"))="unmatch" Then%>Selected<%End If%>>unmatch</option>
+             
+</select>
+
 
 <br/>
   
@@ -1457,7 +1575,173 @@ Field Length</td>
 </div>
               
 
-<% '---- End of modify fixed Field ----- %>
+<% '---- End of Instrument map table ----- %>
+
+
+<%   '---- Start of AccountID ---- %>
+
+
+  <% If FunctionID <> 7 Then %>		
+  		
+  <div style="display:none" align=center>
+  		
+  <% End If %>
+
+
+<%
+ 
+        
+        
+		sql91 = " Select distinct s.AccountID, s.DepotID as AccDepotid From StockReconciliation s Left join ReconAccountID a "
+
+        sql91 = sql91 & " on s.AccountID = a.AccountID where s.AccountID is not null "
+
+         If Trim(Request("AccountID_Match"))="unmatch" Then
+
+         sql91 = sql91 & " and a.DepotCode is null "
+
+         End If 
+
+        sql91 = sql91 & " order by s.AccountID"
+	   
+		set Rs91 = conn.execute(sql91)
+		 
+        'response.write sql91
+%>
+
+<select name="AccountID" class="common"  size="1" onchange="doChange(1)">
+          <% 
+                             If Not Rs91.EoF Then
+
+                                 Rs91.MoveFirst
+
+							do while not Rs91.eof
+
+           %>               
+
+<option value="<% = Rs91("AccountID") %>" <%If Trim(Request("AccountID"))=trim(Rs91("AccountID")) Then%>Selected<%End If%>><% =trim(Rs91("AccountID")) %></option>
+
+                  <%
+                               
+  
+                               Rs91.movenext
+
+							loop
+						
+						End if
+
+ 
+					%>
+</select>
+
+<select name="AccountID_Match" class="common"  size="1" onchange="doChange(1)">
+
+<option value="all" <%If Trim(Request("AccountID_Match"))="all" Then%>Selected<%End If%>>All</option>
+
+<option value="unmatch" <%If Trim(Request("AccountID_Match"))="unmatch" Then%>Selected<%End If%>>unmatch</option>
+             
+</select>
+
+
+<br/>
+  
+<table width="90%" border="0" class="normal">
+
+	<tr> 
+			<td width="30%" bgcolor="#FFFFCC">Account ID</td>
+      		<td width="20%" bgcolor="#FFFFCC">Depot</td>
+            <td width="20%" bgcolor="#FFFFCC">Delete</td>
+	</tr>
+
+<%
+             If Request("AccountID") <> "" Then
+
+  
+              Sql_A1 = "Select * from ReconAccountID where AccountID = '"&Request("AccountID")&"'"
+
+               'response.write sql_a1
+
+              Set RsA1 = Conn.Execute(Sql_A1)
+
+
+              If Not RsA1.EoF Then 
+
+
+
+
+%>
+
+<tr> 
+	<td width="30%"><% = RsA1("AccountID") %>
+			¡@</td>
+
+<td width="20%">
+
+
+<input type=text name="DepotCode3" value ="<% = RsA1("DepotCode") %>">
+			¡@</td>
+<td><input type="radio" name="AccID1" value="<% = RsA1("AccountID") %>"></td> 
+<input type=hidden name="AccID3" value ="<%= RsA1("AccountID") %>">
+<input type=hidden name="AccDepotID" value ="<%= Request.Form("AccDepotid") %>">
+
+	</tr>
+
+
+
+<tr> 
+      <td colspan="2" align =center><font color="red"><% = Message %></font></td> 
+      <td >
+¡@</td>
+    </tr>
+	
+      <tr> 
+      <td></td>
+      <td width="30%"><input type="button" value=" Edit " onClick="EditAccountID();"></td>
+      <td width="30%">
+    </tr>
+
+<% Else %>
+
+<tr> 
+	<td width="30%">
+<input type=text name="AccID2" value ="<% = Request("AccountID") %>">
+			¡@</td>
+
+<td width="20%">
+
+
+<input type=text name="DepotCode2" value ="">
+			¡@</td>
+<td></td> 
+	</tr>
+
+ <tr> 
+      <td></td>
+      <td width="30%"><input type="button" value=" Add " onClick="AddAccountID();"></td>
+      <td width="30%">
+    </tr>
+
+<%  End If %>
+
+
+
+<% 
+
+    
+
+
+    End If
+
+
+%>
+
+</table> 
+
+</div>
+              
+
+<% '---- End of AccountID ----- %>
+
 
 </form>
 
