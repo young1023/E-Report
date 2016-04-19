@@ -43,13 +43,13 @@ Message = ""
 
 ' Setup Print for Member
 '************************
-if trim(request("action_button")) = "allow printing" then
+if trim(request("action_button")) = "allow printing" and FunctionID = 1 then
 
 	xid = split(trim(request("xid")),",")
 	
 		sql1 = "Delete From AllowPrint Where "
 
-        sql1 = sql1 & "PrintAllowed = 1 and MenuID ="& MenuID 
+        sql1 = sql1 & "GroupID is Null and MenuID ="& MenuID 
 
 		Conn.Execute sql1
 	
@@ -61,6 +61,33 @@ if trim(request("action_button")) = "allow printing" then
         sql2 = sql2 & "Values ("&  xid(i)  &","& MenuID &", 1)"
 		
 	    conn.execute sql2 
+	next
+
+End if
+
+if trim(request("action_button")) = "allow printing" and FunctionID = 2 then
+
+
+	gid = split(trim(request("gid")),",")
+	
+		sql3 = "Delete From AllowPrint Where "
+
+        sql3 = sql3 & "MemberID is Null and MenuID ="& MenuID 
+
+		Conn.Execute sql3
+
+    
+	for i=0 to ubound(gid)
+
+
+  	
+		sql5 = "Insert into AllowPrint (GroupID, MenuID, PrintAllowed) "
+
+        sql5 = sql5 & "Values ("&  gid(i)  &","& MenuID &",   1)"
+
+        conn.execute sql5
+
+   
 	next
 
 Message = "System was changed"
@@ -107,15 +134,28 @@ document.fm1.action="PrintSetup.asp?sid=<%=SessionID%>&FunctionID=<%=FunctionID%
 
 %>
 
+<table width="80%" border="0" class="normal" border="1">
+<tr bgcolor="#FFFF00"> 
+
+			<td <% If Trim(FunctionID) =  2  Then %>bgcolor="#FFFFFF"<% End If %>>
+			<a href="PrintSetup.asp?FunctionID=1&sid=<% =SessionID %>">User</a>
+			</td>
+
+<td <% If Trim(FunctionID) =  1  Then %>bgcolor="#FFFFFF"<% End If %>>
+			<a href="PrintSetup.asp?FunctionID=2&sid=<% =SessionID %>">Group</a>
+			</td>
+	</tr>
+	
+</table>
+<br>
+
+
 <form name="fm1" method="post" action="">
 
 <!---- Start of Printing Access Right for Member Menu ---->
 
-  <% If FunctionID <> 1 Then %>		
   		
-  <div style="display:none" align=center>
-  		
-  <% End If %>
+  
 
 
 <table width="80%" border="0" class="normal" border="1">
@@ -123,7 +163,7 @@ document.fm1.action="PrintSetup.asp?sid=<%=SessionID%>&FunctionID=<%=FunctionID%
 
 <%
         
-		sql1 = " Select * From Menu where OrderID < 7 Order By OrderID Desc"
+		sql1 = " Select * From Menu where OrderID < 7 Order By OrderID Asc"
 		
 		Set Rs2 = Conn.Execute(sql1)
 		
@@ -136,7 +176,7 @@ document.fm1.action="PrintSetup.asp?sid=<%=SessionID%>&FunctionID=<%=FunctionID%
 %>
 	
 			<td <% If Trim(MenuID) <>  Trim(Rs2("ID"))  Then %>bgcolor="#FFFFFF"<% End If %>>
-			<a href="PrintSetup.asp?FunctionID=1&MenuID=<% = Rs2("ID") %>&sid=<% =SessionID %>"><% = Rs2("MenuName") %></a>
+			<a href="PrintSetup.asp?FunctionID=<% = FunctionID %>&MenuID=<% = Rs2("ID") %>&sid=<% =SessionID %>"><% = Rs2("MenuName") %></a>
 			</td>
 <%
 		Rs2.MoveNext
@@ -151,19 +191,20 @@ End If
 </table>
 <br>
 
-<table width="80%" border="0" class="normal">
- 
- 
-	<tr> 
-			<td width="39%"></td> 
-			<td width="60%">
-			¡@</td>
-	</tr>
+	
+  		
+
+
+<table width="80%" border="1" class="normal">
+
+<% If Trim(FunctionID) = 1 Then %>	
+
+ <div style="display:none" align=center>
 	
 <%
-		sql6 = " SELECT * from Member Order by Name"
+		sql3 = " SELECT * from Member Order by Name"
 		
-        set acres = Conn.Execute(sql6)
+        set acres = Conn.Execute(sql3)
 	
     
 	if not acres.eof then
@@ -175,13 +216,13 @@ End If
       <td width="60%">
       
 <% 
-	  Sql7 = "Select * From AllowPrint where PrintAllowed = 1 and MemberID = " & acres("MemberID") & " and MenuID = "&MenuID 
+	  Sql4 = "Select * From AllowPrint where PrintAllowed = 1 and MemberID = " & acres("MemberID") & " and MenuID = "&MenuID 
 	  
-	  'response.write sql7
+	  'response.write sql4
   	  
-	  Set Rs2 = Conn.Execute(Sql7)
+	  Set Rs4 = Conn.Execute(Sql4)
 	  
-	  If Not Rs2.EoF Then
+	  If Not Rs4.EoF Then
 	  	
 	  		SelectFlag = 1
 	  		
@@ -204,11 +245,64 @@ End If
  
 	End If
 %>
+
+</div>
+
+<% end if %>
+
+<% If Trim(FunctionID) = 2 Then %>
+
+ <div style="display:none" align=center>
+
+<%
+		sql5 = " SELECT * from  UserGroup u Left Join SharedGroup s on s.SharedGroupID = u.GroupID Order by u.Name"
+		
+        set Rs5 = Conn.Execute(sql5)
+	
+    
+	if not Rs5.eof then
+	  	do while not Rs5.eof
+		  
+%>
+
  <tr> 
-      <td colspan="2" align =center><font color="red"><% = Message %></font></td> 
-      <td >
-¡@</td>
+      <td width="39%"></td> 
+      <td width="60%">
+      
+<% 
+	  Sql6 = "Select * From AllowPrint where PrintAllowed = 1 and GroupID = " & Rs5("GroupID") & " and MenuID = "&MenuID 
+	  
+	  'response.write sql6
+  	  
+	  Set Rs6 = Conn.Execute(Sql6)
+	  
+	  If Not Rs6.EoF Then
+	  	
+	  		SelectFlag = 1
+	  		
+	  End If
+	  
+%>
+      
+      <input type="checkbox" name="gid" value="<% = Rs5("GroupID") %>" <% If SelectFlag = 1 Then%>Checked<% End If %>>&nbsp;
+      <% = Rs5("Name") %> 
+           ¡@</td>
     </tr>
+	
+<%
+	Rs5.movenext 
+	
+		SelectFlag = 0 
+	
+	loop 
+
+ 
+	End If
+%>
+
+</div>
+
+<% end if %>
 
   <tr> 
       <td width="39%"></td> 
@@ -217,7 +311,8 @@ End If
       <input type="hidden" name="action_button" value="">  
     </tr>
 </table>
-</div>
+
+
 
 <!---- End of Printing Access Right for Member Menu ------>
 

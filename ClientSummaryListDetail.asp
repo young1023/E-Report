@@ -513,18 +513,15 @@ Search_CurrentRecord=1
 	case "share2"
 		'shared group member
 			'response.write  ("Exec Retrieve_ClientSummaryListDetail '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ") 
-response.write "This is 1" & session("shell_power") & "," & Search_CurrentRecord
 			Rs0.open ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"', '"&Search_LedgerBalance&"','"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ") ,  Conn,3,1
 	case "share3"
-response.write "This is 2" & session("shell_power") & "," & Search_CurrentRecord
 			'response.write  ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"', '"&Search_LedgerBalance&"','"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1' ")
 
 			Rs0.open ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"', '"&Search_LedgerBalance&"','"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1' ") ,  Conn,3,1
 
 	case else
-response.write "This is 3" & session("shell_power") & "," & Search_CurrentRecord
 		'normal
-		response.write  ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ")
+		'response.write  ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ")
 			Rs0.open ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ") ,  Conn,3,1
 		
 	end select	
@@ -575,7 +572,7 @@ for Search_CurrentRecord = 1 to iPageCount
 
 	case else
 		'normal
-			response.write  ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ")
+			'response.write  ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ")
 			Rs1.open ("Exec Retrieve_ClientSummary '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"','"&Search_Market&"','"&Search_Instrument&"','"&Search_LedgerBalanceType&"','"&Search_LedgerBalance&"', '"&Search_IncludeMarginAccount&"', '"&Search_CurrentRecord&"', '1'  ") ,  Conn,3,1
 		
 	end select	

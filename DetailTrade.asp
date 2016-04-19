@@ -1,16 +1,18 @@
 <% 
 '*********************************************************************************
-'NAME       : DetailTrade.asp           
-'DESCRIPTION: Instrument trading with all details info
+'NAME       : DetailTrade1.asp           
+'DESCRIPTION: Instrument trading with all details info group by Client
 'INPUT      : 
 'OUTPUT     : 
 'RETURNS    :                     
 'CALLS      :                     
 'CREATED    : 090401 Gary Yeung   Prototype
 'MODIFIED   : 090415 Roger Wong   Record and page control
-'							090712 Roger Wong		Add Shared Group
+'					 		090712 Roger Wong		Add Shared Group
 '********************************************************************************
 
+' set server timeout
+Server.ScriptTimeout=7200000
 %>
 
 <%
@@ -51,10 +53,24 @@ Dim iRecord ' Counter for page natvigator
 
 Dim cnnSearch  ' ADO connection
 Dim rstSearch  ' ADO recordset
+Dim itotalNetComm
+  
 
-Dim itotalturnover(), itotalconsideration(), itotalbrokerage(), itotalCCY()
+Dim itotalturnover, itotalconsideration, itotalbrokerage, itotalCCY, itotalNetAmount
 Dim iPageturnover(), iPageconsideration(), iPagebrokerage(), iPageCCY()
-
+Dim itotalAECommFC
+itotalturnover = 0
+itotalconsideration = 0
+itotalbrokerage = 0
+itotalNetAmount = 0
+itotalAECommFC  = 0
+itotalNetComm = 0
+MTDTurnover = 0
+MTDBrokerage = 0
+MTDNetAmount = 0
+YTDTurnover  = 0
+YTDBrokerage = 0
+YTDNetAmount = 0
 
 strURL = Request.ServerVariables("URL") ' Retreive the URL of this page from Server Variables
 %>
@@ -83,13 +99,15 @@ end if
     @media print {
     	.noprint {
     	 display: none;
-    	}
+    	}'
     }  -->
     
     </style>
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <title><% = Title %></title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
+<script src="include/sorttable.js"></script>
+<script src="include/common.js"></script>
 <SCRIPT language=JavaScript>
 <!--
 
@@ -189,89 +207,25 @@ function ordersubmit(iorder, idirection){
   document.fm1.submit();
 }
 
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 //-->
 </SCRIPT>
-<script language="JavaScript">
-function disableCtrlKeyCombination(e)
-{
-        //list all CTRL + key combinations you want to disable
-        var forbiddenKeya = 'a';
-        var forbiddenKeyc = 'c';
-        var forbiddenKeyx = 'x';
-
-
-        var key;
-        var isCtrl;
-
-        if(window.event)
-        {
-                key = window.event.keyCode;     //IE
-                if(window.event.ctrlKey)
-                        isCtrl = true;
-                else
-                        isCtrl = false;
-        }
-        else
-        {
-                key = e.which;     //firefox
-                if(e.ctrlKey)
-                        isCtrl = true;
-                else
-                        isCtrl = false;
-        }
-
-        //if ctrl is pressed check if other key is in forbidenKeys array
-        if(isCtrl)
-        {
-            
-                {
-                        //case-insensitive comparation
-                        if(forbiddenKeya.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-                        if(forbiddenKeyc.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-
-						if(forbiddenKeyx.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-
-                }
-        }
-        return true;
-}
-</script>
-
-<script language="JavaScript">
-<!--
-// disable right click
-var message="Sorry, The right click function is disable."; // Message for the alert box
-
-function click(e) {
-if (document.all) {
-if (event.button == 2) {
-alert(message);
-return false;
-}
-}
-if (document.layers) {
-if (e.which == 3) {
-alert(message);
-return false;
-}
-}
-}
-if (document.layers) {
-document.captureEvents(Event.MOUSEDOWN);
-}
-document.onmousedown=click;
-// --> 
-</script>
 
 </head>
 
@@ -286,6 +240,8 @@ document.onmousedown=click;
 
 
 <div id="Content">
+
+
 
 
 <%
@@ -314,6 +270,7 @@ Dim Search_SharedGroup
 Dim Search_SharedGroupMember
 
 
+
 Search_AEGroup	    = Request.form("GroupID")
 Search_ClientFrom       = Request.form("ClientFrom")
 Search_ClientTo         = Request.form("ClientTo")
@@ -330,15 +287,13 @@ Search_Market           = Request.form("Market")
 Search_Instrument       = Request.form("Instrument")
 Search_Order            = Request.form("Order")
 Search_Direction        = Request.form("Direction")
-Search_SharedSelection      =  Request.form("ShareSelection")	
-Search_SharedGroup  = Request.form("SharedGroup")
-Search_SharedGroupMember  = Request.form("SharedGroupMember")
-
-
+Search_SharedSelection  = Request.form("ShareSelection")	
+Search_SharedGroup      = Request.form("SharedGroup")
+Search_SharedGroupMember= Request.form("SharedGroupMember")
 
 'AECode search permission
 Select Case Session("shell_power")
-	case "1"
+  case "1"
 		'AE shall access their own clients only
 		Search_AEFrom = Session("id")
 		Search_AETo = Session("id")
@@ -443,7 +398,7 @@ sub OrderImage(iorder)
 end sub
 
 %>
-
+ </span>
 <%
 '*****************************************************************
 ' Start of form
@@ -567,7 +522,7 @@ end sub
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -4, Now()))
+Year_starting = Year(DateAdd("yyyy", -2, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -638,7 +593,7 @@ for i=Year_starting to Year_ending
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -4, Now()))
+Year_starting = Year(DateAdd("yyyy", -2, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -674,7 +629,9 @@ for i=Year_starting to Year_ending
      <input name="Instrument" type=text value="<%= Search_Instrument %>" size="15">&nbsp;   
  	     
     </tr>
-    
+
+
+   
 <%if session("SharedGroup") > 0 then 
 
 
@@ -750,7 +707,9 @@ RsSharedGroup.open ("Exec List_SharedGroup '"&Session("id")&"' ") ,  StrCnn,3,1
 		</tr>    
 
     </table>
-</form>    
+</form>   
+
+    
 <%
 '*****************************************************************
 ' End of form
@@ -766,7 +725,6 @@ RsSharedGroup.open ("Exec List_SharedGroup '"&Session("id")&"' ") ,  StrCnn,3,1
     
 <%
 
-'If Search_ClientFrom = "" Then
 
 If Request.form("submitted") = 0 Then
 
@@ -783,56 +741,58 @@ else
 ' If passing arguments
 '**********
 	
-	'dim Rs1 as adodb.recordset 
-	
-	'StrCnn.open myDSN 
-	
-	set Rs1 = server.createobject("adodb.recordset")
-	
-	'rs1.CursorLocation=3
-	
+dim lStrObj 
+
+dim lCR
+
+ set lCR= server.createobject("StringHandle.clsClientRebate")
+
+if err.number <> 0 then
+	response.write "<BR> This is 1 " & Err.Description
+end if
+
+ set lstrObj = server.createobject("StringHandle.clsString")	
+
+if err.number <> 0 then
+	response.write "<BR> This is 2 " & Err.Description
+end if
+
+ set Rs1 = server.createobject("adodb.recordset")
+
+if err.number <> 0 then
+	response.write "<BR> This is 2 " & Err.Description
+end if
 
  'Rs return 2 value
  '1) Total number of matched client
  '2) all records for targeted client
 
-'iRecord = (iPageCurrent -1) * RECORDPERPAGE  +1
-
-'response.write "Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Transaction_Type&"','"&Search_Market&"','"&Search_Instrument&"', '"&iRecord&"', '"&RECORDPERPAGE&"' "  
-
-'response.write ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") 
-
-
 
 	Select Case  Search_SharedSelection
 	case "share2"
 		'shared group member
-			'response.write  ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '',  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") 
+         response.write "Shared"
  			
- 			Rs1.open ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '',  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+ 			Rs1.open ("Exec retrieve_DetailTrade_GroupBy_Client_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '',  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
 			
 	case "share3"
-			'response.write  ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ")
 
- 			Rs1.open ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+ 			Rs1.open ("Exec retrieve_DetailTrade_GroupBy_Client_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
 			
 	case else
 		'normal
-		'response.write  ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") 
  
- 			Rs1.open ("Exec retrieve_DetailTrade '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
-			
+ 			Rs1.open ("Exec retrieve_DetailTrade_GroupBy_Client_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+	'Response.write ("Exec retrieve_DetailTrade_GroupBy_Client_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") 
+	
 	end select	
-
-	'Rs1.open ("Exec retrieve_DetailTrade '0', '9',  '', '', '', '8', '', '1', '2', '2009', '1', '2', '2009', '','', '1', '20', '', '' ") ,  StrCnn,3,1
-
 
 		If Err.Number <> 0 then
 			
 			'SQL connection error handler
 			response.write  "<table><tr><td class='RedClr'>" & MSG_BUSY & "<br></td></tr></table>"
 
-			End If
+		End If
 
 
 
@@ -843,59 +803,38 @@ else
 	erase itotalBrokerage		
   itotalCCYcount=0
   
-	do while (  Not rs1.EOF)
-			itotalCCYcount=itotalCCYcount+1
 
+  if Rs1.EoF then
 
-			ReDim Preserve itotalturnover(itotalCCYcount+1)
-			ReDim Preserve itotalconsideration(itotalCCYcount+1)
-			ReDim Preserve itotalBrokerage(itotalCCYcount+1)
-			ReDim Preserve itotalCCY(itotalCCYcount+1)
-
-
-			iRecordCount = iRecordCount + rs1("totalrecordcount") 'total number of records
-			itotalturnover(itotalCCYcount) = rs1("totalturnover")
-			itotalconsideration(itotalCCYcount) = rs1("totalconsideration")
-			itotalBrokerage(itotalCCYcount) = rs1("totalBrokerage")
-			itotalCCY(itotalCCYcount) = rs1("CCY")
-			
-			'			response.write "B" & j	
-			rs1.movenext
-			
-	loop
-		
-	'	response.write itotalturnover(1) & "AAA"  & itotalconsideration(1)
-	
-'iRecordCount = 0
-
-  if iRecordCount <= 0 then
-		
-		
+        response.write "No record found"
 		
 		If Err.Number <> 0 then
 			
 			'SQL connection error handler
-		'	response.write  "<table><tr><td class='RedClr'>The server is currently too busy to process your request right now. Please wait a moment and then try again. If the problem persists, please contact systems administrator.<br></td></tr></table>"
-			
+			'response.write  "<table><tr><td class='RedClr'>The server is currently too busy to process your request right now. Please wait a moment and then try again. If the problem persists, please contact systems administrator.<br></td></tr></table>"
+			'response.write Err.Number
 		else
 			'no record found
-			response.write ("No record found")
+			response.write "No record found"
 				
 		End If
+
 	else
-		'record found
-		
-		'response.write iRecordCount 
-		
-		'cal total no of pages
-		iPageCount = int(iRecordCount / RECORDPERPAGE)+1
-		
-		'move to next recordset
-  	Set rs1 = rs1.NextRecordset() 
+
+
+        'Set Rs8 = server.createobject("adodb.recordset")  
+
+        'Rs8.open ("Exec Retrieve_RebateAmount_MTD '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Rs1("Market")&"', '"&Search_AETo&"', '"&Search_AETo&"' ") ,  Conn,3,1
+        'Response.write ("Exec Retrieve_RebateAmount_MTD '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Rs3("Market")&"', '"&Search_AETo&"', '"&Search_AETo&"' ")
+
+
+      
  
 %>    
-   
-<div id="reportbody1" >
+
+</span>
+
+
 
 
    
@@ -904,363 +843,386 @@ else
 ' Start of page navigation 
 '**********
 %> 
-    <DIV align=center>
+    
 
-  <TABLE border=0 cellPadding=0 cellSpacing=0 height=100% width=99%>
-
- <tr> 
- <td align="right" height="28" class="NavaMenu" >
-
-		<%
-
-response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
-
-'First button
-%>
-	<a href=javascript:dosubmit(1) style='cursor:hand'>First</a>
-
-<%
-' Prev button
-If iPageCurrent > 1 Then
-	%>
-	<a href=javascript:dosubmit(<%= iPageCurrent-1 %>) style='cursor:hand'>Previous</a>
-<% else %>
-Previous
-	<%
-End If
-
-
-'Next button
-If iPageCurrent < iPageCount Then
-	%>
-	<a href=javascript:dosubmit(<%= iPageCurrent+1 %>) style='cursor:hand'>Next</a>
-<% else %>
-Next
-	<%
-End If
-%>
-
-<%
-'Last button
-%>
-
-<a href=javascript:dosubmit(<%= iPageCount %>) style='cursor:hand'>Last</a>
-
-</td></tr></table>
-
-</span>
-<%
-'**********
-' End of page navigation 
-'**********
-%>
+  
 
 
 
-<% if (session("shell_power") = 1 or session("shell_power") = 5) then %>  
-		<span class="noprint">
-<% end if %>
 
-     
-<br>
-
-<table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
+<table width="97%" border="0" class="normal"  cellspacing="1" cellpadding="4">
 <tr bgcolor="#FFFFCC"> 
-<td  width="20%">　</td>
+<td  width="20%"> </td>
       <td align="center">詳細交易紀錄<br><u>Detail Trade Information</u></td> 
-      <td align="right" width="20%">
-						<% 'If Session("PrintAllowed") = 1 then %>   
-						<%if (session("shell_power") <> 1 and session("shell_power") <> 5) then %>  
-							<a href="javascript:window.print()">Friendly Print</a><% 'end if %> &nbsp;&nbsp;
+      <td align="right" width="20%"><span class="noprint">
+							<%if PrintAllowed = 1 then %>  
+							<a href="javascript:window.print()">Friendly Print</a><% 'end if %>
 <% End If %>
 <%if (session("shell_power") = 8) then %>    
 <a href="javascript:window.doConvert()">Excel</a>
 						<% end if %>      	
-			</td>
+			</span></td>
 </tr>
 </table>
 <br>
-<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-
-<tr bgcolor="#ADF3B6" align="center">
-      <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADENO")  %>) >Trade Code<br>交易編號</a></td>
-      <td width="16%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADINGCCY")  %>) >Currency<br>貨幣</a></td>
-     <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADEDATE")  %>) >Trade Date<br>交易日期</a></td>
-     <td width="14%"><a href=javascript:ordersubmit(<% call OrderVariable("SETTLEDATE")  %>) >Settle Date<br>結算日期</a></td>
-   <td width="30%"><a href=javascript:ordersubmit(<% call OrderVariable("CLIENTCODE")  %>) >Client Code <br> 客戶編號 </a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("BUYSELL")  %>) >Buy/Sell<br>買/賣</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("MARKET")  %>) >Location<br>地點</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("INSTRUMENT")  %>) >Stock Code<br>股票編號</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("TTLQTY")  %>) >Share No<br>股票數量</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("PRICE")  %>) >Price<br>價錢</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("SETFXAMOUNT")  %>) >Consideration<br>交易總額</a></td>
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("a")  %>) >Client Brokerage<br>客戶佣金 </a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("b")  %>) >Client Rebate<br>客戶回扣</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE1")  %>) >Broker Brokerage<br>經紀佣金</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE2")  %>) >Charge 1<br>收入 一</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE3")  %>) >Charge 2<br>收入 二</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE4")  %>) >Charge 3<br>收入 三</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE5")  %>) >Charge 4<br>收入 四</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE6")  %>) >Charge 5<br>收入 五</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE7")  %>) >Charge 6<br>收入 六</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("ORFEE8")  %>) >Charge 7<br>收入 七</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("REBATEAMOUNT")  %>) >Broker Rebate<br>經紀回扣</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("CONSIDERATION")  %>) >Turnover<br>交易量</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("CONFIRMATIONDATE")  %>) >Confirmation Date<br>確認日期</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("BROKERAGERATE")  %>) >Brokerage Rate<br>佣金比率</a></td> 
+<table class="sortable"  width="99%" border="0" style="border-width: 0;FONT-SIZE: 11px;TEXT-ALIGN: Right;FONT-FAMILY: Verdana, 'MS Sans Serif', Arial" bgcolor="#808080" cellspacing="1" cellpadding="2">
+<tr class="alignright" bgcolor="#ADF3B6" align="center">
+   <td width="15%"><span style="cursor:hand">Client Code <br>客戶編號</span></td>
+   <td width="25%"><span style="cursor:hand">Client Name<br>客戶</span></td>
+   <td width="15%"><span style="cursor:hand">Turnover (HKD)<br>交易總額</span></td>
+   <td width="15%"><span style="cursor:hand">Brokerage (HKD)<br>佣金</span></td> 
+   <td width="15%"><span style="cursor:hand">Net Comm (HKD)<br>剩收入</sapn></td> 
+   <td width="15%"><span style="cursor:hand">Net Amount (HKD)<br>總額</span></td> 
 </tr>
-<tr bgcolor="#ADF3B6" align="center">
-			<td><% call OrderImage("TRADENO")  %></td>
-			<td><% call OrderImage("TRADINGCCY")  %></td>
-			<td><% call OrderImage("TRADEDATE")  %></td>
-			<td><% call OrderImage("SETTLEDATE")  %></td>
-			<td><% call OrderImage("CLIENTCODE")  %></td>
-			<td><% call OrderImage("BUYSELL")  %></td>
-			<td><% call OrderImage("MARKET")  %></td>
-			<td><% call OrderImage("INSTRUMENT")  %></td>
-			<td><% call OrderImage("TTLQTY")  %></td>
-			<td><% call OrderImage("PRICE")  %></td>
-			<td><% call OrderImage("NetAmount")  %></td>
-			<td><% call OrderImage("a")  %></td> 
-			<td><% call OrderImage("b")  %></td> 
-			<td><% call OrderImage("ORFEE1")  %></td> 
-			<td><% call OrderImage("ORFEE2")  %></td> 
-			<td><% call OrderImage("ORFEE3")  %></td> 
-			<td><% call OrderImage("ORFEE4")  %></td> 
-			<td><% call OrderImage("ORFEE5")  %></td> 
-			<td><% call OrderImage("ORFEE6")  %></td> 
-			<td><% call OrderImage("ORFEE7")  %></td> 
-			<td><% call OrderImage("ORFEE8")  %></td> 
-			<td><% call OrderImage("REBATEAMOUNT")  %></td> 
-			<td><% call OrderImage("CONSIDERATION")  %></td> 
-			<td><% call OrderImage("CONFIRMATIONDATE")  %></td> 
-			<td><% call OrderImage("BROKERAGERATE")  %></td> 
 
-</tr>
 		<%
+
+            
 			dim iPageCCYcount
 			dim k
 			dim iPageUpdate
-			
-			ReDim Preserve iPageCCY(1)
-			ReDim Preserve iPageturnover(1)
-			ReDim Preserve iPageconsideration(1)
-			ReDim Preserve iPagebrokerage(1)
-			
-			iPageCCYcount = 0
-			iPageturnover(0) = 0
-			iPageconsideration(0)= 0
-			iPagebrokerage(0)= 0
-			'iPageCCY(0) = ""
-			
 			dim mystr
-			do while (  Not rs1.EOF)
-				k=1
-				
-		%>
-<tr bgcolor="#FFFFCC"> 
-   <td width="14%"><%=rs1("TradeNo") %></td>
-   <td width="16%"><%=rs1("TradingCcy") %>　</td>
-   <td width="12%"><%=rs1("TradeDate") %>　</td>
-   <td width="12%"><%=rs1("SettleDate") %>　</td>
-   <td width="26%"><%=rs1("ClientCode") %><img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("ClientCode") %>')"></img></td>
-   <td width="10%"><%=rs1("BuySell") %>　</td>
-   <td width="10%"><%=rs1("Market") %>　</td>
-   <td width="10%"><%=rs1("Instrument") %></td>
-   <td width="10%"><% mystr = replace(rs1("Quantity"), chr(13), "<br>")
-   										response.write	left(mystr, len(mystr)-1) %>　</td>
-   <td width="10%"><% mystr = replace(rs1("Price"), chr(13), "<br>")
-   										response.write	left(mystr, len(mystr)-1) %>　</td>
-									
-   <td width="10%"><%=formatnumber(rs1("NetAmount")) %>　</td>
-   <td width="17%">　</td> 
-   <td width="17%">　</td> 
-   <td width="17%"><%=formatnumber(rs1("ORFee1"),2) %>　　</td> 
-   <td width="17%"><% if clng(rs1("ORFee2")) <> 0 then response.write  rs1("FeeName2") & " " & formatnumber(rs1("ORFee2"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee3")) <> 0 then response.write  rs1("FeeName3") & " " & formatnumber(rs1("ORFee3"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee4")) <> 0 then response.write  rs1("FeeName4") & " " & formatnumber(rs1("ORFee4"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee5")) <> 0 then response.write  rs1("FeeName5") & " " & formatnumber(rs1("ORFee5"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee6")) <> 0 then response.write  rs1("FeeName6") & " " & formatnumber(rs1("ORFee6"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee7")) <> 0 then response.write  rs1("FeeName7") & " " & formatnumber(rs1("ORFee7"))  end if  %>　</td> 
-   <td width="17%"><% if clng(rs1("ORFee8")) <> 0 then response.write  rs1("FeeName8") & " " & formatnumber(rs1("ORFee8"))  end if  %>　</td> 
-   <td width="17%"><%=rs1("RebateAmount")  %>　</td> 
-   <td width="17%"><%=formatnumber(rs1("Consideration"))%>　</td> 
-   <td width="17%"><%=rs1("confirmationdate") %>　</td> 
-   <td width="17%"><%=rs1("BrokerageRate") %>　</td> 
-</tr>
-<%
-				iPageUpdate = 0
-				'find if any existing CCY array
-				for k=1 to iPageCCYcount
-				
-					if iPageCCY(k) = rs1("TradingCCY") then
-							iPageturnover(k) = iPageturnover(k)  + cDbl(rs1("Consideration"))
-							iPageconsideration(k)= iPageconsideration(k)  + cDbl(rs1("NetAmount")) 
-							iPagebrokerage(k) = iPagebrokerage(k)  + cDbl(rs1("ORFee1"))
-							iPageUpdate = 1
-							Exit For
-					end if
-					
 
-				next
-				
-				
-				'if no existing CCy array found, create a new record array
-				if iPageUpdate = 0 then
-						iPageCCYcount = iPageCCYcount + 1
-						ReDim Preserve iPageCCY(iPageCCYcount)
-						ReDim Preserve iPageturnover(iPageCCYcount)
-						ReDim Preserve iPageconsideration(iPageCCYcount)
-						ReDim Preserve iPagebrokerage(iPageCCYcount)
-						
-						
-						iPageCCY(iPageCCYcount) = rs1("TradingCCY")
-						iPageturnover(iPageCCYcount) = cDbl(rs1("Consideration"))
-						iPageconsideration(iPageCCYcount)= cDbl(rs1("NetAmount")) 
-						iPagebrokerage(iPageCCYcount) = cDbl(rs1("ORFee1"))
-				end if
-				
-				
-					
-				rs1.movenext
+
+lCR.LoadData Search_From_Day, Search_From_Month, Search_From_Year, Search_To_Day, Search_To_Month, Search_To_Year, Search_Market, Search_Instrument, Session("id")
+
+			do while (Not rs1.EOF)
+				k=1
+
+
+
+
+'            set Rs4 = server.createobject("adodb.recordset")
+
+'            Rs4.open ("exec Retrieve_RebateAmount_HKD '"&rs1("ClientCode")&"','"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' "),  Conn,3,1
+'     Response.Write  ("exec Retrieve_RebateAmount_HKD '"&rs1("ClientCode")&"','"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ")
+
+lcr.FindClnt trim(rs1("ClientCode"))
+
+            Dim NetComm
+
+            NetComm = 0
+
+            totalBrokerage = formatnumber(rs1("totalBrokerage"),6)
+
+            ClientRebateFC = formatnumber(lcr.ClientRebateFC,6)
+
+
+            AECommFC = formatnumber(lcr.AECommFC,6)
+
+            BrokerCommFC = formatnumber(lcr.BrokerCommFC,6)
+
+            BrokerRebateFC = formatnumber(lcr.BrokerRebateFC,6)
+
+            IntroducerRebateFC = formatnumber(lcr.IntroducerRebateFC,6)
+
+            ResearchCreditFC = formatnumber(lcr.ResearchCreditFC,6)
+
+     
+if AEcommFC > 0 then
+
+	Netcomm = totalbrokerage - AECommFC
+        
+else
+	Netcomm = Totalbrokerage - IntroducerRebateFC 
+end if
+
+
+
+if ClientRebateFC > 0 then
+	Netcomm = Netcomm - ClientRebateFC 
+else
+	Netcomm = Netcomm - ResearchCreditFC
+end if
+
+lstrobj.ConbimeString "<tr class=" 
+lstrobj.ConbimeString  chr(34) 
+lstrobj.ConbimeString "alignright" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "bgcolor=" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "#FFFFCC" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString  "> "
+
+lstrobj.ConbimeString "<td width=" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "15%" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "><a href=" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "DetailTrade2.asp?PrintAllowed=" 
+lstrobj.ConbimeString PrintAllowed 
+lstrobj.ConbimeString "&DisplayFirst=" 
+lstrobj.ConbimeString Trim(rs1("ClientCode")) 
+lstrobj.ConbimeString "&ClientFrom=" 
+
+lstrobj.ConbimeString Search_ClientFrom 
+lstrobj.ConbimeString "&ClientTo=" 
+lstrobj.ConbimeString Search_ClientTo 
+lstrobj.ConbimeString "&AEFrom=" 
+lstrobj.ConbimeString Search_AEFrom 
+
+lstrobj.ConbimeString "&AETo=" 
+lstrobj.ConbimeString Search_AETo 
+lstrobj.ConbimeString "&Instrument=" 
+lstrobj.ConbimeString Search_Instrument 
+lstrobj.ConbimeString "&Market="
+
+lstrobj.ConbimeString Search_Market 
+lstrobj.ConbimeString "&FromDay=" 
+lstrobj.ConbimeString Search_From_Day 
+lstrobj.ConbimeString "&FromMonth="
+lstrobj.ConbimeString Search_From_Month 
+lstrobj.ConbimeString "&FromYear=" 
+lstrobj.ConbimeString Search_From_Year 
+lstrobj.ConbimeString "&Today=" 
+lstrobj.ConbimeString Search_To_Day 
+lstrobj.ConbimeString "&ToMonth=" 
+lstrobj.ConbimeString Search_To_Month 
+lstrobj.ConbimeString "&ToYear=" 
+lstrobj.ConbimeString Search_To_Year 
+lstrobj.ConbimeString "&Search_Order=ClientCode&Search_Direction=ASC&sid=" 
+lstrobj.ConbimeString SessionID 
+lstrobj.ConbimeString "#DisplayFirst" 
+lstrobj.ConbimeString chr(34) 
+lstrobj.ConbimeString "target=_blank>" 
+lstrobj.ConbimeString rs1("ClientCode") 
+lstrobj.ConbimeString "</a><span class=" 
+lstrobj.ConbimeString chr(34) & "noprint" & chr(34) & "><img border=0 src='images/tel.gif' onClick=" & chr(34) & "PopupClientContact('" & rs1("ClientCode") & "')" & chr(34) & "></img></span></td>"
+
+lstrobj.ConbimeString " <td width=" & chr(34) & "25%" & chr(34) & ">" & rs1("ClientName") & "</td>"
+lstrobj.ConbimeString " <td width=" & chr(34) & "15%" & chr(34) & ">" & formatnumber(rs1("totalturnover"),2) & "</td> "
+lstrobj.ConbimeString " <td width=" & chr(34) & "15%" & chr(34) & ">" & formatnumber(totalBrokerage,2)  & "</td> "
+lstrobj.ConbimeString " <td width=" & chr(34) & "15%" & chr(34) & ">" & formatnumber(NetComm,2) & "</td> "
+lstrobj.ConbimeString " <td width=" & chr(34) & "15%" & chr(34) & ">" & formatnumber(rs1("totalNetAmount"),2) & "</td></tr>"
+
+   
+
+   itotalturnover = itotalturnover + formatnumber(rs1("totalturnover"))
+
+   itotalbrokerage = itotalbrokerage + formatnumber(rs1("totalBrokerage"))
+
+   itotalconsideration = itotalconsideration + formatnumber(rs1("totalconsideration"))
+
+   itotalNetAmount = itotalNetAmount + formatnumber(rs1("totalNetamount"))
+
+   itotalNetComm  = itotalNetComm + formatnumber(NetComm,6)
+
+   'response.write itotalAECommFC
+
+    rs1.movenext
 				
 		loop
-		
+
+response.write lstrobj.text
+set lstrobj = nothing
+
+Rs1.Close
+Set Rs1=Nothing
 
 %>
+</table>
+<br>
+<table class="alignright"  width="99%" border="0" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
-
-<% 
-	dim l
-	For l=1 to iPageCCYcount 
-'Dim itotalturnover(), itotalconsideration(), itotalbrokerage(), itotalCCY()
-
-%>
 
 <tr bgcolor="#FFFFCC"> 
 
-   <td colspan="10" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
-   <td ><%=iPageCCY(l)%>&nbsp;<%=formatnumber(iPageconsideration(l)) %></td>
-
-   <td colspan="2" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
-   <td ><%=iPageCCY(l)%>&nbsp;<%=formatnumber(iPagebrokerage(l)) %></td>
-
-   <td colspan="8" align="right"><% if l=1 then response.write "Subtotal<BR>"%> </td>
-   <td ><%=iPageCCY(l)%>&nbsp;<%=formatnumber(iPageturnover(l)) %></td>
-
-   <td colspan="2" align="right"></td>
+   <td colspan="2" width="40%" align="right">Subtotal (HKD)<BR></td>
+   <td width="15%"><%=formatnumber(itotalturnover,2)  %></td>
+   <td width="15%"><%=formatnumber(itotalbrokerage,2) %></td>
+   <td width="15%"><%=formatnumber(itotalNetComm,2) %></td>
+   <td width="15%"><%=formatnumber(itotalNetAmount,2) %></td>
 
 </tr>
 
-<% Next %>
+<tr bgcolor="#FFFFFF"> 
+   <td colspan="6">&nbsp;</td>
+</tr>
 
-<% 
-	dim j
-	For j=1 to itotalCCYcount 
-'Dim itotalturnover(), itotalconsideration(), itotalbrokerage(), itotalCCY()
+<%
+
+    set Rs2 = server.createobject("adodb.recordset")
+    Set Rs8 = server.createobject("adodb.recordset")  
+   
+
+	Select Case  Search_SharedSelection
+	case "share2"
+		'shared group member
+         response.write "Shared"
+ 			
+ 			Rs2.open ("Exec retrieve_DetailTrade_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '',  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+
+                       Rs8.open ("Exec Retrieve_RebateAmount_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+  
+			
+	case "share3"
+
+ 			Rs2.open ("Exec retrieve_DetailTrade_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+
+                        Rs8.open ("Exec Retrieve_RebateAmount_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+   
+			
+	case else
+		'normal
+ 
+ 			Rs2.open ("Exec retrieve_DetailTrade_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '1', '100', 'ClientCode', 'ASC' ") ,  StrCnn,3,1
+		 'Response.write  ("Exec retrieve_DetailTrade_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ")        
+
+                    Rs8.open ("Exec Retrieve_RebateAmount_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+               'Response.write   	("Exec Retrieve_RebateAmount_MTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") 
+ 
+	
+	end select	
+
+ 
+
+
+    If Not Rs2.EoF Then
+
+    MTDTurnover  = formatnumber(rs2("totalturnover"),2)
+    MTDBrokerage = formatnumber(rs2("totalBrokerage"),2)
+    
+    
+    MTDAECommFC = formatnumber(Rs8("AECommFC"),2)
+    MTDIntroducerRebateFC =   formatnumber(Rs8("IntroducerRebateFC"),2)
+    MTDClientRebateFC =  formatnumber(Rs8("ClientRebateFC"),2) 
+    MTDResearchCreditFC = formatnumber(Rs8("ResearchCreditFC"),2)
+ 
+ 
+
+    MTDNetAmount = rs2("totalNetAmount")
+
+
+
+    MTDNetcomm = MTDBrokerage - MTDAECommFC - MTDIntroducerRebateFC  - MTDResearchCreditFC - MTDClientRebateFC
+
+    MTDNetAmount = formatnumber(rs2("totalNetAmount"),2)
+
+    End If
 
 %>
-
-
+   
 <tr bgcolor="#FFFFCC"> 
 	 
-   <td colspan="10" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
-   <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalconsideration(j)) %></td>
-
-   <td colspan="2" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
-   <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalbrokerage(j)) %></td>
-
-   <td colspan="8" align="right"><% if j=1 then response.write "Total<BR>"%>  </td>
-   <td ><%=itotalCCY(j)%>&nbsp;<%=formatnumber(itotalturnover(j)) %></td>
-
-   <td colspan="2" align="right"></td>
+   <td colspan="2" align="right">MTD Subtotal (HKD)</td>
+   <td ><%=MTDTurnover%></td>
+   <td ><%=formatnumber(rs2("totalBrokerage"),2)%></td>
+   <td ><%=formatnumber(MTDNetComm,2)%></td>
+   <td ><%=MTDNetAmount%></td>
 
 </tr>
 
-<% Next %>
+<%    
+
+Rs2.Close
+Set Rs2=Nothing
+set lCR= Nothing
+
+%>
+
+
+
+
+<tr bgcolor="#FFFFFF"> 
+   <td colspan="6">&nbsp;</td>
+</tr>
+
+<%
+
+    
+     set Rs3 = server.createobject("adodb.recordset")
+     Set Rs9 = server.createobject("adodb.recordset")  
+
+
+	Select Case  Search_SharedSelection
+	case "share2"
+		'shared group member
+         response.write "Shared"
+ 			
+ 			Rs3.open ("Exec retrieve_DetailTrade_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '',  '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+
+
+                        Rs9.open ("Exec Retrieve_RebateAmount_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_SharedGroupMember&"', '"&Search_SharedGroupMember&"', '', '"&session("shell_power")&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+  
+			
+	case "share3"
+
+ 			Rs3.open ("Exec retrieve_DetailTrade_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+
+               Rs9.open ("Exec Retrieve_RebateAmount_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"',  '', '', '', '"&session("shell_power")&"', '"&Search_SharedGroup&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+
+			
+	case else
+		'normal
+ 
+ 			Rs3.open ("Exec retrieve_DetailTrade_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  StrCnn,3,1
+
+                           Rs9.open ("Exec Retrieve_RebateAmount_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") ,  Conn,3,1
+   	
+	'response.write	    ("Exec Retrieve_RebateAmount_YTD_HKD '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_To_Day&"', '"&Search_To_Month&"', '"&Search_To_Year&"', '"&Search_Market&"','"&Search_Instrument&"' ") 
+			
+	end select	
+
+
+If Not Rs3.EoF Then
+
+    Dim YTDNetComm
+    YTDNetComm = 0
+
+    
+    YTDTurnover  = formatnumber(rs3("totalturnover"),2)
+    YTDBrokerage = formatnumber(rs3("totalBrokerage"),2)
+
+
+    YTDAECommFC = formatnumber(Rs9("AECommFC"),2)
+    YTDIntroducerRebateFC =   formatnumber(Rs9("IntroducerRebateFC"),2)
+    YTDClientRebateFC =  formatnumber(Rs9("ClientRebateFC"),2) 
+    YTDResearchCreditFC = formatnumber(Rs9("ResearchCreditFC"),2)
+    YTDIntroducerRebateFC =  formatnumber(Rs9("IntroducerRebateFC"),2)
+
+    YTDNetcomm = YTDBrokerage - YTDAECommFC - YTDIntroducerRebateFC  - YTDResearchCreditFC - YTDClientRebateFC
+
+
+
+    YTDNetAmount = formatnumber(rs3("totalNetAmount"),2)
+  
+    
+
+   
+    End If
+
+Rs3.Close
+Set Rs3=Nothing
+
+%>
+
+<tr bgcolor="#FFFFCC"> 
+
+   <td colspan="2" align="right">YTD Subtotal (HKD)<BR></td>
+   <td ><%=YTDTurnover%></td>
+   <td ><%=YTDBrokerage%></td>
+   <td ><%=formatnumber(YTDNetComm,2)%></td>
+   <td ><%=YTDNetAmount%></td>
+</tr>
+
 </table>
 <br>
 <br>
 
-<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-	<tr bgcolor="#FFFFCC"> 
-      <td width="166%" height="18" align="center">End of Statement</td>
-	</tr>
-</table>
-                
+
 </div>
-              </center>
 
-
-
-<% if (session("shell_power") = 1 or session("shell_power") = 5) then %>  
-		</span>
-<% end if %>
-
-<span class="noprint">
-<%
-'**********
-' Start of page navigation 
-'**********
-%> 
-    <DIV align=center>
-
-  <TABLE border=0 cellPadding=0 cellSpacing=0 height=100% width=99%>
-
- <tr> 
- <td align="right" height="28" class="NavaMenu" >
-
-		<%
-
-response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
-
-'First button
-%>
-	<a href=javascript:dosubmit(1) style='cursor:hand'>First</a>
-
-<%
-' Prev button
-If iPageCurrent > 1 Then
-	%>
-	<a href=javascript:dosubmit(<%= iPageCurrent-1 %>) style='cursor:hand'>Previous</a>
-<% else %>
-Previous
-	<%
-End If
-
-
-'Next button
-If iPageCurrent < iPageCount Then
-	%>
-	<a href=javascript:dosubmit(<%= iPageCurrent+1 %>) style='cursor:hand'>Next</a>
-<% else %>
-Next
-	<%
-End If
-%>
-
-<%
-'Last button
-%>
-
-<a href=javascript:dosubmit(<%= iPageCount %>) style='cursor:hand'>Last</a>
-
-</td></tr></table>
 
 
 <%
-'**********
-' End of page navigation 
-'**********
-%>
-
-
-<%
-	end if 'record found if statement
+	    
+    end if 'record found if statement
 end if   'having client number if statement
 %>
 
-</div>
+
 
 <%
 '*****************************************************************
@@ -1268,17 +1230,8 @@ end if   'having client number if statement
 '*****************************************************************
 %>
                 
-                
-                
-                </td>
-                </tr>
-              </table>
               
-</div>
-
-</span>
               </body>
-
               </html>
               
 <%
@@ -1292,11 +1245,12 @@ end if   'having client number if statement
  Set Rs2 = Nothing
  Conn.Close
  Set Conn = Nothing
+ PrintAllowed = 0
 %>
 <SCRIPT language=JavaScript>
 <!--
 function doConvert(){
-window.open("ConvertDetailTrade.asp?Search_Instrument=<%=Search_Instrument%>&Search_Market=<%=Search_Market%>&From_Day=<%=Search_From_Day%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>&To_day=<%=Search_To_Day%>&To_Month=<%=Search_To_Month%>&To_Year=<%=Search_To_Year%>"); 
+window.open("ConvertDetailTrade.asp?Search_Instrument=<%=Search_Instrument%>&Search_Market=<%=Search_Market%>&From_Day=<%=Search_From_Day%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>&To_day=<%=Search_To_Day%>&To_Month=<%=Search_To_Month%>&To_Year=<%=Search_To_Year%>&Search_SharedGroupMember=<%=Search_SharedGroupMember%>&Search_SharedGroup=<%=Search_AEGroup%>"); 
 
 }
 

@@ -164,6 +164,24 @@ function ordersubmit(iorder, idirection){
 	document.fm1.Direction.value=idirection;
   document.fm1.submit();
 }
+
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
+
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 //-->
 </SCRIPT>
 

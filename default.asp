@@ -1,7 +1,7 @@
 
 <%
 
-Title = "Intranet"
+Title = "UOB Intranet"
 session("shell_power")= 0
 'Session("SystemMessage") = ""
 

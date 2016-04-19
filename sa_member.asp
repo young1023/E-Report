@@ -257,7 +257,7 @@ document.onmousedown=click;
 
 	    fsql = fsql & "From (Member m Left Join UserLevel l on m.UserLevel = l.LevelNumber ) "
 	    
-	    fsql  =  fsql  &  " Left Join UserGroup u on m.GroupID = u.GroupID and u.sharing=0 " 
+	    fsql  =  fsql  &  " Left Join UserGroup u on m.GroupID = u.GroupID and u.sharing=0" 
 	    
         If findnum <> "" Then
         
@@ -323,7 +323,7 @@ document.onmousedown=click;
 		 Branch<br/><a href="sa_member.asp?SortingID=Branch&sid=<%=SessionID%>"><img border="0" src="images/up.gif"></a><a href="sa_member.asp?SortingID=Branch&FilterID=1&sid=<%=SessionID%>"><img border="0" src="images/down.gif"></a></font></td>
   <td width="10%">Share Group</td>
  																								<td width="10%">
-										  Password Expired Date<br><a href="sa_member.asp?SortingID=LastPasswordChangeDate&sid=<%=SessionID%>"><img border="0" src="images/up.gif"></a><a href="sa_member.asp?SortingID=LastPasswordChangeDate&FilterID=1&sid=<%=SessionID%>"><img border="0" src="images/down.gif"></a><br/></td>
+										  Password Expired Date<a href="sa_member.asp?SortingID=LastPasswordChangeDate&sid=<%=SessionID%>"><img border="0" src="images/up.gif"></a><a href="sa_member.asp?SortingID=LastPasswordChangeDate&FilterID=1&sid=<%=SessionID%>"><img border="0" src="images/down.gif"></a><br/></td>
  																		<td width="10%">
 																		Lock<br/><a href="sa_member.asp?SortingID=Lock&sid=<%=SessionID%>"><img border="0" src="images/up.gif"></a><a href="sa_member.asp?SortingID=Lock&FilterID=1&sid=<%=SessionID%>"><img border="0" src="images/down.gif"></a></td>                                      
                                     <td width="7%">Delete</td>
@@ -388,7 +388,7 @@ document.onmousedown=click;
    response.write "<td align=center>"
    
    
-   If (session("shell_power") = 8 or session("shell_power") = 3) Then
+   If session("shell_power") = 8 Then
      response.write "<input type=checkbox name=mid value="&frs("MemberID")&">"
    End if
    response.write "</td>"
@@ -486,9 +486,7 @@ document.ok.submit();
                                   <%
 if frs.recordcount>0 then
   response.write "<input type='button' value='   New Member   ' onClick='NewMember();' class='common'>&nbsp;"
-  If (session("shell_power") = 8 or session("shell_power") = 3) Then
   response.write "<input type='button' value='   Delete   ' onClick='delcheck();' class='common'>&nbsp;"
-  End If
   response.write "<input type='button' value='   Excel   ' onClick='doConvert();' class='common'>&nbsp;"
   response.write "<input type=hidden value='' name=whatdo>"
   response.write "<input type=hidden value="&pageid&" name=pageid>"

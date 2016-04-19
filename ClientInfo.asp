@@ -152,7 +152,23 @@ function dosubmit(what){
 	
 }
 
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
 //-->
 </SCRIPT>
@@ -736,7 +752,7 @@ End If
 			do while (  Not rs1.EOF) 
 				if rs1("sectioncode") = "1700" then
 					if isnumeric(rs1("FieldValue")) then
-						response.write rs1("FieldValue")
+						response.write formatnumber(rs1("FieldValue"),2)
 						response.write "<BR>"
 					end if
 					rs1.movenext
@@ -760,7 +776,7 @@ End If
       <% 
 			do while (  Not rs1.EOF) 
 				if rs1("sectioncode") = "1800" then
-					response.write CDbl(rs1("FieldValue"))
+					response.write rs1("FieldValue")
 					response.write "<BR>"
 					rs1.movenext
 				end if	
@@ -804,7 +820,7 @@ End If
       <% 
 			do while (  Not rs1.EOF) 
 				if rs1("sectioncode") = "2000" then
-					response.write CDbl(rs1("FieldValue"))
+					response.write rs1("FieldValue")
 					response.write "<BR>"
 					rs1.movenext
 				end if	
@@ -827,7 +843,7 @@ End If
       <% 
 			do while (  Not rs1.EOF) 
 				if rs1("sectioncode") = "2100" then
-					response.write CDbl(rs1("FieldValue"))
+					response.write rs1("FieldValue")
 					response.write "<BR>"
 					rs1.movenext
 				end if	

@@ -160,12 +160,6 @@ function listToAray(fullString, separator) {
     
      Conn.Execute(sqv)
 
-       ' Set Error situation
-            'Err.Clear
-         'On Error Resume Next
-  
-    'response.end
-
     Sql3 = "bulk insert vw_"&DepotID
 
     Sql3 = Sql3 & " from '"&sFolder&"\"&x.Name&"'"
@@ -187,7 +181,7 @@ function listToAray(fullString, separator) {
     Conn.Execute(Sql3)
 
 
-            ' REcord if there is error
+            ' Record if there is error
             If Err.Number <> 0 Then
   
   
@@ -219,7 +213,7 @@ function listToAray(fullString, separator) {
            
          response.write x.Name
 
-         fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
+         'fs.movefile sFolder&"\"&x.Name , RsFd("SettingValue") 
     
 
      next

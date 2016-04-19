@@ -205,7 +205,7 @@ for i=Year_starting to Year_ending
 
      <%
 
-            sql = "Select DepotID, DepotCode, DepotName From ReconDepotFolder order by depotID "
+            sql = "Select DepotID, DepotCode, DepotName From ReconDepotFolder order by depotcode "
 
             set rs = Conn.Execute(sql)
 
@@ -277,7 +277,7 @@ for i=Year_starting to Year_ending
 
        fsql = fsql & " from StockReconciliation s join ReconDepotFolder r on s.depotid = r.depotid "
 
-       fsql = fsql & " Where s.UnitHeld is not null and ISNUMERIC(s.UnitHeld) = 1  "
+      ' fsql = fsql & " Where s.UnitHeld is not null and ISNUMERIC(s.UnitHeld) = 1  "
 
        If Search_DepotID <> "" then
 
@@ -354,7 +354,7 @@ for i=Year_starting to Year_ending
 
 <tr bgcolor="#ADF3B6" align="center">
       
-      <td width="40%">Depot</td>
+      <td >Depot</td>
       <td>Month</td>
       <td>Local Exchange Symbol</td>
       <td>Instrument Name</td>
@@ -381,7 +381,7 @@ for i=Year_starting to Year_ending
 
 <td>
 <%
-    Sql_I = "Select ShortName from UOBKHHKEQPRO.dbo.Instrument where 1=1 "
+    Sql_I = "Select distinct ShortName from UOBKHHKEQPRO.dbo.Instrument where 1=1 "
 
     If frs("ISINCode") <> "" Then
 
@@ -417,9 +417,17 @@ for i=Year_starting to Year_ending
 <td>
 
 <% 
+     If Not Rs_I.EoF then
+     
+        Do While Not  Rs_I.Eof   
    
-   
-          Response.Write Rs_I("ShortName") 
+          Response.Write Rs_I("ShortName") & "<br/>"
+          
+          Rs_I.MoveNext
+           
+        Loop
+        
+    End If
 
    
 

@@ -24,6 +24,7 @@ DepotID = trim(Request("DepotID"))
    Set Rs1 = Conn.Execute(SQL1)
 
 FileType = Rs1("FileType")
+DepotCode = Rs1("DepotCode")
 
 
 
@@ -85,6 +86,7 @@ function listToAray(fullString, separator) {
   
       'Audit Log
       Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
+      
          
 
 
@@ -92,7 +94,7 @@ Set objFile = fs.OpenTextFile(sFolder&"\"&x.Name, 1)
 
 Do Until objFile.AtEndOfStream
     strLine = objFile.ReadLine
-    strLine = replace(strLine,"'","")
+    strLine = replace(strLine,"'","-")
  
     intLength = Len(strLine)
 
@@ -149,11 +151,11 @@ Do While Not objSourceFile.AtEndOfStream
 
     intLength = Len(strData)
 
-    'response.write intLength & "<br>"
-    'response.write strData
+    response.write intLength & "<br>"
+    response.write strData
     
     
-    If intLength = 75 and DepotID = 48 then
+    If intLength = 75 and DepotCode = 605 then
 	
 	strName2 = Trim(Mid(strData, 1, 29))
 	strName3 = replace(replace(Trim(Mid(strData, 65, 15)),",",""),".","")
@@ -184,12 +186,14 @@ Do While Not objSourceFile.AtEndOfStream
      
      End If
  
-     ElseIf intLength = 80  and DepotID = 23 then
+     ElseIf intLength = 80  and DepotCode = 202 then
 
 
     strName1 = Trim(Mid(strData, 1, 9))
 	strName2 = Trim(Mid(strData, 37, 15))
 	strName3 = replace(replace(Trim(Mid(strData, 50, 15)),",",""),".","")
+	
+	
 	
    sql_i1 = "Insert into StockReconciliation (DepotID, ImportFileName, ISINCode, UnitHeld) Values (" & DepotID & ", '" & x.Name & "' , '" & strName2 & "' , '" & strName3 &"')"
 
@@ -199,7 +203,6 @@ Do While Not objSourceFile.AtEndOfStream
   	
   
     response.write sql_i1 & "<br>"
-    'response.end
     Conn.Execute(sql_i1)
   
 

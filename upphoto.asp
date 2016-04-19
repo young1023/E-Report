@@ -1,17 +1,12 @@
-
-<!--#include file="include/SessionHandler.inc.asp" -->
-<%
-if session("shell_power")="" then
-  response.redirect "logout.asp?r=1"
-end if
- 
+<!--#include file="images/conne.inc" -->
+<% 
 order_id = session("order_id")
 'response.write order_id
 %>
 <html>
 <head>
-<title>Upload File</title>
-<link rel="stylesheet" type="text/css" href="include/uob.css" />
+<title>Shell Gas Maintenance Database</title>
+<link rel="stylesheet" type="text/css" href="hse.css" />
 <meta http-equiv="Refresh" content="2; url='upload_photo.asp?flag=<% =order_id %>'">
 </head>
 

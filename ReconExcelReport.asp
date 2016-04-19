@@ -76,14 +76,12 @@ TD.caption
 <tr bgcolor="#ADF3B6" align="center">
       
       <td width="20%" >Depot</td>
-      <td width="7%" >Depot Code</td>
-      <td width="7%" >Location</td>
+      <td width="7%" >Depot Code</td>   
       <td width="7%" >STOCK Code</td>
-      <td width="7%">Local Code</td>
       <td width="30%">Instrument Name</td>
-      <td>Status</td>
-      <td>ABC Position</td>
+  
       <td>Custodian Position</td>
+          <td>ABC Position</td>
       <td>Difference</td>    
 </tr>
 <%		
@@ -115,15 +113,7 @@ TD.caption
 %>
 </td>
 
-<td>
-<%
-   
-        Response.Write Rs1("Location")
 
-
- 
-%>
-</td>
 <td>
 <%
        If Rs1("Instrument") <> "" Then
@@ -144,7 +134,7 @@ TD.caption
  
 %>
 </td>
-<td><% = Rs1("Local Code") %></td>
+
 <td>
 <% 
 
@@ -155,7 +145,7 @@ TD.caption
 %>
 </td>
 
-<td></td>
+
 <td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
 <td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
 <td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td>
@@ -208,7 +198,6 @@ TD.caption
 %>
 </td>
 
-<td></td>
 
 <td><%
        If Rs1("Instrument") <> "" Then
@@ -228,21 +217,43 @@ TD.caption
 
  
 %></td>
-<td></td>
+
 <td>
 <% 
 
-        sql2 = "Select InstrumentName from ReconMonthly where "
+        sql2 = "Select ShortName from UOBKHHKEQPRO.dbo.Instrument where "
+        
+        If Trim(Rs1("Instrument")) <> "" then
 
-        sql2 = sql2 & "(ISIN = '" & Rs1("ISIN") &"' or Instrument = '" & Rs1("Instrument") & "' )"
+        sql2 = sql2 & " Instrument = '" & Trim(Rs1("Instrument")) & "'"
+        
+        Elseif Trim(Rs1("ISIN")) <> "" then
+        
+        sql2 = sql2 & " ISIN = '" & Trim(Rs1("ISIN")) & "'"
+        
+        Else 
+        
+        sql2 = sql2 & " Sedol = '" & Trim(Rs1("Sedol")) &"'"
+        
+        End if
+             
+        'response.write sql2
 
         Set Rs2 = Conn.execute(sql2)
+        
+        If not Rs2.Eof then
 
-        Response.Write Rs2("InstrumentName")
+        Response.Write Rs2("ShortName")
+        
+        Else
+        
+        Response.write "Instrument name cannot be found."
+        
+        End if
 
 %>
 </td>
-<td></td>
+
 
 <td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
 <td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
@@ -293,26 +304,14 @@ TD.caption
  
 %>
 </td>
-<td></td>
+
 <td><%
-       If Rs1("Instrument") <> "" Then
-       
-        Response.Write Rs1("Instrument")
-        
-       Elseif Rs1("ISIN") <> "" Then
-       
-        Response.Write Rs1("ISIN")
-        
-       Else
-       
-        Response.Write Rs1("Sedol")
-        
-       End If
+       Response.Write Rs1("StockCode")
 
 
  
 %></td>
-<td></td>
+
 <td>
 <% 
 
@@ -324,7 +323,6 @@ TD.caption
 </td>
 
 
-<td></td>
 
 <td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
 <td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>

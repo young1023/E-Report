@@ -224,6 +224,23 @@ function ordersubmit(iorder, idirection){
   document.fm1.submit();
 }
 
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
+
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
 //-->
 </SCRIPT>
@@ -291,6 +308,29 @@ Search_Direction        = Request.form("Direction")
 Search_SharedSelection  = Request.form("ShareSelection")	
 Search_SharedGroup      = Request.form("SharedGroup")
 Search_SharedGroupMember= Request.form("SharedGroupMember")
+
+
+'response.write "1 " & Search_AEGroup	    & "<BR>"
+'response.write "2 " & Search_ClientFrom   & "<BR>"
+'response.write "3 " & Search_ClientTo     & "<BR>"
+'response.write "4 " & Search_AEFrom       & "<BR>"
+'response.write "5 " & Search_AETo         & "<BR>"
+'response.write "6 " & Search_From_Day     & "<BR>"
+'response.write "7 " & Search_From_Month   & "<BR>"
+'response.write "8 " & Search_From_Year    & "<BR>"
+'response.write "9 " & Search_Transaction_Type & "<BR>"
+'response.write "10 " & Search_Market           & "<BR>"
+'response.write "11 " & Search_Instrument       & "<BR>"
+'response.write "12 " & Search_Order            & "<BR>"
+'response.write "13 " & Search_AccountType      & "<BR>"
+'response.write "14 " & Search_Amount_type      & "<BR>"
+'response.write "15 " & Search_balance_greater  & "<BR>"
+'response.write "16 " & Search_balance_less  & "<BR>"
+'response.write "17 " & Search_Direction        & "<BR>"
+'response.write "18 " & Search_SharedSelection  & "<BR>"
+'response.write "19 " & Search_SharedGroup      & "<BR>"
+'response.write "20 " & Search_SharedGroupMember & "<BR>"
+
 
 
 'AECode search permission
@@ -523,7 +563,7 @@ end sub
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -10, Now()))
+Year_starting = Year(DateAdd("yyyy", -1, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -736,7 +776,15 @@ else
  
  			Rs1.open ("Exec Retrieve_ClientSummaryDetail_GroupBy_Client '"&Search_ClientFrom&"', '"&Search_ClientTo&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_From_Day&"', '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"','"&Search_Instrument&"',  '"&Search_Amount_type&"', '"&Search_balance_greater&"','"&Search_balance_less&"','"&Search_AccountType&"', '"&iPageCurrent&"', '"&RECORDPERPAGE&"', '"&Search_Order&"', '"&Search_Direction&"' ") ,  Conn,3,1
 
-   				
+
+response.write "11 " & iPageCurrent & "<BR>"
+response.write "22 " & RECORDPERPAGE & "<BR>"
+response.write "33 " & Search_Order & "<BR>"
+response.write "44 " & Search_Direction & "<BR>"
+response.write "55 " & Search_Amount_type & "<BR>"
+response.write "66 " & Search_balance_greater & "<BR>"
+response.write "77 " & Search_balance_less & "<BR>"
+response.write "88 " & Search_AccountType & "<BR>"
 			
 	end select	
 

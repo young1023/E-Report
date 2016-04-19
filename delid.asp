@@ -133,29 +133,6 @@ Select case whatdo
 
    whatgo="unlock.asp"
 
-'==========================================================================
-'
-'
-'  Delete Recon Check List Record
-'
-'
-'==========================================================================
-
-
- case "del_record"
- 
-  delid=split(trim(request.form("mid")),",")
-   
-   for i=0 to Ubound(delid)
-     sql="Delete from StockReconciliation where id ="&trim(delid(i))
-     conn.execute(sql)
-	 'response.write sql&"<br>"
-   next
-   
-
-   whatgo="ReconCheckList.asp?sid=<%=SessionID%>"
-
-
 
  
 case ""

@@ -11,15 +11,6 @@ Search_ISIN             = Request.form("ISIN")
 Search_Sedol            = Request.form("Sedol")
 Search_Match            = Request.form("Match")
 
-'response.write search_DepotCode
-
-if Search_DepotCode = "" then
-
-  Search_DepotCode = "105"
-  
-end if
-
-
 
 ' Retrieve page to show or default to the first
 If Request.form("page") = "" Then
@@ -27,6 +18,7 @@ If Request.form("page") = "" Then
 Else
 	iPageCurrent = Clng(Request.form("page"))
 End If
+
 
 If Search_From_Month = "" Then
      Search_From_Month = month(Session("DBLastModifiedDateValue")) - 1
@@ -80,11 +72,11 @@ function dosubmit(what){
 	
 }
 
-function doRetrieve(){
- 
- document.fm1.action="ReconReport.asp?sid=<%=SessionID%>";
- document.fm1.whatdo.value=1;
- document.fm1.submit();
+function doretrieve(){
+
+ //   window.open('Retrieve_ABC.asp?sid=<%=SessionID%>', 'winname', 'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=400,height=350');
+ document.fm1.action="Retrieve_ABC.asp?sid=<%=SessionID%>";
+document.fm1.submit();
 	
 }
 
@@ -153,11 +145,9 @@ for i=Year_starting to Year_ending
 
 			</select> </td>
      
-     <td width="20%"></td> 
-      <td>
-<span class="noprint">
-<input id="Retrieve" type="button" value=" Retrieve last month data from ABC " onClick="doRetrieve();"></td>
-</span> 
+     <td width="20%"> <input id="Button1" type="button" value="Retrieve ABC Position" onClick="doretrieve();"></td>
+      <td></td>
+
  	     
 	
     
@@ -248,16 +238,25 @@ for i=Year_starting to Year_ending
 
 <%
 
+   
 
 ' Start the Queries
 ' *****************
+
      set Rs1 = server.createobject("adodb.recordset")
 
-    'response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") 
+    response.write ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") 
               
 	Rs1.open ("Exec Retrieve_MonthReport '"&Search_From_Month&"', '"&Search_From_Year&"', '"&Search_Market&"', '"&Search_DepotCode&"', '"&Search_Match&"' , '"&iPageCurrent&"' ") ,  conn,3,1
 
 
+	'assign total number of pages
+	
+	
+	
+	iRecordCount = Rs1("Tcount")
+	
+  
 
 %>   
   
@@ -272,8 +271,22 @@ for i=Year_starting to Year_ending
 <td  width="20%">¡@</td>
       <td align="center">Reconciliation Exception Report</td> 
       <td align="right" width="20%">
+      
+ <%
+ 
+ ' show excel and print button only when there is record
+ 
+ if Search_DepotCode <> "" then
+ 
+ %>
 						
 <a href="javascript:window.doConvert()">Excel</a>&nbsp;<a href="javascript:window.print()">Friendly Print</a>
+
+<%
+
+ end if
+
+ %>
 					   	
 			</td>
 </tr>
@@ -284,8 +297,7 @@ for i=Year_starting to Year_ending
 
 <%
 
-	'assign total number of pages
-	iRecordCount = Rs1("Tcount")
+
 
 
   if iRecordCount <= 0 then
@@ -296,10 +308,17 @@ for i=Year_starting to Year_ending
 						
 	else
 
-		
+		if Search_DepotCode <> "" then
 		
         'cal total no of pages
-		iPageCount = int(iRecordCount / 200) + 1
+		iPageCount = int(iRecordCount / 1000) + 1
+		
+		else
+		
+		 'cal total no of pages
+		iPageCount = int(iRecordCount / 10) + 1
+		
+		end if
 
 		'move to next recordset
   	Set Rs1 = Rs1.NextRecordset() 
@@ -364,10 +383,20 @@ End If
         
 </tr>
 <%		
+     ' define varable to check instrument code and qty
+    QTY0 = 0 
+    QTY1 = 0
+    Instrument0 = ""
+    Instrument1 = ""
     i=0
+    
+    
   do while Not Rs1.EoF
 
    if Rs1.eof then exit do
+   
+   Instrument0 = Instrument1
+   QTY0        = QTY1
 
    i=i+1
 		
@@ -387,7 +416,7 @@ End If
    
         Response.Write Rs1("DepotCode")
 
-
+        'Response.write Instrument0
  
 %>
 </td>
@@ -397,18 +426,23 @@ End If
        
         Response.Write Rs1("Instrument")
         
+        Instrument1 = Rs1("Instrument")
+        
        Elseif Rs1("ISIN") <> "" Then
        
         Response.Write Rs1("ISIN")
+        
+        Instrument1 =  Rs1("ISIN")
         
        Else
        
         Response.Write Rs1("Sedol")
         
+         Instrument1 = Rs1("Sedol")
+        
        End If
 
-
- 
+   
 %></td>
 <td>
 <% 
@@ -422,8 +456,38 @@ End If
 
 
 <td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
-<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
-<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
+<td ><%
+         QTY1 = formatnumber(Rs1("TotalQTY"),0)
+
+         If trim(Instrument0) = Trim(Instrument1) and trim(QTY0) = trim(QTY1) then
+         
+          Response.Write "0"
+          
+          Else
+
+          Response.Write formatnumber(Rs1("TotalQTY"),0)
+          
+          End if
+ 
+    %>
+
+</td>
+<td>
+<%  
+
+            If trim(Instrument0) = Trim(Instrument1) and trim(QTY0) = trim(QTY1) then  
+
+            Response.Write formatnumber(Rs1("UnitHeld"),0)
+            
+    Else
+
+ %>
+
+<% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %>
+
+<% End If  %>
+
+</td> 
 
 
 
@@ -497,11 +561,15 @@ End If
 <td>
 <% 
 
-        sql2 = "Select ShortName from UOBKHHKEQPRO.dbo.Instrument where "
+        
+
+        sql2 = "Select distinct ShortName from UOBKHHKEQPRO.dbo.Instrument where "
         
         If Trim(Rs1("Instrument")) <> "" then
 
         sql2 = sql2 & " Instrument = '" & Trim(Rs1("Instrument")) & "'"
+        
+        Check
         
         Elseif Trim(Rs1("ISIN")) <> "" then
         
@@ -518,8 +586,14 @@ End If
         Set Rs2 = Conn.execute(sql2)
         
         If not Rs2.Eof then
+        
+           Do While Not Rs2.EoF
 
-        Response.Write Rs2("ShortName")
+        Response.Write Rs2("ShortName") & "<br/>"
+        
+           Rs2.Movenext
+           
+           Loop
         
         Else
         
@@ -582,19 +656,11 @@ End If
 </td>
 
 <td><%
-       If Rs1("Instrument") <> "" Then
+      
        
-        Response.Write Rs1("Instrument")
+        Response.Write Rs1("StockCode")
         
-       Elseif Rs1("ISIN") <> "" Then
-       
-        Response.Write Rs1("ISIN")
-        
-       Else
-       
-        Response.Write Rs1("Sedol")
-        
-       End If
+ 
 
 
  
@@ -644,31 +710,15 @@ End If
 <span class="noprint">
  <%
 
-
-      'record found
-      response.write "Total <font color=red>"& i &"</font> Records "
+     
   
-	 if   findrecord >0 then
+ 
+ ' show excel and print button only when there is record
+  
+	 if   iRecordCount > 0 then
                
-      
-
-             call countpage(PageSize ,pageid)
-			 response.write "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			 if Clng(pageid)<>1 then
-                 response.write " <a href=javascript:gtpage('1') style='cursor:hand' >First</a> "
-                 response.write " <a href=javascript:gtpage('"&(pageid-1)&"') style='cursor:hand' >Previous</a> "
-			 else
-                 response.write " First "
-                 response.write " Previous "
-			 end if
-	         if Clng(pageid)<>Clng(Rs1.PageCount) then
-                 response.write " <a href=javascript:gtpage('"&(pageid+1)&"') style='cursor:hand' >Next</a> "
-                 response.write " <a href=javascript:gtpage('"&Rs1.PageCount&"') style='cursor:hand' >Last</a> "
-             else
-                 response.write " Next "
-                 response.write " Last "
-			 end if
-	         response.write "&nbsp;&nbsp;"
+             response.write "Total <font color=red>"& i &"</font> Records "
+   
 	 end if
 
 if   findrecord>0 then

@@ -419,26 +419,28 @@ if trim(request("action_button")) = "EditInstrument" then
 end if
 
 
-' Modify AccountID
+' Delete AccountID
 '*******************
-if trim(request("action_button")) = "EditAccountID" then
+if trim(request("action_button")) = "DeleteAccountID" then
 
-	AccID3 = trim(request.form("AccID3"))
-  
-	DepotCode3 = trim(request.form("DepotCode3"))
-    
-     sql = "Select DepotID from ReconDepotFolder where depotcode = '"&DepotCode3&"'"
-
-     Set rs = Conn.Execute(sql)
-
-     depotid = rs("depotID")
-
+	AccID1 =  split(trim(request.form("AccID1")),",")
+     
 	
-	sql_Acc="Update ReconAccountID set DepotCode = '"&  depotCode3 &"' , DepotID = "& DepotID &" where AccountID = '"& AccID3 & "'"
-	response.write sql_Acc
-	    conn.execute sql_Acc 
 
-        Message =  "Done."
+
+	for i=0 to ubound(AccID1)
+	
+		sql_d="Delete From ReconAccountID where DepotID = "&  AccID1(i) 
+		
+		response.Write sql_d
+		'response.end
+		
+	    conn.execute sql_d 
+
+
+	next
+
+        Message =  "Depot was Deleted."
 
 
 	
@@ -479,24 +481,32 @@ if trim(request("action_button")) = "AddAccount" then
 
         Set rs = Conn.Execute(sql)
 
-        response.write sql
+        'response.write sql
 
         If Not rs.EoF Then
 
          depotid = rs("DepotID")
 
-        End If
+        
       
 		sql2 = "insert into ReconAccountID (AccountID, DepotCode, DepotID) "
 
         sql2 = sql2 & "values ( '"& AccID2 & "', '"& DepotCode2 & "', "& DepotID &")"
 
-        response.write sql2
+        'response.write sql2
 
-        'Conn.Execute sql2
+        Conn.Execute sql2
 
 
         Message =  "The items were added."
+        
+        
+        Else
+        
+        Message = "No such Depot."
+        
+        
+        End If
 	
 		set acres=nothing
 end if
@@ -807,11 +817,11 @@ else if (k==1)
 
 }
 
-function EditAccountID()
+function DeleteAccountID()
 {
 	
 		{
-		document.fm1.action_button.value="EditAccountID";
+		document.fm1.action_button.value="DeleteAccountID";
 		document.fm1.submit();
 		}
 }
@@ -1583,64 +1593,21 @@ Field Length</td>
 
   <% If FunctionID <> 7 Then %>		
   		
-  <div style="display:none" align=center>
+  <div style="display:none" align="center">
   		
-  <% End If %>
+  <% End If 
 
 
-<%
- 
-        
-        
-		sql91 = " Select distinct s.AccountID, s.DepotID as AccDepotid From StockReconciliation s Left join ReconAccountID a "
 
-        sql91 = sql91 & " on s.AccountID = a.AccountID where s.AccountID is not null "
+    ' List Account Id information
+     sql_ac = "Select * from ReconAccountID order by AccountID"
+     
+     Set RsA1 = Conn.Execute(sql_ac)
+     
+    
+       
 
-         If Trim(Request("AccountID_Match"))="unmatch" Then
-
-         sql91 = sql91 & " and a.DepotCode is null "
-
-         End If 
-
-        sql91 = sql91 & " order by s.AccountID"
-	   
-		set Rs91 = conn.execute(sql91)
-		 
-        'response.write sql91
 %>
-
-<select name="AccountID" class="common"  size="1" onchange="doChange(1)">
-          <% 
-                             If Not Rs91.EoF Then
-
-                                 Rs91.MoveFirst
-
-							do while not Rs91.eof
-
-           %>               
-
-<option value="<% = Rs91("AccountID") %>" <%If Trim(Request("AccountID"))=trim(Rs91("AccountID")) Then%>Selected<%End If%>><% =trim(Rs91("AccountID")) %></option>
-
-                  <%
-                               
-  
-                               Rs91.movenext
-
-							loop
-						
-						End if
-
- 
-					%>
-</select>
-
-<select name="AccountID_Match" class="common"  size="1" onchange="doChange(1)">
-
-<option value="all" <%If Trim(Request("AccountID_Match"))="all" Then%>Selected<%End If%>>All</option>
-
-<option value="unmatch" <%If Trim(Request("AccountID_Match"))="unmatch" Then%>Selected<%End If%>>unmatch</option>
-             
-</select>
 
 
 <br/>
@@ -1654,23 +1621,14 @@ Field Length</td>
 	</tr>
 
 <%
-             If Request("AccountID") <> "" Then
 
-  
-              Sql_A1 = "Select * from ReconAccountID where AccountID = '"&Request("AccountID")&"'"
-
-               'response.write sql_a1
-
-              Set RsA1 = Conn.Execute(Sql_A1)
-
-
-              If Not RsA1.EoF Then 
-
-
-
-
-%>
-
+ If Not RsA1.EoF Then
+     
+            RsA1.MoveFirst
+     
+       Do While Not RsA1.Eof
+       
+ %>
 <tr> 
 	<td width="30%"><% = RsA1("AccountID") %>
 			¡@</td>
@@ -1678,33 +1636,30 @@ Field Length</td>
 <td width="20%">
 
 
-<input type=text name="DepotCode3" value ="<% = RsA1("DepotCode") %>">
+<% = RsA1("DepotCode") %>
 			¡@</td>
-<td><input type="radio" name="AccID1" value="<% = RsA1("AccountID") %>"></td> 
-<input type=hidden name="AccID3" value ="<%= RsA1("AccountID") %>">
-<input type=hidden name="AccDepotID" value ="<%= Request.Form("AccDepotid") %>">
+<td><input type="radio" name="AccID1" value="<% = RsA1("DepotID") %>"></td> 
+
 
 	</tr>
 
+<%         
+
+                 RsA1.MoveNext
+
+                 Loop
+                 
+          End If
+                 
+%>
 
 
-<tr> 
-      <td colspan="2" align =center><font color="red"><% = Message %></font></td> 
-      <td >
-¡@</td>
-    </tr>
-	
-      <tr> 
-      <td></td>
-      <td width="30%"><input type="button" value=" Edit " onClick="EditAccountID();"></td>
-      <td width="30%">
-    </tr>
-
-<% Else %>
 
 <tr> 
 	<td width="30%">
-<input type=text name="AccID2" value ="<% = Request("AccountID") %>">
+	
+	
+<input type=text name="AccID2" value ="<%  if Request("AccountID") <> "New" then  Request("AccountID") end if%>">
 			¡@</td>
 
 <td width="20%">
@@ -1712,28 +1667,23 @@ Field Length</td>
 
 <input type=text name="DepotCode2" value ="">
 			¡@</td>
-<td></td> 
+<td>&nbsp;</td> 
 	</tr>
 
  <tr> 
-      <td></td>
-      <td width="30%"><input type="button" value=" Add " onClick="AddAccountID();"></td>
-      <td width="30%">
+      <td><input type="button" value=" Add " onClick="AddAccountID();"></td>
+      <td width="30%"><input type="button" value=" Delete " onClick="DeleteAccountID();"></td>
+  <td>&nbsp;</td>    
     </tr>
 
-<%  End If %>
+ <tr> 
+      <td></td>
+      <td width="30%"><% = Message  %></td>
+     <td>&nbsp;</td> 
+    </tr>
 
 
 
-<% 
-
-    
-
-
-    End If
-
-
-%>
 
 </table> 
 

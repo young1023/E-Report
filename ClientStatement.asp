@@ -94,13 +94,11 @@ strURL = Request.ServerVariables("URL") ' Retreive the URL of this page from Ser
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  
+ 
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 
 <title><% = Title %></title>
-<link rel="stylesheet" type="text/css" href="include/uob.css" media="screen"/>
-<!-- Include Print CSS -->
-<link rel="stylesheet" type="text/css" media="print" href="include/print.css" />
+<link rel="stylesheet" type="text/css" href="include/uob.css">
 
 
 <SCRIPT language=JavaScript>
@@ -189,91 +187,27 @@ function dosubmit(what){
 
 }
 
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
 //-->
 </SCRIPT>
 
-<script language="JavaScript">
-function disableCtrlKeyCombination(e)
-{
-        //list all CTRL + key combinations you want to disable
-        var forbiddenKeya = 'a';
-        var forbiddenKeyc = 'c';
-        var forbiddenKeyx = 'x';
-
-
-        var key;
-        var isCtrl;
-
-        if(window.event)
-        {
-                key = window.event.keyCode;     //IE
-                if(window.event.ctrlKey)
-                        isCtrl = true;
-                else
-                        isCtrl = false;
-        }
-        else
-        {
-                key = e.which;     //firefox
-                if(e.ctrlKey)
-                        isCtrl = true;
-                else
-                        isCtrl = false;
-        }
-
-        //if ctrl is pressed check if other key is in forbidenKeys array
-        if(isCtrl)
-        {
-            
-                {
-                        //case-insensitive comparation
-                        if(forbiddenKeya.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-                        if(forbiddenKeyc.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-
-						if(forbiddenKeyx.toLowerCase() == String.fromCharCode(key).toLowerCase())
-                        {
-                                return false;
-                        }
-
-                }
-        }
-        return true;
-}
-</script>
-
-<script language="JavaScript">
-<!--
-// disable right click
-var message="Sorry, The right click function is disable."; // Message for the alert box
-
-function click(e) {
-if (document.all) {
-if (event.button == 2) {
-alert(message);
-return false;
-}
-}
-if (document.layers) {
-if (e.which == 3) {
-alert(message);
-return false;
-}
-}
-}
-if (document.layers) {
-document.captureEvents(Event.MOUSEDOWN);
-}
-document.onmousedown=click;
-// --> 
-</script>
 
 </head>
 <body leftmargin="0" topmargin="0" OnLoad="document.fm1.submitted.value=0;document.fm1.ClientFrom.focus();" onkeypress="return disableCtrlKeyCombination(event);" onkeydown="return disableCtrlKeyCombination(event);" >
@@ -421,6 +355,8 @@ RsGroupID.open ("Exec Retrieve_AvailableGroupID ") ,  StrCnn,3,1
 
 <!-- #include file ="include/Master.inc.asp" -->
 
+
+
 <div id="Content">
 
 
@@ -521,7 +457,7 @@ RsGroupID.open ("Exec Retrieve_AvailableGroupID ") ,  StrCnn,3,1
 			Dim Year_starting
 			Dim Year_ending
 			
-			Year_starting = Year(DateAdd("yyyy", -8, Now()))
+			Year_starting = Year(DateAdd("yyyy", -2, Now()))
 			year_ending = Year(Now())
 			
 			for i=Year_starting to Year_ending
@@ -592,7 +528,7 @@ RsGroupID.open ("Exec Retrieve_AvailableGroupID ") ,  StrCnn,3,1
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -8, Now()))
+Year_starting = Year(DateAdd("yyyy", -2, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -763,6 +699,8 @@ else
   if iPageCount <= 0 then
 
 		If Err.Number <> 0 then
+
+            response.write Err.Number
 			
 			'SQL connection error handler
 			response.write  "<table><tr><td class='RedClr'>" & MSG_BUSY & "<br></td></tr></table>"
@@ -783,7 +721,7 @@ else
 </span>
 
 
-<div id="reportbody1" >
+
 <script type="text/javascript">
 var somediv=document.getElementById("reportbody1")
 disableSelection(somediv) //disable text selection within DIV with id="mydiv"
@@ -795,14 +733,17 @@ disableSelection(somediv) //disable text selection within DIV with id="mydiv"
 ' Start of page navigation 
 '**********
 %>
-  <TABLE border=0 cellPadding=0 cellSpacing=0 height=100% width=99%>
+  <TABLE border=0 cellPadding=4 cellSpacing=4 width=97%>
 
  <tr> 
  <td align="right" height="28" class="NavaMenu" >
 
-
+<% If PrintAllowed = 1 then %>  
+							<a href="javascript:window.print()">Friendly Print</a>
+<% end if %>
+&nbsp;&nbsp;
 <%
-response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
+response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;" )
 
 'First button
 %>
@@ -835,7 +776,7 @@ End If
 
 <a href=javascript:dosubmit(<%= iPageCount %>) style='cursor:hand'>Last</a>
 
-</td></tr></table>
+</td></tr></Table>
 
 
 <%
@@ -843,41 +784,25 @@ End If
 ' End of page navigation 
 '**********
 %>
+</div>
 
 
-
-
+<div id="PrintArea">
 <table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
-<tr bgcolor="#FFFFCC">
-		<td  width="30%">　</td> 
+   <tr bgcolor="#FFFFCC">
+      <td align="center">
       <% if Search_statement="Monthly" then %>
-      	<td align="center" width="40%">月結單<br><u>Monthly Statement</u></td>
+      	月結單<br><u>Monthly Statement</u>
       <%else %>
-				<td align="center" width="40%">
 					<% if cint(rs1("Quantity")) > 0 then %>
-							綜合日結單/買賣合約<br><u>Daily Combined Statement/Contract Note</u></td>
+							綜合日結單/買賣合約<br><u>Daily Combined Statement/Contract Note</u>
 					<% else %>
 							綜合日結單<br><u>Daily Combined Statement</u></td>
-					
 					<% end if%>
 			<% end if %>
-      <td align="right" valign="bottom" width="30%">　</td>
-</tr>
-
-
-<tr bgcolor="#FFFFCC">
-			<td  width="30%"></td> 
-			<td  width="40%"></td>      
-			<td align="right" valign="bottom" width="30%" id="noprint">
-
-						<% If Session("PrintAllowed") = 1 then %>  
-							<a href="javascript:window.print()">Friendly Print</a>
-						<% end if %>
-			</td>
-		
+      </td>
 </tr>
 </table>
-
 
 <br>
 
@@ -890,6 +815,7 @@ End If
 Dim AccountType
 
 if (  Not rs1.EOF)  then
+'Response.write rs1("sectioncode")
 			if rs1("sectioncode") = "CH" then 
 						
 						'Accounttype: If or not Margin client 
@@ -934,18 +860,13 @@ if (  Not rs1.EOF)  then
 						
 								
 								<tr bgcolor="#FFFFCC"> 
-											<td width="14%"><% = FormatDateTime(now(),2) %></td>
-											<td width="16%">  <img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("clnt") %>')"></img><%=rs1("clnt") %></td>
-<% 
-
-       Client_Fun = Rs1("clnt") 
-       
-%>
+											<td width="14%"><%=rs1("StatementDate") %></td>
+											<td width="16%"><span class="noprint"><img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("clnt") %>')"></img></span><%=rs1("clnt") %></td>
 											<td width="12%"><%=rs1("AE") %></td>
 											<td width="26%"><%= rs1("DebitInterestRate") %>%</td>
 											
 												<% if AccountType = "MRGN" then %>
-													 	<td width='10%'> <%=formatnumber(rs1("MarginLimit")) %>
+													 	<td width='10%' style="white-space: nowrap"> <%=formatnumber(rs1("MarginLimit")) %>
 			    									</td>
 														<td width='17%'>
 
@@ -970,7 +891,7 @@ end if
 '''''''''
 
 do while (Not rs1.EOF)
-			
+'Response.write rs1("sectioncode")			
 			Select Case rs1("sectioncode")
 					case "IN" exit do
 					case "CM" exit do
@@ -1013,12 +934,12 @@ if (  Not rs1.EOF)  then
 												<td width="5%">Date<br>交易日期</td>
 												<td width="6%">Sdate<br>交收日期</td>
 												<td width="6%">Ref No<br>參考編號</td>
-												<td width="10%">Stock Code<br>股票代號</td>
+												<td width="5%">Stock Code<br>股票代號</td>
 												<td width="6%">Bought/In<br>買 / 入</td>
-												<td width="4%">Sold/Out<br>沽 / 出</td>
-												<td width="21%">Description<br>摘要</td>
-												<td width="9%">Price<br>單價</td>
-												<td width="7%">CCY<br>貨幣</td>
+												<td width="10%">Sold/Out<br>沽 / 出</td>
+												<td width="19%">Description<br>摘要</td>
+												<td width="12%">Price<br>單價</td>
+												<td width="5%">CCY<br>貨幣</td>
 												<td width="7%">Debit<br>支帳/結欠</td>
 												<td width="7%">Credit<br>存帳/結存</td>
 												<td width="10%">Balance<br>結餘</td> 
@@ -1047,7 +968,7 @@ if (  Not rs1.EOF)  then
 																				<td colspan="3" align="right"> </td>
 																				<td><%=rs1("CCY")%> </td>
 																				<td colspan="2" align="right"> </td>
-																			  <td><%=formatnumber(rs1("Openingbalance"),2,-2,-1)%> </td>
+																			  <td style="white-space: nowrap"><%=formatnumber(rs1("Openingbalance"),2)%> </td>
 								
 																	</tr>									
 										            <% end if 
@@ -1062,15 +983,15 @@ if (  Not rs1.EOF)  then
 																	<td width="5%" height="19"><%=rs1("TradeDate") %>　</td>
 																	<td width="6%" height="19"><%=rs1("SettleDate") %>　</td>
 																	<td width="6%" height="19"><%=rs1("RefNo") %>　</td>
-																	<td width="10%" height="19"><%=rs1("Instrument") %>　</td>
-																	<td width="6%" height="19"><% if rs1("Quantity") > "0" then response.write formatnumber(rs1("Quantity"),0,-2,-1) %>　</td>
-																	<td width="4%" height="19"><% if rs1("Quantity") < "0" then response.write formatnumber(rs1("Quantity"),0,-2,-1) %>　</td>
-																	<td width="21%" height="19"><%=rs1("comment") %>　</td> 
-																	<td width="9%" height="19"><% if rs1("Price") <> "0" then response.write formatnumber(rs1("Price"),4,-2,-1) %>　</td> 
-																	<td width="7%" height="19"><%=rs1("CCY") %>　</td> 
-																	<td width="7%" height="19"><% if rs1("Amount") < "0" then response.write formatnumber(rs1("Amount"),2,-2,-1) %>　</td> 
-																	<td width="7%" height="19"><% if rs1("Amount") > "0" then response.write  formatnumber(rs1("Amount"),2,-2,-1) %>　</td> 
-																	<td width="10%" height="19"><%=formatnumber(TotalBalance, 2,-2,-1)%></td> 
+																	<td width="5%" height="19"><%=rs1("Instrument") %>　</td>
+																	<td width="6%" height="19"><% if rs1("Quantity") > "0" then response.write formatnumber(rs1("Quantity"),0) %>　</td>
+																	<td width="10%" height="19"><% if rs1("Quantity") < "0" then response.write formatnumber(rs1("Quantity"),0) %>　</td>
+																	<td width="19%" height="19"><%=rs1("comment") %>　</td> 
+																	<td width="12%" height="19"><% if rs1("Price") <> "0" then response.write formatnumber(rs1("Price"),6) %>　</td> 
+																	<td width="5%" height="19"><%=rs1("CCY") %>　</td> 
+																	<td width="7%" height="19" style="white-space: nowrap"><% if rs1("Amount") < "0" then response.write formatnumber(rs1("Amount"),2) %>　</td> 
+																	<td width="7%" height="19" style="white-space: nowrap"><% if rs1("Amount") > "0" then response.write  formatnumber(rs1("Amount"),2) %>　</td> 
+																	<td width="10%" height="19" style="white-space: nowrap"><%=formatnumber(TotalBalance, 2)%></td> 
 																	</tr>
 																	<%
 		
@@ -1087,7 +1008,7 @@ if (  Not rs1.EOF)  then
 																									<td colspan="3" align="right"> </td>
 																									<td><%=LastCurrency%> </td>
 																									<td colspan="2" align="right"> </td>
-																								  <td><%=formatnumber(TotalBalance,2,-2,-1)%> </td>
+																								  <td style="white-space: nowrap"><%=formatnumber(TotalBalance,2)%> </td>
 													
 																						</tr>								
 													            <% 
@@ -1121,7 +1042,7 @@ if (  Not rs1.EOF)  then
 																					<td colspan="7" align="right">Daily Interest Accrued </td>
 																					<td width="5%"><%=rs1("CCY")%></td>
 																					<td width="21%" colspan="2" align="right"> </td>
-																				  <td width="10%"><%=formatnumber(rs1("MTDDebitInterest"),2,-2,-1)%> </td>
+																				  <td width="10%" style="white-space: nowrap"><%=formatnumber(rs1("MTDDebitInterest"),2)%> </td>
 									
 																		</tr>		
 																<%
@@ -1155,7 +1076,7 @@ end if
 '''''''''
 
 do while (Not rs1.EOF)
-			
+'Response.write rs1("sectioncode")			
 			Select Case rs1("sectioncode")
 					case "IN" exit do
 					case "CM" exit do
@@ -1291,19 +1212,19 @@ if (  Not rs1.EOF)  then
 												<td width="10%">Market<br>市場</td>
 												<td width="10%">Stock Code<br>股票代號</td>
 												<td width="12%">Stock Name<br>股票名稱</td>
-												<td width="10%">Holding B/F<br>承上</td>
-												<td width="15%">Movement<br>In/Out<br>出/入</td>
-												<td width="10%">Holding C/F<br>轉下</td>
-												<td width="10%">Closing Price<br>收市價</td>
+												<td width="10%" align="right">Holding B/F<br>承上</td>
+												<td width="15%" align="right">Movement<br>In/Out<br>出/入</td>
+												<td width="10%" align="right">Holding C/F<br>轉下</td>
+												<td width="10%" align="right">Closing Price<br>收市價</td>
 												<td width="10%">CCY<br>貨幣</td> 
-												<td width="17%">Value<br>市場價值</td> 
-												<td width="17%">#Exch Rate<br>匯率</td> 
+												<td width="17%" align="right">Value<br>市場價值</td> 
+												<td width="17%" align="right">#Exch Rate<br>匯率</td> 
 												<td width="17%">Value (HKD)<br>市場價值(港元)</td> 
 																															
 													<%if AccountType = "MRGN" then %>
 															
-														<td width="17%"> %</td>
-														<td width="17%">Margin Value<br>按倉價值(港元)</td> 
+														<td width="17%" align="right"> %</td>
+														<td width="17%" align="right">Margin Value<br>按倉價值(港元)</td> 
 													<%	end if %>
 									</tr>
 									
@@ -1317,46 +1238,46 @@ if (  Not rs1.EOF)  then
 																		<td width="10%"><%= rs1("Market") %></td>
 																		<td width="10%"><%= rs1("Instrument") %></td>
 																		<td width="12%"><% response.write rs1("InstrumentDesc") & "<br>" & rs1("InstrumentCDesc") %>　</td>
-																		<td width="10%">
+																		<td width="10%" align="right">
 																			<%
 																			
-																			response.write formatnumber(rs1("OpeningBalance"),0,-2,-1) 
+																			response.write formatnumber(rs1("OpeningBalance"),0) 
 																			
 																				if (clng(rs1("orfee1")) <> 0  ) then
-																					response.write "<br>*" & formatnumber(clng(rs1("orfee1")),0,-2,-1)
+																					response.write "<br>*" & formatnumber(clng(rs1("orfee1")),0)
 																				end if																			
 																			%>
 																			</td>
-																		<td width="10%">
+																		<td width="10%" align="right" style="white-space: nowrap">
 																			<%
-																				response.write formatnumber(rs1("Netbalance"),0,-2,-1) 
+																				response.write formatnumber(rs1("Netbalance"),0) 
 
 																			%>　
 																		</td>
-																		<td width="10%">
+																		<td width="10%" align="right" style="white-space: nowrap">
 																			<%
-																				response.write formatnumber(rs1("EndingBalance"),0,-2,-1) 
+																				response.write formatnumber(rs1("EndingBalance"),0) 
 																				'stock on hold positive
 																				'response.write clng(rs1("orfee1"))
 																				if (clng(rs1("orfee1")) <> 0  ) then
-																					response.write "<br>*" & formatnumber(clng(rs1("orfee2")),0,-2,-1)
+																					response.write "<br>*" & formatnumber(clng(rs1("orfee2")),0)
 																				end if
 																				
 														
 																			%>　
 																		</td>
 
-																		<td width="10%"><%= rs1("Price") %>　</td>
+																		<td width="10%" align="right"><%= rs1("Price") %>　</td>
 																		<td width="10%"><%= rs1("CCY") %>　</td> 
-																		<td width="17%"><%= formatnumber(cDbl(rs1("StockPortValue")) / cDbl(rs1("MarginLimit")),2,-2,-1) %>　</td> 
-																		<td width="17%"><%= formatnumber(rs1("MarginLimit"),4) %>　</td> 
-																		<td width="17%"><%= formatnumber( int(cDbl(rs1("StockPortValue"))*100)/100  ,2,-2,-1) %>　</td> 
+																		<td width="17%" align="right"><%= formatnumber(cDbl(rs1("StockPortValue")) / cDbl(rs1("MarginLimit")),2) %>　</td> 
+																		<td width="17%" align="right"><%= formatnumber(rs1("MarginLimit"),4) %>　</td> 
+																		<td width="17%" align="right" style="white-space: nowrap"><%= formatnumber( int(cDbl(rs1("StockPortValue"))*100)/100  ,2) %>　</td> 
 
 
 																		<%if AccountType = "MRGN" then %>
 																				
-																			<td width="17%"><%=rs1("MarginPercent")%></td>
-																			<td width="17%"><%=formatnumber(cDbl(rs1("MarginValue")),2,-2,-1)%></td> 
+																			<td width="17%" align="right"><%=rs1("MarginPercent")%></td>
+																			<td width="17%" align="right"><%=formatnumber(cDbl(rs1("MarginValue")),2)%></td> 
 																		<%	end if %>
 																		
 																		<%
@@ -1381,12 +1302,12 @@ if (  Not rs1.EOF)  then
 									<tr bgcolor="#FFFFCC">
 												<td colspan="10" align="right">
 													<b>股份組合市值( Portfolio Value (HKD): </b></td>
-												<td><b><%=formatnumber(TotalPortfolioValue,2,-2,-1) %></b></td>
+												<td style="white-space: nowrap"><b><%=formatnumber(TotalPortfolioValue,2) %></b></td>
 
 													<%
 													if AccountType = "MRGN" then 
 														response.write "<td></td><td><b>"
-														response.write formatnumber(TotalMarginValue,2,-2,-1) 
+														response.write formatnumber(TotalMarginValue,2) 
 														response.write "</b></td>"
 													end if %>
 													
@@ -1441,6 +1362,7 @@ TotalMarginNetValue=0
 'Response.write rs1("sectioncode")
 
 if (  Not rs1.EOF)  then
+
 			if rs1("sectioncode") = "CB" then %>
 
 			
@@ -1455,14 +1377,14 @@ if (  Not rs1.EOF)  then
 									
 									<tr bgcolor="#ADF3B6">
 												<td width="14%">CCY<br>貨幣</td>
-												<td width="16%">Available Balance<br>可用結餘</td>
-												<td width="12%">Unavailable Balance<br>未可用結餘</td>
-												<td width="26%">Ledger Balance<br>帳面結餘</td>
-												<td width="10%">## Interest Accrued<br>## 應計利息</td>
-												<td width="10%">#Exchange Rate<br># 匯率</td>
-												<td width="10%">Balance (HKD)<br>結餘</td>
+												<td width="16%" align="right">Available Balance<br>可用結餘</td>
+												<td width="12%" align="right">Unavailable Balance<br>未可用結餘</td>
+												<td width="26%" align="right">Ledger Balance<br>帳面結餘</td>
+												<td width="10%" align="right">## Interest Accrued<br>## 應計利息</td>
+												<td width="10%" align="right">#Exchange Rate<br># 匯率</td>
+												<td width="10%" align="right">Balance (HKD)<br>結餘</td>
 												<% if AccountType = "MRGN" then %>
-														<td width="17%"></td> 
+														<td width="17%" align="right"></td> 
 												<% end if %>
 									</tr>
 									
@@ -1475,12 +1397,12 @@ if (  Not rs1.EOF)  then
 												
 												<tr bgcolor="#FFFFCC"> 
 															<td width="14%"><%= rs1("CCY") %></td>
-															<td width="16%"><%= formatnumber(rs1("OpeningBalance"),2,-2,-1) %>　</td>
-															<td width="12%"><%= formatnumber(rs1("Netbalance"),2,-2,-1) %>　</td>
-															<td width="26%"><%= formatnumber(rs1("EndingBalance"),2,-2,-1) %>　</td>
-															<td width="10%"><%= formatnumber(rs1("MTDDebitInterest"),2,-2,-1)  %>　</td>
-															<td width="10%"><%= formatnumber(rs1("MarginLimit"),4,-2,-1) %>　</td>
-															<td width="10%"><%= formatnumber(rs1("StockPortValue"),2,-2,-1) %>　</td>
+															<td width="16%" align="right"><%= formatnumber(rs1("OpeningBalance"),2) %>　</td>
+															<td width="12%" align="right"><%= formatnumber(rs1("Netbalance"),2) %>　</td>
+															<td width="26%" align="right"><%= formatnumber(rs1("EndingBalance"),2) %>　</td>
+															<td width="10%" align="right" nowrap="nowrap"><%= formatnumber(rs1("MTDDebitInterest"),2)  %>　</td>
+															<td width="10%" align="right"><%= formatnumber(rs1("MarginLimit"),6) %>　</td>
+															<td width="10%" align="right" nowrap="nowrap"><%= formatnumber(rs1("StockPortValue"),2) %>　</td>
 															<% if AccountType = "MRGN" then %>
 																	<td width="17%"></td> 
 															<% end if %>
@@ -1499,25 +1421,95 @@ if (  Not rs1.EOF)  then
 												end if
 									loop
 									%>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<%
+'''''''''
+' Loop for next records, added by gary at 18 Jan 2011
+'''''''''
+
+do while (Not rs1.EOF)
+			
+			Select Case rs1("sectioncode")
+					case "IN" exit do
+					case "CM" exit do
+					case "SM" exit do
+					case "SP" exit do
+					case "CB" exit do
+					case "MG" exit do
+					case "CN" exit do
+			
+			end select
+			rs1.movenext
+loop
+
+'''''''''
+
+'Response.write rs1("sectioncode")
+if (  Not rs1.EOF)  then
+	if rs1("sectioncode") = "MG" then 
+	
+        MarginCall = rs1("MarginCall") 
+
+        end if 
+end if
+%>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 									
 									<%
 										TotalNetValue = TotalCashValue  + TotalPortfolioValue
-										TotalMarginNetValue = TotalBalance + TotalMarginValue
+
+
+                                        ' Change the TotalMarginNetValue by gary at 18 Jan 2011
+										'TotalMarginNetValue = TotalBalance + TotalMarginValue
+
+                                        TotalMarginNetValue = formatnumber(MarginCall,2)
+
 									%>
 									<tr bgcolor="#FFFFCC">
 												<td colspan="6" align="right"><b>現金值 Cash Value: </b></td>
-												<td><%=formatnumber(TotalCashValue,2,-2,-1) %></td>
+												<td align="right"><%=formatnumber(TotalCashValue,2) %></td>
 															<% if AccountType = "MRGN" then %>
 																	<td width="17%"></td> 
 															<% end if %>
 								  </tr>
 								  <tr bgcolor="#FFFFCC">
 												<td colspan="6" align="right"><b>總值 Net Value: </b></td>
-												<td><b><%=formatnumber(TotalNetValue,2,-2,-1) %></b></td>
+												<td align="right"><b><%=formatnumber(TotalNetValue,2) %></b></td>
 												
 													<%
 													if AccountType = "MRGN" then %>
-														<td><b> <%= formatnumber(TotalMarginNetValue,2,-2,-1) %>
+														<td align="right"><b> <%= formatnumber(TotalMarginNetValue,2) %>
 															</b>
 														</td>
 													<% end if %>												
@@ -1530,9 +1522,9 @@ if (  Not rs1.EOF)  then
 													<%
 													
 														if TotalMarginNetValue >= 0 then
-																	response.write "<td colspan=1><b>Margin Available</b></td>"
+																	response.write "<td align=right colspan=1><b>Margin Available</b></td>"
 														else
-																	response.write "<td colspan=1><b>Margin Call</b></td>"
+																	response.write "<td align=right colspan=1><b>Margin Call</b></td>"
 														end if
 													%>
 													
@@ -1545,7 +1537,7 @@ if (  Not rs1.EOF)  then
 											<td colspan="4">
 												# Exchange Rate used are for indication only 匯率只作指引用途 <br>
 												## Interest Accrued  will be credited/debited to your account on the last day of each month
-												<br> 應計利息將會於每月的最後一天從閣下之戶口存入\提取
+												<br> 應計利息將會於每月的最後一天從閣下之戶口存入/提取
 											<td>
 											<td><td>
 											<% if AccountType = "MRGN" then %>
@@ -1567,7 +1559,7 @@ else
 <br>
 			<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">			 <tr bgcolor="#FFFFCC">
 					<td align="right"><b>總值 Net Value: </b></td>
-					<td width="20%"><b><%=formatnumber(TotalPortfolioValue,2,-2,-1) %></b></td>
+					<td width="20%"><b><%=formatnumber(TotalPortfolioValue,2) %></b></td>
 												
 																						
 			  </tr>
@@ -1604,7 +1596,7 @@ loop
 	''''''''''''''''''''''''''
 	'  Trade Detail (CN)
 	''''''''''''''''''''''''''
-
+'Response.write rs1("sectioncode")
 if (  Not rs1.EOF)  then
 	if rs1("sectioncode") = "CN" then 
 	
@@ -1737,17 +1729,17 @@ if (  Not rs1.EOF)  then
 						   </td>
 						   
 						   <td><%= CCY %>　       </td> 
-						   <td><%= formatnumber(NetBalance,2,-2,-1) %>　</td> 
+						   <td nowrap="nowrap"><%= formatnumber(NetBalance,2) %>　</td> 
 						   <td>
 						   <% 
 						   For k=0 to 10 
 						   	if feename(k) <> ""  and cDbl(orfee(k)) <> 0  then 
-						   		Response.Write (feename(k) & ": " & formatnumber(cDbl(orfee(k)),2,-2,-1) & "<br>")
+						   		Response.Write (feename(k) & ": " & formatnumber(cDbl(orfee(k)),2) & "<br>")
 						   	end if
 						   next %>
 			
 						   </td> 
-							 <td width="17%" height="18"><%= formatnumber(cDbl(Amount),2,-2,-1) %>　</td> 
+							 <td width="17%" height="18" nowrap="nowrap"><%= formatnumber(cDbl(Amount),2) %>　</td> 
 						</tr>							
 					<%
 						'move to next new ref no
@@ -1816,165 +1808,36 @@ if (  Not rs1.EOF)  then
 						   </td>
 						   
 						   <td><%= CCY %>　       </td> 
-						   <td><%= formatnumber(NetBalance,2,-2,-1) %>　</td> 
+						   <td nowrap="nowrap"><%= formatnumber(NetBalance,2) %>　</td> 
 						   <td>
 						   <% 
 						   For k=0 to 10 
 						   	if feename(k) <> ""  and cDbl(orfee(k)) <> 0  then 
-						   		Response.Write (feename(k) & ": " & formatnumber(cDbl(orfee(k)),2,-2,-1) & "<br>")
+						   		Response.Write (feename(k) & ": " & formatnumber(cDbl(orfee(k)),2) & "<br>")
 						   	end if
 						   next %>
 			
 						   </td> 
-							 <td width="17%" height="18"><%= formatnumber(cDbl(Amount),2,-2,-1) %>　</td> 
+							 <td width="17%" height="18" nowrap="nowrap"><%= formatnumber(cDbl(Amount),2) %>　</td> 
 						</tr>				
 
-
-
- </table>
- 
- 	<%
-
-      end if 
-
-	end if
-	
+	<%
 		
 
-		
-       
 
-
-	''''''''''''''''''''''''''
-	'  Fund
-	''''''''''''''''''''''''''
-
-
-    set Rs2 = server.createobject("adodb.recordset")
-         Rs2.open ("Exec Retrieve_ClientStatement_fun '"&Client_Fun&"', '"&Client_Fun&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Statement&"', '"&Search_Monthly_Month&"', '"&Search_Monthly_Year&"', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"', '"&Search_NetValue&"','"&iPageCurrent&"', '1' ") ,  StrCnn,3,1		
-   response.write ("Exec Retrieve_ClientStatement_fun '"&Client_Fun&"', '"&Client_Fun&"', '"&Search_AEFrom&"', '"&Search_AETo&"', '"&Search_AEGroup&"', '', '', '"&Search_Statement&"', '"&Search_Monthly_Month&"', '"&Search_Monthly_Year&"', '"&Search_Daily_Day&"', '"&Search_Daily_Month&"', '"&Search_Daily_Year&"', '"&Search_NetValue&"','"&iPageCurrent&"', '1' ")
-
-
-if Not Rs2.EoF then
-
-   
-
-	%>
-
-
-<br>
-
-<table  width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-
-						
-<tr bgcolor="#FFFFCC"> 
-      <td width="166%" height="18" colspan="12">在途交易基金詳情 Unsettled Detail Fund for <span lang="en-us"><% = FormatDateTime(Rs2("StatementDate"),1) %></span></td>
-</tr>
-
-<tr bgcolor="#ADF3B6">
-   <td width="8%" height="18">Market<br>市場</td>
-   <td width="5%" height="18">Order No<br>交易編號</td>
-   <td width="5%" height="18">O/D<br>交易</td>
-   <td width="18%" height="18">Fund<br>股票</td>
-   <td width="10%" height="18">B/S<br>買沽</td>
-   
-   <td width="5%" height="18">Unit<br>成交價</td>
-   <td width="5%" height="18">CCY<br>貨幣</td> 
-   <td width="10%" height="18">Gross Amount<br>總額</td> 
-   <td width="17%" height="18">Transaction Cost<br>交易費用</td> 
-   <td width="10%" height="18">Net Amount<br>淨額</td> 
-</tr>
-		<% 
-               
-                     Rs2.MoveFirst
-
-                  Do While Not Rs2.EoF
-					
-						%>
-
-	<tr bgcolor="#FFFFCC"> 
-						   <td><%= Rs2("Market") %></td>
-						   <td><%= Rs2("TradeNo") %></td>
-						   <td><%= Rs2("TradeDate") %></td>
-						   <td><%= Rs2("Instrument") %>&nbsp;<%= Rs2("InstrumentDesc") %>&nbsp;<%= Rs2("InstrumentCDesc") %>　</td>
-						   <td><%
-                                   
-                                   If Trim(Rs2("BuySell")) = "BUY" Then
-
-                                      Response.Write "Subscription"
-
-                                   Elseif Trim(Rs2("BuySell")) = "SELL" Then
-
-                                      Response.write "Redemption"
-
-                                   End If                                     
-                                 
-
-                                %>　   </td> 
-						   
-						   <td>
-						   <% = Rs2("LotSize") %></td> 
-							 <td width="17%" height="18"><%= Rs2("ccy") %>　</td> 
-<td width="17%" height="18"><%= formatnumber(cDbl(rs2("consideration")),2,-2,-1) %>　</td>
-<td width="17%" height="18"><%= formatnumber(cDbl(Rs2("ORFee1")),2,-2,-1) %>　</td>
-<td width="17%" height="18"><%= formatnumber(cDbl(Rs2("NetAmount")),2,-2,-1) %>　</td>
-						</tr>							
-					<%
-									
-                          Rs2.MoveNext
-         
-				   loop
-
-                          Set rs2 = rs2.NextRecordset() 
 %>
 
-                       <tr bgcolor="#FFFFCC">
-                           <td colspan="9" align="right">
-                           <% = Rs2("CCY") %>
-                           </td>
-                           <td colspan="3" align="right">
-                           <% = formatnumber(Rs2("TotalBalance"),2,-2,-1) %>
-                           </td>
-                       </tr>
-
-	
-
 
  </table>
  
- 	<% End if %>
-
-
-
-
-
-
+ 	<%end if 
+	end if
+	
+		%>
 		<br>
-		<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-		<tr bgcolor="#FFFFCC"> 
-					<td width="166%" height="18" colspan="12">
-						1. For Margin Accounts, the margin limit is subject to change from time to time
-						at our sole discretion. Your current margin limit is stated in the first page of 
-						this statement
-						 <br>
-						 2. Stock Borrowing Services for Hong Kong Market is now available in UOB KayHian 
-						(Hong Kong) Limi ted, for more details, please contact your Account Manager or customer
-						service hotline at 2826 4868. 
-						<br>
-						3. Effective from 11 Aug 2009, we require all clients to sign the W-8BEN certificate to 
-						certify their foreign status of US before trading US Securities. W-8BEN certificate is a 
-						Certificate of Foreign Status of US. With W-8BEN certificate, the client wil l be exempted 
-						from US Capital Gains Tax. For further information, kindly contact your responsible salespersons.
-			</td>
-		</tr>		
-	</table>
-	<br>
-		<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
-		<tr bgcolor="#FFFFCC"> 
-					<td width="166%" height="18" colspan="12" align="center">結單完結<br>End of Statement</td>
-		</tr>
 		
-	</table>
+	<br>
+		
 	</td>
 	</tr>
 </table>
@@ -2060,6 +1923,8 @@ end if   'having client number if statement
 
 </td></tr></table>
 </div>
+
+
   </body>
 </html>
 

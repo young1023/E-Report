@@ -95,6 +95,31 @@ strURL = Request.ServerVariables("URL") ' Retreive the URL of this page from Ser
     
     </style>
 
+<script language="JavaScript">
+<!--
+// disable right click
+var message="Sorry, The right click function is disable."; // Message for the alert box
+
+function click(e) {
+if (document.all) {
+if (event.button == 2) {
+alert(message);
+return false;
+}
+}
+if (document.layers) {
+if (e.which == 3) {
+alert(message);
+return false;
+}
+}
+}
+if (document.layers) {
+document.captureEvents(Event.MOUSEDOWN);
+}
+document.onmousedown=click;
+// --> 
+</script>
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <title><% = Title %></title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
@@ -244,31 +269,7 @@ function disableCtrlKeyCombination(e)
 }
 </script>
 
-<script language="JavaScript">
-<!--
-// disable right click
-var message="Sorry, The right click function is disable."; // Message for the alert box
 
-function click(e) {
-if (document.all) {
-if (event.button == 2) {
-alert(message);
-return false;
-}
-}
-if (document.layers) {
-if (e.which == 3) {
-alert(message);
-return false;
-}
-}
-}
-if (document.layers) {
-document.captureEvents(Event.MOUSEDOWN);
-}
-document.onmousedown=click;
-// --> 
-</script>
 
 </head>
 <body leftmargin="0" topmargin="0" OnLoad="document.fm1.submitted.value=0;document.fm1.ClientFrom.focus();"  onkeypress="return disableCtrlKeyCombination(event);" onkeydown="return disableCtrlKeyCombination(event);"  >
@@ -520,7 +521,7 @@ if session("shell_power")>=3 then %>
 Dim Year_starting
 Dim Year_ending
 
-Year_starting = Year(DateAdd("yyyy", -9, Now()))
+Year_starting = Year(DateAdd("yyyy", -1, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -574,13 +575,14 @@ for i=Year_starting to Year_ending
       	     
 <input name="LedgerBalance" type=text value="<%= Search_LedgerBalance %>" size="15">&nbsp;   
 
-			<td width="20%">Include Margin A/C</td> 
+			<td width="20%">Include Margin A/C1</td> 
 			<td>
 			   
 			<select size="1" name="IncludeMarginAccount" class="common">
 				<option value="ALL" <% if Search_IncludeMarginAccount="YES" then response.write "selected"%>>All</option>
 				<option value="MRGN" <% if Search_IncludeMarginAccount="MRGN" then response.write "selected"%>>Margin Only  </option>
 			<option value="NMRGN" <% if Search_IncludeMarginAccount="NMRGN" then response.write "selected"%>>Non Margin Only  </option>
+	
 			</select>   
 		</tr>
 		
@@ -940,10 +942,70 @@ end if
 %>
 		<br>
 
-
-
-
 <%
+
+' Accrued Interest
+if (  Not rs1.EOF)  then
+			if rs1("sectioncode") = "IN" then %>
+
+
+
+	<br>
+						<table width="50%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
+				
+							
+									<tr bgcolor="#FFFFCC"> 
+												<td width="95%" colspan="13">應計利息 Interest Accrued</td>
+									</tr>
+									
+									<tr bgcolor="#ADF3B6">
+												<td width="50%">CCY<br>貨幣</td> 
+												<td width="50%">Interest Accrued<br>應計利息</td> 
+																															
+													
+									</tr>
+									
+									<% 
+									do while (  Not rs1.EOF)
+									
+												if rs1("sectioncode") = "IN" then
+												%>
+
+															<tr bgcolor="#FFFFCC"> 
+																
+																		<td ><%= rs1("CCY") %>　</td> 
+																	
+																				
+																			<td ><%= Formatnumber(rs1("MTDDebitInterest"),2)%></td>
+																		
+															</tr>
+															
+
+															<%
+												end if	
+												rs1.movenext
+												if not rs1.eof then
+														if rs1("sectioncode") <> "IN" then 
+																exit do
+														end if
+												end if
+									loop
+							
+									
+									%>
+							
+									
+						</table>
+
+
+	<%
+			
+			end if 
+end if
+
+
+
+
 '''''''''
 ' Loop for next records
 '''''''''
@@ -964,13 +1026,7 @@ do while (Not rs1.EOF)
 loop
 
 '''''''''
-
 %>
-
-
-
-
-<br/>
 
 
 <% 
@@ -987,27 +1043,6 @@ TotalMarginValue=0
 
 
 if (  Not rs1.EOF)  then
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
 			if rs1("sectioncode") = "SP" then %>
 			
 						<br>
@@ -1134,6 +1169,8 @@ end if
 		</table>
 		<br>
 
+
+
 				<% do while (  Not rs1.EOF)
 		
 				if rs1("sectioncode") = "CB" then
@@ -1157,7 +1194,7 @@ end if
    <td width="16%" rowspan="2">Ledger balance<br>帳面結餘</td>
    <td width="30%" colspan="4" align="center">Available Balance<br>可用結餘</td>
    <td width="24%" colspan="4">Settlement Amount<br>結算總額</td> 
-      <td width="14%" rowspan="2">Int Accrued<br>應計利息</td>
+      
 </tr>
 
 <tr bgcolor="#ADF3B6">
@@ -1188,13 +1225,16 @@ end if
    <td width="3%"><%= formatnumber(rs1("orfee8"),2,-2,-1) %>　</td> 
    <td width="7%"><%= formatnumber(rs1("orfee9"),2,-2,-1) %>　</td> 
       <td width="14%"><%= formatnumber(rs1("orfee10"),2,-2,-1) %></td>
-      <td width="14%"><%= formatnumber(rs1("MTDDebitInterest"),2,-2,-1) %></td>
+      
 
 </tr>
 <%
 					end if	
 				rs1.movenext
-				
+%>
+
+
+<%				
 			if not rs1.eof then
 				Select Case rs1("sectioncode")
 						case "IN" exit do
@@ -1218,7 +1258,6 @@ end if
 
 </table>
 <br>
-
 
 
 <table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">

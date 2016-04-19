@@ -76,14 +76,27 @@ end if
 
 <html>
 <head>
-
+    <style type="text/css">
+    <!-- Hide from legacy browsers
+    .print { 
+    display: none;
+    }
+    @media print {
+    	.noprint {
+    	 display: none;
+    	}
+    }  -->
+    
+    </style>
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <title><% = Title %></title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
-<script src="include/sorttable.js"></script>
-<script src="include/common.js"></script>
+
 <SCRIPT language=JavaScript>
 <!--
+
+
+
 
 function datevalidate(inDay, inMonth, inYear){
 	
@@ -186,12 +199,113 @@ function popup() {
 window.open( "trancode.asp", "myWindow")
 }
 
+function PopupSearchAE() {
+		newwindow=window.open( "SearchAE.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
+
+function PopupWindow() {
+		newwindow=window.open( "SearchClientNumber.asp?sid=<%=SessionID%>", "myWindow", 
+									"status = 1, height = 300, width = 800, resizable = 1'"  )
+		 if (window.focus) {
+           newwindow.focus();
+       }
+ 			
+}
 
 //-->
 </SCRIPT>
 
+
+<script language="JavaScript">
+function disableCtrlKeyCombination(e)
+{
+        //list all CTRL + key combinations you want to disable
+        var forbiddenKeya = 'a';
+        var forbiddenKeyc = 'c';
+        var forbiddenKeyx = 'x';
+
+
+        var key;
+        var isCtrl;
+
+        if(window.event)
+        {
+                key = window.event.keyCode;     //IE
+                if(window.event.ctrlKey)
+                        isCtrl = true;
+                else
+                        isCtrl = false;
+        }
+        else
+        {
+                key = e.which;     //firefox
+                if(e.ctrlKey)
+                        isCtrl = true;
+                else
+                        isCtrl = false;
+        }
+
+        //if ctrl is pressed check if other key is in forbidenKeys array
+        if(isCtrl)
+        {
+            
+                {
+                        //case-insensitive comparation
+                        if(forbiddenKeya.toLowerCase() == String.fromCharCode(key).toLowerCase())
+                        {
+                                return false;
+                        }
+                        if(forbiddenKeyc.toLowerCase() == String.fromCharCode(key).toLowerCase())
+                        {
+                                return false;
+                        }
+
+						if(forbiddenKeyx.toLowerCase() == String.fromCharCode(key).toLowerCase())
+                        {
+                                return false;
+                        }
+
+                }
+        }
+        return true;
+}
+</script>
+
+<script language="JavaScript">
+<!--
+// disable right click
+var message="Sorry, The right click function is disable."; // Message for the alert box
+
+function click(e) {
+if (document.all) {
+if (event.button == 2) {
+alert(message);
+return false;
+}
+}
+if (document.layers) {
+if (e.which == 3) {
+alert(message);
+return false;
+}
+}
+}
+if (document.layers) {
+document.captureEvents(Event.MOUSEDOWN);
+}
+document.onmousedown=click;
+// --> 
+</script>
+
 </head>
-<body leftmargin="0" topmargin="0" OnLoad="document.fm1.submitted.value=0;document.fm1.ClientFrom.focus();" >
+<body leftmargin="0" topmargin="0" OnLoad="document.fm1.submitted.value=0;document.fm1.ClientFrom.focus();" onkeypress="return disableCtrlKeyCombination(event);" onkeydown="return disableCtrlKeyCombination(event);" >
+
+
 
 
 <span class="noprint">
@@ -272,7 +386,7 @@ Select Case Session("shell_power")
 end select
 
 
-'response.write session("id")
+
 
 
 
@@ -476,7 +590,7 @@ end sub
 							<% 
 							
 							
-							Year_starting = Year(DateAdd("yyyy", -10, Now()))
+							Year_starting = Year(DateAdd("yyyy", -1, Now()))
 							year_ending = Year(Now())
 							
 							for i=Year_starting to Year_ending
@@ -547,7 +661,7 @@ end sub
 <% 
 
 
-Year_starting = Year(DateAdd("yyyy", -10, Now()))
+Year_starting = Year(DateAdd("yyyy", -1, Now()))
 year_ending = Year(Now())
 
 for i=Year_starting to Year_ending
@@ -569,7 +683,7 @@ for i=Year_starting to Year_ending
       	     
 <select size="1" name="TranType" class="common">
 		<option value="ALL" <% if Search_Transaction_Type="ALL" then response.write "selected" %> >All</option>
-                <option value="TRADE" <% if Search_Transaction_Type="TRADE" then response.write "selected" %> >TRADE</option>
+		<option value="TRADE" <% if Search_Transaction_Type="TRADE" then response.write "selected" %> >Trade</option>
 		<option value="VOUCHER" <% if Search_Transaction_Type="VOUCHER" then response.write "selected" %> >Vouchers</option>
 		<option value="INSTRUMENT" <% if Search_Transaction_Type="INSTRUMENT" then response.write "selected" %> >Instrument</option>
 </select></td>
@@ -756,7 +870,7 @@ iRecord = iPageCurrent
 
  
 
-' Rs1.open (" Exec retrieve_transactionhistory '0','z','701','701','',9,3,2009,9,3,2009,'ALL','','','1','5','CLNT','ASC' ") ,  StrCnn,3,1
+ 'Rs1.open (" Exec retrieve_transactionhistory '0','z','701','701','',9,3,2009,9,3,2009,'ALL','','','1','5','CLNT','ASC' ") ,  StrCnn,3,1
 
  	Select Case  Search_SharedSelection
 	case "share2"
@@ -821,10 +935,7 @@ iRecord = iPageCurrent
 <script type="text/javascript">
 var somediv=document.getElementById("reportbody1")
 disableSelection(somediv) //disable text selection within DIV with id="mydiv"
-</script>
-
-</span>
-	    
+</script>	    
     <DIV align=center>
 
   <TABLE border=0 cellPadding=0 cellSpacing=0 height=100% width=99%>
@@ -832,21 +943,14 @@ disableSelection(somediv) //disable text selection within DIV with id="mydiv"
  <tr> 
  <td align="right" height="28" class="NavaMenu" >
 
-	<%if PrintAllowed = 1 then %>  
-							<a href="javascript:window.print()">Friendly Print</a>&nbsp;
-							<% end if %>
-							<%if (session("shell_power") = 8 ) then %>
-							<a href="javascript:window.doConvert()">&nbsp;Excel</a>
-						<% end if %>
 
-&nbsp;&nbsp;
 
 		<%
 '**********
 ' Start of page navigation 
 '**********
 
-response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" )
+response.write (iPageCurrent & " Pages " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
 
 'First button
 %>
@@ -889,35 +993,45 @@ End If
 %>
 
 
-
+</span>
     
-
+<% if (session("shell_power") = 1 or session("shell_power") = 5) then %>  
+		<span class="noprint">
+<% end if %>
 
 
 <table width="99%" border="0" class="normal" cellspacing="1" cellpadding="2">
 <tr bgcolor="#FFFFCC">
-      <td align="center">帳戶記錄<br><u>Transaction History</u></td>
+<td  width="30%"></td> 
+      <td align="center" width="40%">帳戶記錄<br><u>Transaction History</u></td>
+					<td align="right" width="20%">
+						<%if (session("shell_power") <> 1 and session("shell_power") <> 5) then %>  
+							<a href="javascript:window.print()">Friendly Print</a>&nbsp;
+							<% end if %>
+							<%if (session("shell_power") = 8 ) then %>
+							<a href="javascript:window.doConvert()">/&nbsp;Excel</a>
+						<% end if %>
+					</td>	
 </tr>
 </table>
 
 <br>
 
-<table  width="100%" border="0" class="sortable" style="border-width: 0;FONT-SIZE: 11px;TEXT-ALIGN: Right;FONT-FAMILY: Verdana, 'MS Sans Serif', Arial" bgcolor="#808080" cellspacing="1" cellpadding="2">
+<table  width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
-<thead>
 
 <tr bgcolor="#ADF3B6">
       <td width="8%"><a href=javascript:ordersubmit(<% call OrderVariable("TRADEDATE")  %>) >Trade Date<br>交易日期</a></td>
-      <td width="7%"><a href=javascript:ordersubmit(<% call OrderVariable("CLNT")  %>) >Client No.<br>客戶編號</a></td>
+      <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("CLNT")  %>) >Client No.<br>客戶編號</a></td>
       <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("CLNTNAME")  %>) >Client Name<br>客戶名稱</a></td>
    <td width="10%"> <a href=javascript:ordersubmit(<% call OrderVariable("VALUEDATE")  %>) >Value Date<br>評價日期</a></td>
-   <td width="10%"><a href=javascript:popup() > (A full list of trans. type 交易類型清單) </a> <p><a href=javascript:ordersubmit(<% call OrderVariable("TRADETYPE")  %>) >Trans Type<br>交易類型</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("MARKET")  %>) >Market<br>市場</a></td>
-   <td width="10%"><a href=javascript:ordersubmit(<% call OrderVariable("CCY")  %>) >Curr<br>貨幣</a></td>
+   <td width="8%"><img border=0 src='images/file.gif' onClick="popup()"></img><a href=javascript:ordersubmit(<% call OrderVariable("TRADETYPE")  %>) >Trans Type<br>交易類型</a></td>
+   <td width="8%"><a href=javascript:ordersubmit(<% call OrderVariable("MARKET")  %>) >Market<br>市場</a></td>
+   <td width="8%"><a href=javascript:ordersubmit(<% call OrderVariable("CCY")  %>) >Curr<br>貨幣</a></td>
    <td width="9%"><a href=javascript:ordersubmit(<% call OrderVariable("INSTRUMENT")  %>) >Instrument<br>股票號碼</a></td> 
    <td width="12%"><a href=javascript:ordersubmit(<% call OrderVariable("INSTRUMENTDESC")  %>) >Instrument Name<br>股票名稱</a></td> 
-   <td width="9%"><a href=javascript:ordersubmit(<% call OrderVariable("QUANTITY")  %>) >Quantity<br>數量</a></td> 
-   <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("PRICE")  %>) >Price<br>價錢</a></td> 
+   <td width="9%">Quantity<br>數量</td> 
+   <td width="17%">Price<br>價錢</td> 
    <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("AMOUNT")  %>) >Amount<br>總值</a></td> 
    <td width="17%"><a href=javascript:ordersubmit(<% call OrderVariable("REMARK")  %>) >Remark<br>備註</a></td> 
 </tr>
@@ -937,9 +1051,6 @@ End If
 			<td><% call OrderImage("REMARK")  %></td>
 
 </tr>
-</thead>
-<tbody>
-
 		<%
 			dim mystr
 			do while (  Not rs1.EOF)
@@ -947,25 +1058,41 @@ End If
 				
 		%>
 <tr bgcolor="#FFFFCC"> 
-      <td> <%=rs1("TradeDate") %>　</td>
-      <td><%=rs1("Clnt") %><span class="noprint"><img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("clnt") %>')"></img></span></td>
-      <td ><%=rs1("ClntName") %>　</td>
-   <td><%=rs1("ValueDate") %>　</td>
+      <td width="8%"> <%=rs1("TradeDate") %>　</td>
+      <td width="13%"><%=rs1("Clnt") %><img border=0 src='images/tel.gif' onClick="PopupClientContact('<%=rs1("clnt") %>')"></img></td>
+      <td width="10%"><%=rs1("ClntName") %>　</td>
+   <td width="10%"><%=rs1("ValueDate") %>　</td>
    <td><% =rs1("TradeType") %>  </td>
-   <td><%=rs1("Market") %>　</td>
-   <td><%=rs1("Ccy") %>　</td>
-   <td><%=rs1("Instrument") %>　</td> 
-   <td><%=rs1("InstrumentDesc") %>　</td> 
-   <td><%  if rs1("strquantity") <> "" then
-   											mystr = replace(rs1("strquantity"), chr(13), "<br>")
+   <td width="8%"><%=rs1("Market") %>　</td>
+   <td width="8%"><%=rs1("Ccy") %>　</td>
+   <td width="9%"><%=rs1("Instrument") %>　</td> 
+   <td width="12%"><%=rs1("InstrumentDesc") %>　</td> 
+   <td width="9%"><%  if rs1("strquantity") <> "" then
+
+				mystr =""
+				lQTY = split(rs1("strquantity"),chr(13))
+				for llCount = 0 to ubound(lQTY )
+					if trim(mystr) = "" then
+
+						'mystr = formatnumber(lqty(llcount),0) & " "
+
+                                                 mystr = lqty(llcount) & " "
+					else
+						'mystr = mystr & " <BR>" & formatnumber(lqty(llcount),0) & " "
+                                                    
+                                                 mystr =  mystr & " <BR>" & lqty(llcount) & " "
+					end if
+				next 
+'   											mystr = replace(rs1("strquantity"), chr(13), "<br>")
+
    											response.write	left(mystr, len(mystr)-1) 
    										end if%>　</td> 
-   <td><%  if rs1("strPrice") <> "" then
+   <td width="17%"><%  if rs1("strPrice") <> "" then
    											mystr = replace(rs1("strPrice"), chr(13), "<br>")
    											response.write	left(mystr, len(mystr)-1) 
    										end if%>　</td> 
-   <td>&nbsp;<%=formatnumber(rs1("Amount"),2) %></td> 
-   <td><%=rs1("Remark") %>　</td> 
+   <td width="17%"><%=formatnumber(rs1("Amount"),2,-1,-1) %>　</td> 
+   <td width="17%"><%=rs1("Remark") %>　</td> 
 </tr>
 <%
 
@@ -976,9 +1103,8 @@ End If
 		loop
 		
 %>
-</tbody>
 
-
+</tr>
 </table>
 <br>
 <br>
@@ -992,7 +1118,9 @@ End If
 
 
 
-
+<% if (session("shell_power") = 1 or session("shell_power") = 5) then %>  
+		</span>
+<% end if %>
 
 <span class="noprint">
 
@@ -1094,7 +1222,7 @@ end if   'having client number if statement
 <SCRIPT language=JavaScript>
 <!--
 function doConvert(){
-window.open("ConvertTran.asp?Search_Amount_type=<%=Search_Amount_type%>&Search_Currency=<%=Search_Currency%>&Search_Transaction_Type=<%=Search_Transaction_Type%>&Search_Instrument=<%=Search_Instrument%>&Search_Market=<%=Search_Market%>&From_Day=<%=Search_From_Day%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>&To_day=<%=Search_To_Day%>&To_Month=<%=Search_To_Month%>&To_Year=<%=Search_To_Year%>&Search_SharedGroupMember=<%=Search_SharedGroupMember%>&Search_SharedGroup=<%=Search_AEGroup%>"); 
+window.open("ConvertTran.asp?Search_Amount_type=<%=Search_Amount_type%>&Search_Currency=<%=Search_Currency%>&Search_Transaction_Type=<%=Search_Transaction_Type%>&Search_Instrument=<%=Search_Instrument%>&Search_Market=<%=Search_Market%>&From_Day=<%=Search_From_Day%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>&To_day=<%=Search_To_Day%>&To_Month=<%=Search_To_Month%>&To_Year=<%=Search_To_Year%>"); 
 
 }
 
