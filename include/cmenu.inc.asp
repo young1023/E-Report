@@ -22,6 +22,10 @@
 	
          set Rs = server.createobject("adodb.recordset")
 
+        ' response.write ("Exec Generate_Menu '"&Session("shell_power")&"', '"&Session("MemberID")&"', '"&Title&"' ") 
+
+	
+
 		 Rs.open ("Exec Generate_Menu '"&Session("shell_power")&"', '"&Session("MemberID")&"', '"&Title&"' ") , StrCnn,3,1
 
 	

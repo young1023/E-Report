@@ -123,6 +123,16 @@ If Request("action")="1" Then
   response.redirect "ConvertTxTFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
 
+                Elseif Rs1("DepotCode") = 100 Then
+
+
+                     Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
+
+
+
+    response.redirect "ConvertShellFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
+
                 Else
 
                        Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")

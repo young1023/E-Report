@@ -37,6 +37,7 @@ Class ShadowUpload
 
         'first of all, get amount of uploaded bytes:
         iBytesCount = Request.TotalBytes
+        response.write iBytesCount
 
         WriteDebug("initializing upload, bytes: " & iBytesCount & "<br />")
 
@@ -51,7 +52,7 @@ Class ShadowUpload
             m_Error = MSG_EXCEEDED_MAX_SIZE
             Exit Sub
         End If
-
+        
         'read the binary data:
         strBinData = Request.BinaryRead(iBytesCount)
 
