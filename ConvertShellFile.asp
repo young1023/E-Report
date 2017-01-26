@@ -31,25 +31,6 @@ DepotID = trim(Request("DepotID"))
 <meta http-equiv="Content-Type" content="text/html; charset=big5">
 <title><% = Title %></title>
 <link rel="stylesheet" type="text/css" href="include/uob.css" />
-
-<SCRIPT language=JavaScript>
-<!--
-
-function listToAray(fullString, separator) {
-  var fullArray = [];
-
-  if (fullString !== undefined) {
-    if (fullString.indexOf(separator) == -1) {
-      fullAray.push(fullString);
-    } else {
-      fullArray = fullString.split(separator);
-    }
-  }
-
-  return fullArray;
-}
-//-->
-</SCRIPT>
 </head>
 
 <body leftmargin="0" topmargin="0">
@@ -80,11 +61,15 @@ function listToAray(fullString, separator) {
 
             for each x in fo.files  
 
-' *********************************************
-'         
-' Remove Semicolon and strange characters
-'
-' *********************************************
+
+%>
+
+ <!--#include file="include/remove_Shell_comma.inc" -->
+
+<%
+
+    strNewContents = ""
+    strCharacter   = ""
 
     Set objFile = fs.OpenTextFile(sFolder&"\"&x.Name, 1)
 
@@ -95,11 +80,6 @@ function listToAray(fullString, separator) {
 
     ' read each line of the file
     strLine = objFile.ReadLine
-
-    strLine = replace(strLine,"""","")
-
-    ' remove unwant character from line
-    strLine = replace(strLine,"'","")
 
     lineNo = lineNo + 1
 
@@ -120,42 +100,66 @@ function listToAray(fullString, separator) {
         strCharacter = Mid(strLine, i, 1)          
 
         
-        If strCharacter = ";" Then
+        If strCharacter = Chr(44) Then
             
           delimiterNo = delimiterNo + 1
 
         End If
 
-        If i = 1 Then
-
-         strNewContents =  strNewContents & "AC"
-
-        End if
 
         'Retrieve Family Name
         If delimiterNo = 5 Then
       
-          strNewContents = strNewContents & strCharacter 
+         strFamilyName  = replace(strFamilyName,",","") & strCharacter 
 
-          'strFamilyName  = strFamilyName & strCharacter 
+        End if
+
+        'Retrieve mile
+        If delimiterNo = 14 Then
+      
+         strMile  = replace(strMile,",","") & strCharacter 
 
         End if
 
         'Retrieve Activity Date
-        If delimiterNo = 68 Then
+        If delimiterNo = 17 Then
       
-          strNewContents = strNewContents & strCharacter
+          'strNewContents = strNewContents & strCharacter
 
-           'strActivityDate = strActivityDate & strCharacter
+          strActivityDate = replace(strActivityDate,",","") & strCharacter
 
         End if
+
+       ' Retrieve Membership number
+       If delimiterNo = 18 Then
+      
+          'strNewContents = strNewContents & strCharacter
+
+           strMembership = replace(strMembership,",","") & strCharacter
+
+        End if
+
     
     Next
 
-    strNewContents =  replace(strNewContents,";","")  & space(75) & "." & vbCrLf 
+
+     SQL2 = "Insert into AsiaMileData (LineNumber, Membership,FamilyName,ActivityDate, Miles) Values "
+
+     SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' , '" & strActivityDate & "', "
+
+     SQL2 = SQL2 & " ' " & strMile & "' )"
+
+     Response.write SQL2 & "<br/>"
+
+     Conn.Execute(SQL2)
+
 
     ' reset character
-    strNewCharacters = ""
+    strNewCharacters  = ""
+    strMembership     = ""
+    strFamilyName     = ""
+    strActivityDate   = ""
+    strMile           = ""
 
     
 
@@ -166,7 +170,12 @@ function listToAray(fullString, separator) {
 
 Loop
 
+
+   ' ****************************************************
+   '
    ' Formation of output file
+   '
+   ' ****************************************************
 
    'Retrieve Month
    TapMonth = month(Now)
@@ -183,8 +192,21 @@ Loop
    ' Retrieve Tape Creation Date
    TapeCreationDate = year(Now) & TapMonth & TapDay
 
-   ' First Line
+   ' **********************************************************
+   '
+   ' Formation of First Line
+   '
+   ' **********************************************************
+
    strFirstLine = "HDNONAIR    "  & TapeCreationDate & "XX1 " & space(175) & "." & vbCrLF 
+
+   ' **********************************************************
+   ' 
+   '  Formation of content
+   '
+   ' ***********************************************************
+
+   SQL3 = "Select * from AsiaMileSetup"
 
    strNewContents1 = strFirstLine & strNewContents
 
@@ -205,11 +227,11 @@ Loop
          End If
 
 
-' **************************************************
-'
-' Copy csv file into required file name and format
-'
-' **************************************************
+   ' **************************************************
+   '
+   ' Copy csv file into required file name and format
+   '
+   ' **************************************************
 
        fs.CopyFile sFolder&"\"&x.Name, sFolder&"\001.txt"
   

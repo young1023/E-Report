@@ -4,8 +4,6 @@
 
 DepotID = Request("DepotId")
 
-Response.write Month(Session("DBLastModifiedDate")) 
-
 ' Check folder
     
 ' *****************
@@ -86,7 +84,7 @@ If Request("action")="1" Then
 
                 Response.Write("image to big, not saving!")
 
-            Elseif Trim(Rs1("FileType")) <> Trim(Right(objUpload.File(x).FileName, 3)) Then
+            Elseif Trim(Right(Rs1("FileType"),3)) <> Trim(Right(objUpload.File(x).FileName, 3)) Then
 
 %>
               
@@ -129,8 +127,19 @@ If Request("action")="1" Then
                      Call objUpload.File(x).SaveToDisk(Server.MapPath(sFolder) , "")
 
 
+                      ' upload to different page depends on the file type
+                        If Trim(Right(objUpload.File(x).FileName, 3)) = "csv" Then
+               
 
     response.redirect "ConvertShellFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
+
+                       else
+
+    response.redirect "ConvertShellExcel.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+
+
+                       end if
 
 
                 Else
