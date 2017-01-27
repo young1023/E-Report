@@ -94,10 +94,47 @@ function doSubmit()
 {
        
 
+	if(document.fm1.TrackingName.value =="")
+       {
+		alert("Please enter the TrackingName!");
+        document.fm1.TrackingName.focus();
+        return false;
+       }
+
+	if(document.fm1.PartnerCode.value =="")
+       {
+		alert("Please enter the Partner  Code!");
+        document.fm1.PartnerCode.focus();
+        return false;
+       }
+
+
 	if(document.fm1.PartnerReferenceCode.value =="")
        {
 		alert("Please enter the Partner Reference Code!");
         document.fm1.PartnerReferenceCode.focus();
+        return false;
+       }
+
+
+    if(document.fm1.EstablishCode.value =="")
+       {
+		alert("Please enter Establishment Code!");
+        document.fm1.EstablishCode.focus();
+        return false;
+       }
+
+    if(document.fm1.Rate.value =="")
+       {
+		alert("Please enter Exchange Rate!");
+        document.fm1.Rate.focus();
+        return false;
+       }
+
+    if(document.fm1.DepotFolder.value =="")
+       {
+		alert("Please enter upload folder!");
+        document.fm1.DepotFolder.focus();
         return false;
        }
 

@@ -20,9 +20,28 @@ DepotID = trim(Request("DepotID"))
 ' Retrieve Folder
 '****************
 
-   SQL1 = "select * from ReconDepotFolder where depotid="&DepotID
+   SQL1 = "select * from AsiaMileSetup where DepotNo = 100"
+
    Set Rs1 = Conn.Execute(SQL1)
 
+   If Not Rs1.EoF Then
+
+    PartnerCode          = trim(Rs1("PartnerCode"))
+
+    PartnerReferenceCode = trim(Rs1("PartnerReferenceCode"))
+
+    TrackingName         = trim(Rs1("TrackingName"))
+
+    EstablishmentCode    = trim(Rs1("EstablishmentCode"))
+
+    ExchangeRate         = trim(Rs1("ExchangeRate"))
+
+    DepotFolder          = trim(Rs1("DepotFolder"))
+
+
+   End if
+
+  
 %>   
 
 <html>
@@ -112,7 +131,7 @@ DepotID = trim(Request("DepotID"))
         'Retrieve Given Name
         If delimiterNo = 4 Then
       
-         strGivenName  = replace(strGivenName,",","") & strCharacter 
+         strGivenName  = replace(replace(strGivenName,",","")," ","") & strCharacter 
 
         End if
 
@@ -153,9 +172,9 @@ DepotID = trim(Request("DepotID"))
     Next
 
 
-     SQL2 = "Insert into AsiaMileData (LineNumber, Membership, FamilyName,  ActivityDate, Miles) Values "
+     SQL2 = "Insert into AsiaMileData (LineNumber, Membership, FamilyName, GivenName, ActivityDate, Miles) Values "
 
-     SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' ,'" & strActivityDate & "', "
+     SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' , '" & strGivenName &"' , '" & strActivityDate & "', "
 
      SQL2 = SQL2 & " ' " & strMile & "' )"
 
@@ -209,7 +228,19 @@ Loop
    '
    ' **********************************************************
 
-   strFirstLine = "HDNONAIR    "  & TapeCreationDate & "XX1 " & space(175) & "." & vbCrLF 
+
+   ' **********************************************************
+   '
+   ' handle space of Partner Code
+   '
+   ' **********************************************************
+    iSpace = 4 - Len(PartnerCode)
+
+    PartnerCode =  PartnerCode & space(iSpace) 
+
+
+
+   strFirstLine = "HDNONAIR    "  & TapeCreationDate & PartnerCode & space(175) & "." & vbCrLF 
 
    ' **********************************************************
    ' 
@@ -250,6 +281,9 @@ Loop
 
        strMembership = strMembership & space(iSpace) 
 
+
+
+
       ' **********************************************************
       '
       ' handle space of Family Name
@@ -259,7 +293,22 @@ Loop
 
        iSpace = 25 - Len(strFamilyname)
 
-       strFamilyName =  strFamilyName & space(iSpace) & "GivenName" & space(41)
+       strFamilyName =  strFamilyName & space(iSpace) 
+
+
+
+      ' **********************************************************
+      '
+      ' handle space of Given Name
+      '
+      ' **********************************************************
+       strGivenName = Rs4("GivenName")
+
+       iSpace = 25 - Len(strGivenName)
+
+       strGivenName =  strGivenName & space(iSpace) & space(25)
+
+
 
        ' ***********************************************************
        '
@@ -268,8 +317,10 @@ Loop
        ' ***********************************************************
        strActivityDate = Rs4("ActivityDate")
 
-       strActivityDate = Right(strActivityDate,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (30)
-       
+       strActivityDate = Right(strActivityDate,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (38)
+ 
+
+     
        ' ***********************************************************
        '
        '  Handle Mile
@@ -277,10 +328,40 @@ Loop
        ' ***********************************************************
        strMile = Rs4("Miles")
 
-       strMile = strMile * 400 
+       strMile = strMile * ExchangeRate
+
+       iSpace = 8 - Len(strMile)
+
+       strMile = strMile &  space(iSpace)
+
+
+
+
+      ' **********************************************************
+      '
+      ' handle space of Partner Reference Code
+      '
+      ' **********************************************************
+       iSpace = 10 - Len(PartnerReferenceCode)
+
+       PartnerReferenceCode =  PartnerReferenceCode & space(iSpace) 
+
+
+
+
+      ' **********************************************************
+      '
+      ' handle space of Establishment Code
+      '
+      ' **********************************************************
+       iSpace = 10 - Len(EstablishmentCode)
+
+       EstablishmentCode =  EstablishmentCode & space(iSpace) 
    
 
-       strNewContents = strNewContents & "AC" & strMembership & strFamilyName & strActivityDate & strMile & space(58) & "." &vbCrLF 
+       strNewContents = strNewContents & "AC" & strMembership & strFamilyName & strGivenName & strActivityDate & strMile 
+
+       strNewContents = strNewContents & PartnerReferenceCode & space(5) & EstablishmentCode & space(33) & "." & vbCrLF 
 
      
        Rs4.MoveNext
