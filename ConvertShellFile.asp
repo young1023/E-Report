@@ -68,6 +68,8 @@ DepotID = trim(Request("DepotID"))
 
 <%
 
+    
+
     strNewContents = ""
     strCharacter   = ""
 
@@ -107,10 +109,18 @@ DepotID = trim(Request("DepotID"))
         End If
 
 
+        'Retrieve Given Name
+        If delimiterNo = 4 Then
+      
+         strGivenName  = replace(strGivenName,",","") & strCharacter 
+
+        End if
+
+
         'Retrieve Family Name
         If delimiterNo = 5 Then
       
-         strFamilyName  = replace(strFamilyName,",","") & strCharacter 
+         strFamilyName  = replace(replace(strFamilyName,",","")," ","_") & strCharacter 
 
         End if
 
@@ -143,13 +153,13 @@ DepotID = trim(Request("DepotID"))
     Next
 
 
-     SQL2 = "Insert into AsiaMileData (LineNumber, Membership,FamilyName,ActivityDate, Miles) Values "
+     SQL2 = "Insert into AsiaMileData (LineNumber, Membership, FamilyName,  ActivityDate, Miles) Values "
 
-     SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' , '" & strActivityDate & "', "
+     SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' ,'" & strActivityDate & "', "
 
      SQL2 = SQL2 & " ' " & strMile & "' )"
 
-     Response.write SQL2 & "<br/>"
+     'Response.write "Write into database :" & SQL2 & "<br/>"
 
      Conn.Execute(SQL2)
 
@@ -158,6 +168,7 @@ DepotID = trim(Request("DepotID"))
     strNewCharacters  = ""
     strMembership     = ""
     strFamilyName     = ""
+    strGivenName     = ""
     strActivityDate   = ""
     strMile           = ""
 
@@ -206,9 +217,127 @@ Loop
    '
    ' ***********************************************************
 
+   ' Retrieve System parameters
    SQL3 = "Select * from AsiaMileSetup"
 
-   strNewContents1 = strFirstLine & strNewContents
+   Set Rs3 = Conn.Execute(SQL3)
+
+   ' ***********************************************************
+   '
+   ' Retrieve content
+   '
+   ' ***********************************************************
+
+   SQL4 = "Select * from AsiaMileData order by LineNumber asc"
+   
+   Set Rs4 = Conn.Execute(SQL4)
+
+   If Not Rs4.EoF Then
+
+       Rs4.MoveFirst
+
+     Do While Not Rs4.EoF
+
+       
+       ' ********************************************************
+       '
+       ' Membership
+       '
+       ' ********************************************************
+       strMembership = Rs4("Membership")
+
+       iSpace = 10 - Len(strMembership)
+
+       strMembership = strMembership & space(iSpace) 
+
+      ' **********************************************************
+      '
+      ' handle space of Family Name
+      '
+      ' **********************************************************
+       strFamilyName = Rs4("FamilyName")
+
+       iSpace = 25 - Len(strFamilyname)
+
+       strFamilyName =  strFamilyName & space(iSpace) & "GivenName" & space(41)
+
+       ' ***********************************************************
+       '
+       '  Handle Activity Date
+       '
+       ' ***********************************************************
+       strActivityDate = Rs4("ActivityDate")
+
+       strActivityDate = Right(strActivityDate,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (30)
+       
+       ' ***********************************************************
+       '
+       '  Handle Mile
+       '
+       ' ***********************************************************
+       strMile = Rs4("Miles")
+
+       strMile = strMile * 400 
+   
+
+       strNewContents = strNewContents & "AC" & strMembership & strFamilyName & strActivityDate & strMile & space(58) & "." &vbCrLF 
+
+     
+       Rs4.MoveNext
+
+     Loop
+
+   End if
+
+
+       ' ***********************************************************
+       '
+       '  Handle Last Line
+       '
+       ' ***********************************************************
+
+   ' Handle total number of records
+   iSpace = Len(LineNo)  
+
+   ' Number of zero
+   ' ***************
+   Select case iSpace
+  
+     Case 1
+     
+        strZero = "00000"
+
+     Case 2
+
+        strZero = "0000"
+
+     Case 3
+
+        strZero = "000"
+
+     Case 4
+
+        strZero = "00"
+
+     Case 5
+
+        strZero = "0"
+
+     Case Else
+      
+        strZero = ""
+
+   End Select
+
+ 
+
+   LineNo = strZero & LineNo - 1 
+
+   strLastLine = "$$" & LineNo & LineNo & "000000000000000000000000" & space(161) & "."
+    
+   'response.write  strNewContents
+
+   strNewContents1 = strFirstLine & strNewContents & strLastLine
 
        
    objFile.Close
@@ -233,7 +362,7 @@ Loop
    '
    ' **************************************************
 
-       fs.CopyFile sFolder&"\"&x.Name, sFolder&"\001.txt"
+       fs.MoveFile sFolder&"\"&x.Name, sFolder&"\001.txt"
   
 
      next
@@ -241,6 +370,11 @@ Loop
 
        ' Get current url
         curPageURL = "http://" & Request.ServerVariables("SERVER_NAME") & "/intranet/recon/001.txt" 
+
+
+     SQL5 = "Delete From AsiaMileData"
+
+     Conn.Execute(SQL5)
 
     
        

@@ -184,8 +184,12 @@ function doUpload(what)
   If fs.GetFolder(sFolder).Files.Count  > 0 then
 
 
+        
+
       set fo=fs.GetFolder(sFolder)
   For each x in fo.files
+
+       
 ' ---------------------------------------------------------
 '                                                          
 ' Check file date                 
@@ -208,7 +212,14 @@ function doUpload(what)
     
             End if
 
+      fs.DeleteFile(sFolder&"\001.txt")
+
+
   Next
+
+
+
+
 
    Else   ' If no file exists
 
