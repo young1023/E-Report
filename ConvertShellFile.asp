@@ -131,8 +131,8 @@ DepotID = trim(Request("DepotID"))
         'Retrieve Given Name
         If delimiterNo = 4 Then
       
-         strGivenName  = replace(replace(strGivenName,",","")," ","") & strCharacter 
-
+         'strGivenName  = replace(replace(strGivenName,",","")," ","") & strCharacter 
+strGivenName  = replace(strGivenName,",","") & strCharacter 
         End if
 
 
@@ -330,9 +330,47 @@ Loop
 
        strMile = strMile * ExchangeRate
 
-       iSpace = 8 - Len(strMile)
+       iSpace = Len(strMile)
 
-       strMile = strMile &  space(iSpace)
+       ' Number of zero will be used for Mile
+       ' *************************************
+   Select case iSpace
+  
+     Case 1
+     
+        strZero = "0000000"
+
+     Case 2
+
+        strZero = "000000"
+
+     Case 3
+
+        strZero = "00000"
+
+     Case 4
+
+        strZero = "0000"
+
+     Case 5
+
+        strZero = "000"
+
+      Case 6
+
+        strZero = "00"
+
+      Case 7
+
+        strZero = "0"
+
+     Case Else
+      
+        strZero = ""
+
+     End Select
+
+       strMile =  strZero & strMile 
 
 
 
@@ -443,14 +481,14 @@ Loop
    '
    ' **************************************************
 
-       fs.MoveFile sFolder&"\"&x.Name, sFolder&"\001.txt"
+       fs.MoveFile sFolder&"\"&x.Name, sFolder&"\" & TrackingName & ".txt"
   
 
      next
 
 
        ' Get current url
-        curPageURL = "http://" & Request.ServerVariables("SERVER_NAME") & "/intranet/recon/001.txt" 
+        curPageURL = "http://" & Request.ServerVariables("SERVER_NAME") & "/intranet/recon/" & TrackingName & ".txt" 
 
 
      SQL5 = "Delete From AsiaMileData"
