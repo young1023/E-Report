@@ -101,16 +101,16 @@ session("shell_power")= 0
           </table>
        
           <br>
-          <table width="80%" border="0" cellspacing="1" cellpadding="1" class="Normal" style="border-style: solid">
+          <table width="80%" border="0" cellspacing="2" cellpadding="2" class="Normal" style="border-style: solid">
             <tr> 
               <td align="center" colspan="2"><b>Declaration</b></td>
             </tr>
             <tr> 
               <td align="center" colspan="2">
 								Access to electronic resources to this system is restricted to individuals 
-								authorized by UOB or its affiliates. Use of this system 
-								is subject to all policies and procedures set forth by UOB. 
-								Unauthorized use is prohibited and may result in administrative or legal action. UOB 
+								authorized by Elegant Technologies Limited or its affiliates. Use of this system 
+								is subject to all policies and procedures set forth by Elegant Technologies Limited. 
+								Unauthorized use is prohibited and may result in administrative or legal action. Elegant Technologies Limited
 								may monitor the use of this system for purposes related to security management, system 
 								operations, and intellectual property compliance.
 						</td>

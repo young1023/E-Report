@@ -80,6 +80,11 @@ DepotID = trim(Request("DepotID"))
 
             for each x in fo.files  
 
+            
+           'Audit Log
+      Conn.Execute "Exec AddReconLog 'converted file " & x.Name & "','" & Session("MemberID") & "'"
+      
+
 
 %>
 
@@ -484,7 +489,12 @@ Loop
        fs.MoveFile sFolder&"\"&x.Name, sFolder&"\" & TrackingName & ".txt"
   
 
+    
+
+
+
      next
+
 
 
        ' Get current url
