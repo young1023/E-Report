@@ -1,6 +1,3 @@
-
-
-
 <%
 ' Get Login and Password
 num = replace(trim(request.form("num")),"'","''")

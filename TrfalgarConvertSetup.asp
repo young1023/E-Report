@@ -4,8 +4,6 @@ if session("shell_power")="" then
   response.redirect "logout.asp?r=1"
 end if
 
-
-
 Title = "Conversion File Setup"
 %>
 
@@ -19,8 +17,6 @@ Message = ""
 ' Modify the Setup
 '*******************
 if trim(request("action_button")) = "editSetup" then
-
-    MemberID = Request.Form("MemberID")
 
     TrackingName          = trim(request.form("TrackingName"))
 
@@ -40,46 +36,32 @@ if trim(request("action_button")) = "editSetup" then
 
     Delimiter             = trim(request.form("Delimiter"))
 
-    GivenName             = trim(request.form("GivenName"))
-
-    FamilyName            = trim(request.form("FamilyName"))
-
-    Mile                  = trim(request.form("Mile"))
-
-    ActivityDate          = trim(request.form("ActivityDate"))
-
-    Membership            = trim(request.form("Membership"))
-
-
-       
-       delsql = "Delete from AsiaMileSetup where DepotNo = " & MemberID
-
-       conn.execute delsql 
-
 	
-		strsql="Insert into AsiaMileSetup (DepotNo, TrackingName , PartnerCode , PartnerReferenceCode "
+		strsql="Update AsiaMileSetup set TrackingName = '" & TrackingName & "', PartnerCode = '"
 
-        strsql= strsql & ", EstablishmentCode , ExchangeRate , DepotFolder , FileType , FirstRow , Delimiter "
+        strsql= strsql & PartnerCode 
 
-        strsql= strsql & ", GivenName, FamilyName, Mile, ActivityDate, Membership)"
+        strsql= strsql & "' , PartnerReferenceCode = '" 
 
-        strsql= strsql & "Values (" & MemberID & ",'" & TrackingName & "', '" & PartnerCode & "','"
+        strsql= strsql & PartnerReferenceCode
 
-        strsql= strsql &  PartnerReferenceCode & "','" & EstablishCode & "', '"  
+        strsql= strsql & "' , EstablishmentCode ='"
 
-        strsql= strsql &  Rate & "','" & DepotFolder & "','"  
+        strsql= strsql & EstablishCode 
 
-        strsql= strsql &  Filetype & "','"
+        strsql= strsql & "' , ExchangeRate = " & Rate 
 
-        strsql= strsql &  FirstRow & "','"
+        strsql= strsql & ", DepotFolder = '" & DepotFolder 
 
-        strsql= strsql &  Delimiter & "', "
+        strsql= strsql & "', FileType = '" & Filetype 
 
-        strsql= strsql &  GivenName & ", " & FamilyName & "," & Mile & "," & ActivityDate 
+        strsql= strsql & "' , FirstRow = " & FirstRow
 
-        strsql= strsql & "," & Membership & ")"
- 
-        'response.write strsql
+        strsql= strsql & " , Delimiter ="& Delimiter 
+
+        strsql= strsql & " where DepotNo = " & MemberID
+
+        response.write strsql
 		
 	    conn.execute strsql 
 
@@ -161,12 +143,7 @@ function doSubmit()
 		}
 }
 
-function doSelect()
-{
-  	document.fm1.action_button.value="ViewSetup";
-		document.fm1.submit();
-	
-}
+
 
 
 //-->
@@ -186,17 +163,8 @@ function doSelect()
 '
 '-----------------------------------------------------------------------------
 
-    If trim(request("action_button")) = "ViewSetup" then
-
-    MemberID = Request.Form("MemberID")
-    
-    SQL    = "Select * from AsiaMileSetup where DepotNo = " & MemberID
-
-    Else
 
     SQL    = "Select * from AsiaMileSetup where DepotNo = " & MemberID
-
-    End if
 
     Set Rs = Conn.Execute(SQL)
 
@@ -220,16 +188,6 @@ function doSelect()
 
     Delimiter            = trim(Rs("Delimiter"))
 
-    GivenName             = trim(Rs("GivenName"))
-
-    FamilyName            = trim(Rs("FamilyName"))
-
-    Mile                  = trim(Rs("Mile"))
-
-    ActivityDate          = trim(Rs("ActivityDate"))
-
-    Membership            = trim(Rs("Membership"))
-
     End if
 
 %>
@@ -241,42 +199,8 @@ function doSelect()
 <table width="80%" border="0" cellpadding="4" class="normal">
 
 
-      <% 
-           
-           Lsql = " Select * from Member where MemberID < > 7 order by LoginName"
-           Set LRs = conn.execute(Lsql)
-  
-%>
 
-
-	<tr>
-
-      <td height="18">Member</td>
-      <td valign="bottom" height="18">
-				    	
-<select name="MemberID" class="common"  size="1" onchange="doSelect()">
-          <% 
-                             If Not LRs.EoF Then
-                        LRs.MoveFirst
-							do while not LRs.eof
-                              if trim(MemberID) = trim(LRs("MemberID")) then
-                                 response.write "<option value="&LRs("MemberID")&" selected>"&trim(LRs("LoginName"))&"</option>"
-                                 else
-                                 response.write "<option value="&LRs("MemberID")&">"&trim(LRs("LoginName"))&"</option>"
-                               end if
-                               LRs.movenext
-							loop
-						
-						End if
-					%>
-        </select>
-				
-				
-				</td>
-
-
-    </tr>
-
+ <tr> 
     
  <tr> 
       <td width="27%">
@@ -285,6 +209,7 @@ Tracking Name</td>
       <Input name="TrackingName" type=text value="<% = TrackingName %>" size="30"></td>
     </tr>
 
+ <tr> 
 
  <tr> 
       <td width="27%">
@@ -293,7 +218,7 @@ Partner Code</td>
       <Input name="PartnerCode" type=text value="<% = PartnerCode %>" size="30" MaxLength="4"></td>
     </tr>
 
-
+ <tr> 
 
  <tr> 
       <td width="27%">
@@ -302,7 +227,7 @@ Partner Reference Code</td>
       <Input name="PartnerReferenceCode" type=text value="<% = PartnerReferenceCode %>" MaxLength="10" size="30"></td>
     </tr>
 
-
+ <tr> 
 
  <tr> 
       <td width="27%">
@@ -319,6 +244,8 @@ Asia Mile Exchange Rate</td>
       <td width="69%">
       <Input name="Rate" type=text value="<% = Rate %>" size="30" MaxLength="4"></td>
     </tr>
+
+ <tr> 
 
 
 
@@ -371,56 +298,6 @@ Delimiter</td>
        </td>
     </tr>
  
-<tr> 
-      <td width="27%">
-Given Name Position</td> 
-      <td width="69%">
-      <Input name="GivenName" type=text value="<% = GivenName %>" size="30" MaxLength="2">&nbsp;
-
-
-       </td>
-    </tr>
-
-<tr> 
-      <td width="27%">
-Family Name Position</td> 
-      <td width="69%">
-      <Input name="FamilyName" type=text value="<% = FamilyName %>" size="30" MaxLength="2">&nbsp;
-
-
-       </td>
-    </tr>
-
-<tr> 
-      <td width="27%">
-Mile</td> 
-      <td width="69%">
-      <Input name="Mile" type=text value="<% = Mile %>" size="30" MaxLength="2">&nbsp;
-
-
-       </td>
-    </tr>
-
-<tr> 
-      <td width="27%">
-Activity Date</td> 
-      <td width="69%">
-      <Input name="ActivityDate" type=text value="<% = ActivityDate %>" size="30" MaxLength="2">&nbsp;
-
-
-       </td>
-    </tr>
-
-<tr> 
-      <td width="27%">
-Membership</td> 
-      <td width="69%">
-      <Input name="Membership" type=text value="<% = Membership %>" size="30" MaxLength="2">&nbsp;
-
-
-       </td>
-    </tr>
-
  <tr> 
       <td width="27%">
 ¡@</td> 

@@ -129,9 +129,12 @@ If Request("action")="1" Then
 
                       ' upload to different page depends on the file type
                         If Trim(Right(objUpload.File(x).FileName, 3)) = "csv" Then
+
+
+                   
                
 
-    response.redirect "ConvertShellFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
+    response.redirect "ConvertTrafalgarFile.asp?depotid="&Rs1("DepotID")&"&sid="&sessionid
 
 
                        else
