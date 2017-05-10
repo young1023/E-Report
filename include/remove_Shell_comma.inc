@@ -5,7 +5,7 @@ Set objFile = fs.OpenTextFile(sFolder&"\"&x.Name, 1)
 Do Until objFile.AtEndOfStream
     strLine = objFile.ReadLine
     strLine = replace(strLine,"'","")
-    strLine = replace(strLine,"/","")
+    'strLine = replace(strLine,"/","")
    
     intLength = Len(strLine)
 

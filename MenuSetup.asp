@@ -62,12 +62,12 @@ if trim(request("action_button")) = "Modify" then
 	
 	vPageLink = split(trim(request("Link2")),",")
 	
-	vid = split(trim(request("mid")),",")
+	vid = split(trim(request("xid")),",")
 	
 	for i=0 to ubound(vid)
 	
 		strsql="Update Menu set MenuName = '"& trim(replace(vMenuName(i),"'","''")) &"' where id="& trim(vid(i))
-		
+		response.write 	strsql
 	    conn.execute strsql 
 	next
 	

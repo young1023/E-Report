@@ -178,9 +178,6 @@ MemberID = Session("MemberID")
            strMembership = replace(strMembership,",","") & strCharacter
 
         End if
-
-       
-
     
     Next
 

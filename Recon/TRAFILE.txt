@@ -1,6 +1,0 @@
-HDNONAIR    20170503TRA                                                                                                                                                                                .
-AC8006683695Wong                     Ginny                                             7   2015                                      000000020903270002     TRAFALGCON                                 .
-AC8006683695Tan                      Dora                                                  0165                                      000000020903270002     TRAFALGCON                                 .
-AC8006683695Koh                      Kelly                                                 0196                                      000000040903270002     TRAFALGCON                                 .
-AC                                                                                                                                   000000000903270002     TRAFALGCON                                 .
-$$000004000004000000000000000000000000                                                                                                                                                                 .

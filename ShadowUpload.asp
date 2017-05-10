@@ -1,6 +1,6 @@
 <%
 'constants:
-Const MAX_UPLOAD_SIZE=1500000 'bytes
+Const MAX_UPLOAD_SIZE=15000000 'bytes
 Const MSG_NO_DATA="nothing to upload!"
 Const MSG_EXCEEDED_MAX_SIZE="you exceeded the maximum upload size!"
 Const SU_DEBUG_MODE=False
