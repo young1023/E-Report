@@ -243,7 +243,7 @@ else if (k==1)
 <td ><% = i & ". "%><% =frs("Product")%>
 </td>
 <td>
-<% = frs("Date") %>
+<% = frs("TransactionDate") %>
 </td>
 
 <td><% = frs("QTY") %></td>

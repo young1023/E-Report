@@ -164,13 +164,11 @@ DepotID = trim(Request("DepotID"))
      If QTY <> "," Then
 
 
-     SQL2 = "Insert into Shipment (Product, QTY, Date, ShipTo, SaleAmount, FileName) Values "
+     SQL2 = "Insert into Shipment (Product, QTY, TransactionDate, ShipTo, SaleAmount, FileName) Values "
 
      SQL2 = SQL2 & "( '" & strProduct &"' , '" & QTY &"' , '" & strDate &"' , '" & strShipTo &"'  "
 
      SQL2 = SQL2 & " , ' " & trim(SaleAmount) & "', ' " & trim(FileName) & "' )"
-
-     'SQL2 = "Insert into Shipment(Product, QTY , Date ) Values ( '" & strProduct &"' , '" & QTY &"' )"
 
      'Response.write "Write into database :" & SQL2 & "<br/>"
 

@@ -21,7 +21,7 @@ End If
 
 
 If Search_From_Month = "" Then
-     Search_From_Month = month(now()) - 1
+     Search_From_Month = month(now()) 
  End If
  
       If len(Search_From_Month) = 1 Then
@@ -29,7 +29,7 @@ If Search_From_Month = "" Then
       End if
 
 If Search_From_Year = "" Then      
-	Search_From_Year = year(Now())  
+	Search_From_Year = year(Now())  - 1
 End If
 
 ' Market pull down menu
@@ -69,14 +69,6 @@ function dosubmit(what){
  document.fm1.action="ShipmentReport.asp?sid=<%=SessionID%>";
  document.fm1.page.value=what;
  document.fm1.submit();
-	
-}
-
-function doretrieve(){
-
- //   window.open('Retrieve_ABC.asp?sid=<%=SessionID%>', 'winname', 'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=400,height=350');
- document.fm1.action="Retrieve_ABC.asp?sid=<%=SessionID%>";
-document.fm1.submit();
 	
 }
 
@@ -145,7 +137,7 @@ for i=Year_starting to Year_ending
 
 			</select> </td>
      
-     <td width="20%"> <input id="Button1" type="button" value="Retrieve ABC Position" onClick="doretrieve();"></td>
+     <td width="20%"></td>
       <td></td>
 
  	     
@@ -180,13 +172,26 @@ for i=Year_starting to Year_ending
 
        set Rs1 = server.createobject("adodb.recordset")
                
-       fsql = "select Product,  Sum(Cast(QTY as int)) as TotalQTY, " 
+       fsql = "select Product, ShipTo,  "
+
+       fsql = fsql & "Sum(Cast(QTY as int)) as TotalQTY,  "
+
+       fsql = fsql & "UnitVol=(Select Volume from LubeVolume where LubeName = Shipment.Product), "
 
        fsql = fsql & "Sum(Cast(SaleAmount as decimal(9,2))) as TotalAmount "
 
-       fsql = fsql & " from Shipment group by product  order by Product"
+       fsql = fsql & "from Shipment  " 
 
-          response.write fsql
+       fsql = fsql & "  where "
+
+       fsql = fsql & "SUBSTRing(TransactionDate,7,4) = '" & Search_From_Year 
+
+       fsql = fsql & "' and SUBSTRing(TransactionDate,4,2) = '" & Search_From_Month 
+
+       fsql = fsql & "' group by product, ShipTo order by Product, ShipTo"
+
+       'response.write fsql
+
         set frs=createobject("adodb.recordset")
 		Rs1.cursortype=1
 		Rs1.locktype=1
@@ -268,13 +273,12 @@ End If
 <tr bgcolor="#ADF3B6" align="center">
       
       <td></td>
-      <td  >Product</td>
+      <td>Product</td>
       <td>Ship To</td>
-      <td >Qty</td>
-      <td >Sale Amount</td>
-      <td >Date</td>
-      
-      <td>From </td>
+      <td>Month/Year</td>
+      <td>Qty</td>
+      <td>Sale Amount</td>
+      <td>Sale Volume</td>
       <td>Difference</td> 
       
         
@@ -305,10 +309,21 @@ End If
 
 %>
 </td>
-<td><%  '= Rs1("ShipTo")  %></td> 
+<td><%  = Rs1("ShipTo")  %></td> 
+
+<td><%  = Search_From_Month & "/" & Search_From_Year %></td> 
+
 
 <td>
 <% = Rs1("TotalQTY") %>
+</td>
+
+<td>
+
+<% = Rs1("UnitVol") *  Rs1("TotalQTY") %>
+
+          
+
 </td>
 
 
@@ -332,233 +347,7 @@ End If
 
 %>
 
-<%		
-
-    If Search_Match => 2 Then
-
-   Set rs1 = rs1.NextRecordset() 
-    
-
-  do while Not Rs1.EoF
-
-   if Rs1.eof then exit do
-
-   i=i+1
-		
-%>
-<tr bgcolor="#FFFFCC"> 
-<td>
-<%
-        Response.write i & ".&nbsp;"
-        Response.Write Rs1("DepotName")
-
-
- 
-%>
-</td>
-<td>
-<%
-   
-        Response.Write Rs1("DepotCode")
-
-
- 
-%>
-</td>
-
-<td><%
-       If Rs1("Instrument") <> "" Then
-       
-        Response.Write Rs1("Instrument")
-        
-       Elseif Rs1("ISIN") <> "" Then
-       
-        Response.Write Rs1("ISIN")
-        
-       Else
-       
-        Response.Write Rs1("Sedol")
-        
-       End If
-
-
- 
-%></td>
-<td>
-<% 
-
-        
-
-        sql2 = "Select distinct ShortName from UOBKHHKEQPRO.dbo.Instrument where "
-        
-        If Trim(Rs1("Instrument")) <> "" then
-
-        sql2 = sql2 & " Instrument = '" & Trim(Rs1("Instrument")) & "'"
-        
-        Check
-        
-        Elseif Trim(Rs1("ISIN")) <> "" then
-        
-        sql2 = sql2 & " ISIN = '" & Trim(Rs1("ISIN")) & "'"
-        
-        Else 
-        
-        sql2 = sql2 & " Sedol = '" & Trim(Rs1("Sedol")) &"'"
-        
-        End if
-             
-        'response.write sql2
-
-        Set Rs2 = Conn.execute(sql2)
-        
-        If not Rs2.Eof then
-        
-           Do While Not Rs2.EoF
-
-        Response.Write Rs2("ShortName") & "<br/>"
-        
-           Rs2.Movenext
-           
-           Loop
-        
-        Else
-        
-        Response.write "Instrument name cannot be found."
-        
-        End if
-
-%>
-</td>
-
-
-<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
-<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
-<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
-
-
-
-</tr>
-
-
-<%
-
-				
-					
-				Rs1.movenext
-				
-		loop
-	
-
-
- Set rs1 = rs1.NextRecordset() 
-
-    
-
-  do while Not Rs1.EoF
-
-   if Rs1.eof then exit do
-
-   i=i+1
-		
-%>
-<tr bgcolor="#FFFFCC"> 
-<td>
-<%
-        Response.write i & ".&nbsp;"
-        Response.Write Rs1("DepotName")
-
-
- 
-%>
-</td>
-<td>
-<%
-   
-        Response.Write Rs1("DepotCode")
-
-
- 
-%>
-</td>
-
-<td><%
-      
-       
-        Response.Write Rs1("StockCode")
-        
- 
-
-
- 
-%></td>
-<td>
-<% 
-
-
-
-        Response.Write Rs1("InstrumentName")
-
-%>
-</td>
-
-
-<td><% = formatnumber(Rs1("UnitHeld"),0) %></td>
-<td ><% = formatnumber(Rs1("TotalQTY"),0)%></td>
-<td><% = formatnumber((formatnumber(Rs1("UnitHeld"),0) - formatnumber(Rs1("TotalQTY"),0)),0)   %></td> 
-
-
-
-</tr>
-
-
-<%
-
-				
-					
-				Rs1.movenext
-				
-		loop
-	
-	
-
-
-End If
-
-%>
-
-                              <tr bgcolor="#FFFFCC"> 
-                                <td align="left" colspan="10" height="28"> 
-
-
-
-
-<span class="noprint">
- <%
-
-     
-  
- 
- ' show excel and print button only when there is record
-  
-	 if   iRecordCount > 0 then
-               
-             response.write "Total <font color=red>"& i &"</font> Records "
-   
-	 end if
-
-if   findrecord>0 then
-  response.write "<input type=hidden value='' name=whatdo>"
-  response.write "<input type=hidden value="&pageid&" name=pageid>"
-end if
-			  Rs1.close
-			  set Rs1=nothing
-			  conn.close
-			  set conn=nothing
-%>
-
-</span>
-   </td>
-     </tr>                             
+                             
 </table>
 </form>  
 
