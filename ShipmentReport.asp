@@ -172,7 +172,9 @@ for i=Year_starting to Year_ending
 
        set Rs1 = server.createobject("adodb.recordset")
                
-       fsql = "select Product, ShipTo,  "
+       fsql = "Select Product, "
+
+       fsql = fsql & "Retailer = ( Select Retailer From Retailer where ShipTo = Shipment.ShipTo) ,  "
 
        fsql = fsql & "Sum(Cast(QTY as int)) as TotalQTY,  "
 
@@ -188,7 +190,7 @@ for i=Year_starting to Year_ending
 
        fsql = fsql & "' and SUBSTRing(TransactionDate,4,2) = '" & Search_From_Month 
 
-       fsql = fsql & "' group by product, ShipTo order by Product, ShipTo"
+       fsql = fsql & "' group by product, ShipTo order by Product"
 
        'response.write fsql
 
@@ -274,7 +276,7 @@ End If
       
       <td></td>
       <td>Product</td>
-      <td>Ship To</td>
+      <td>Retailer</td>
       <td>Month/Year</td>
       <td>Qty</td>
       <td>Sale Amount</td>
@@ -309,7 +311,7 @@ End If
 
 %>
 </td>
-<td><%  = Rs1("ShipTo")  %></td> 
+<td><%  = Rs1("Retailer")  %></td> 
 
 <td><%  = Search_From_Month & "/" & Search_From_Year %></td> 
 
