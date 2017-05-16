@@ -20,7 +20,7 @@ DepotID = trim(Request("DepotID"))
 ' Retrieve Folder
 '****************
 
-   SQL1 = "select * from AsiaMileSetup where DepotNo = 100"
+   SQL1 = "select * from AsiaMileSetup where DepotNo = 18"
 
    Set Rs1 = Conn.Execute(SQL1)
 
@@ -132,12 +132,19 @@ DepotID = trim(Request("DepotID"))
 
         End If
 
+        'Retrieve AK Account Code
+        If delimiterNo = 2 Then
+      
+            strAccountCode  = replace(strAccountCode,",","") & strCharacter 
+
+        End if
+
 
         'Retrieve Given Name
         If delimiterNo = 4 Then
       
-         'strGivenName  = replace(replace(strGivenName,",","")," ","") & strCharacter 
-strGivenName  = replace(strGivenName,",","") & strCharacter 
+             strGivenName  = replace(strGivenName,",","") & strCharacter 
+   
         End if
 
 
@@ -177,11 +184,11 @@ strGivenName  = replace(strGivenName,",","") & strCharacter
     Next
 
 
-     SQL2 = "Insert into AsiaMileData (LineNumber, Membership, FamilyName, GivenName, ActivityDate, Miles) Values "
+     SQL2 = "Insert into AsiaMileData (LineNumber, Membership, FamilyName, GivenName, ActivityDate, Miles, AkAccountCode) Values "
 
      SQL2 = SQL2 & "( '" & LineNo &"' , '" & strMembership &"' , '" & strFamilyName &"' , '" & strGivenName &"' , '" & strActivityDate & "', "
 
-     SQL2 = SQL2 & " ' " & strMile & "' )"
+     SQL2 = SQL2 & " ' " & strMile & "' , '" & strAccountCode & "')"
 
      'Response.write "Write into database :" & SQL2 & "<br/>"
 
@@ -192,9 +199,10 @@ strGivenName  = replace(strGivenName,",","") & strCharacter
     strNewCharacters  = ""
     strMembership     = ""
     strFamilyName     = ""
-    strGivenName     = ""
+    strGivenName      = ""
     strActivityDate   = ""
     strMile           = ""
+    strAccountCode    = ""
 
     
 
@@ -400,11 +408,73 @@ Loop
        iSpace = 10 - Len(EstablishmentCode)
 
        EstablishmentCode =  EstablishmentCode & space(iSpace) 
+
+
+      ' **********************************************************
+      '
+      ' handle space of Account Code
+      '
+      ' **********************************************************
+
+       strAccountCode = trim(Rs4("AKAccountCode"))
+
+ 
+       iSpace = Len(trim(strAccountCode))
+
+       ' Number of zero will be used for Mile
+       ' *************************************
+   Select case iSpace
+
+     Case 11
+     
+        strZero = "0000"
+
+     Case 10
+     
+        strZero = "00000"
+
+  
+     Case 9
+     
+        strZero = "000000"
+
+     Case 8
+
+        strZero = "0000000"
+
+     Case 7
+
+        strZero = "00000000"
+
+     Case 6
+
+        strZero = "000000000"
+
+     Case 5
+
+        strZero = "0000000000"
+
+      Case 4
+
+        strZero = "00000000000"
+
+      Case 3
+
+        strZero = "000000000000"
+
+     Case Else
+      
+        strZero = ""
+
+     End Select
+
+       strAccountCode =  strZero & strAccountCode 
+   
    
 
        strNewContents = strNewContents & "AC" & strMembership & strFamilyName & strGivenName & strActivityDate & strMile 
 
-       strNewContents = strNewContents & PartnerReferenceCode & space(5) & EstablishmentCode & space(33) & "." & vbCrLF 
+       strNewContents = strNewContents & PartnerReferenceCode & space(5) & EstablishmentCode & strAccountCode & space(18) & "." & vbCrLF 
 
      
        Rs4.MoveNext

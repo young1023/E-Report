@@ -157,11 +157,13 @@ MemberID = Session("MemberID")
 
         End if
 
+   
         'Retrieve mile
-        If trim(delimiterNo) = trim(Mile) Then
+        If delimiterNo = 16 Then
       
-         strMile  = replace(strMile,",","") & strCharacter 
+         strMile  = replace(replace(replace(replace(strMile,",",""),"USD","")," ",""),".","") & strCharacter 
 
+  
         End if
 
         'Retrieve Activity Date
@@ -317,11 +319,9 @@ Loop
        '  Handle Activity Date
        '
        ' ***********************************************************
-       strActivityDate = Rs4("ActivityDate")
+       strActivityDate = TapeCreationDate & space (38)
 
-       strActivityDate = Right(strActivityDate,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (38)
  
-
      
        ' ***********************************************************
        '
