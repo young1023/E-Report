@@ -190,7 +190,7 @@ DepotID = trim(Request("DepotID"))
 
      SQL2 = SQL2 & " ' " & strMile & "' , '" & strAccountCode & "')"
 
-     'Response.write "Write into database :" & SQL2 & "<br/>"
+     Response.write "Write into database :" & SQL2 & "<br/>"
 
      Conn.Execute(SQL2)
 
@@ -328,9 +328,13 @@ Loop
        '  Handle Activity Date
        '
        ' ***********************************************************
-       strActivityDate = Rs4("ActivityDate")
+        strActivityDate = Rs4("ActivityDate")
 
-       strActivityDate = Right(strActivityDate,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (38)
+      ' strActivityDate = TapeCreationDate
+
+      ' strActivityDate = TapeCreationDate & space (38)
+ 
+       strActivityDate = mid(strActivityDate,7,4) & mid(strActivityDate, 4, 2) & Left(strActivityDate,2) & space (38)
  
 
      
