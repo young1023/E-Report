@@ -1,0 +1,12 @@
+TotalSale,YYYY,MM,DD,Day of Week,Station,Product ID,Product EAN Code,Product,Category ID,Category,Sub Category,Sub Group,Sum of Quantity,Lube Total Volume,Unit Price,Sum of Sale
+20150101,2015,1,1,Weekend,134,200000028,0000000000044,超凡喜力5W40全合成機油4L,5030,Lubricants,H ULTRA 4L,Lube,1,4,483,483
+20150101,2015,1,1,Weekend,134,501300063,0000000000016,人手洗車服務,5080,Lubricants Service,LabPartWsh,Lube,180,180,1,180
+20150101,2015,1,1,Weekend,134,502000077,4890008100941,可口可樂罐裝8罐裝,1071,Non-Alcoholic Beverages,Carbonated,CR,1,1,28,28
+20150101,2015,1,1,Weekend,134,502000095,4890008110940,雪碧罐裝8罐裝,1071,Non-Alcoholic Beverages,Carbonated,CR,1,1,28,28
+20150101,2015,1,1,Weekend,134,502002264,0000000009153,B2B贈品JAN維他檸檬茶6P,1016,Instore Services,Other Instore Services,CR,1,1,0.01,0.01
+20150101,2015,1,1,Weekend,134,502002272,2900000003804,MPJ優惠券,1016,Instore Services,Other Instore Services,CR,1,1,0.01,0.01
+20150101,2015,1,1,Weekend,134,502002274,2900000003828,ThreeSixty優惠券,1016,Instore Services,Other Instore Services,CR,1,1,0.01,0.01
+20150101,2015,1,1,Weekend,134,502100183,4897878100026,合味道杯麵-牛肉味,1025,Food,Other Food,F&B,1,1,8.5,8.5
+20150101,2015,1,1,Weekend,134,502100189,4897878100057,合味道杯麵-海鮮味,1025,Food,Other Food,F&B,3,3,8.5,25.5
+20150101,2015,1,1,Weekend,134,502200212,0000000123073,醇駱駝硬盒,1031,Tobacco,Cigarettes,CR,6,6,55,330
+20150101,2015,1,1,Weekend,134,502200249,0000095508788,黑薄荷萬寶路,1031,Tobacco,Cigarettes,CR,3,3,55,165
