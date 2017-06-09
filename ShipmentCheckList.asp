@@ -164,7 +164,7 @@ else if (k==1)
                 
        fsql = "select  * "
 
-       fsql = fsql & " from Shipment order by shipid asc "
+       fsql = fsql & " from SaleIn order by shipid asc "
 
           'response.write fsql
         set frs=createobject("adodb.recordset")
@@ -179,7 +179,7 @@ else if (k==1)
    
 <br>
 
-<table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
+<table width="97%" border="0" class="normal"  cellspacing="1" cellpadding="2">
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">¡@</td>
       <td align="center">Check List</td> 
@@ -218,11 +218,12 @@ else if (k==1)
 <br>
 
 
-<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
+<table width="97%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 
 <tr bgcolor="#ADF3B6" align="center">
       
-      <td>Product</td>
+      <td></td>
+      <td>Material</td>
       <td>Date</td>
       <td>QTY</td>
       <td>Sale Amount</td>
@@ -240,7 +241,8 @@ else if (k==1)
 %>
 <tr bgcolor="#FFFFCC">
 
-<td ><% = i & ". "%><% =frs("Product")%>
+<td ><% = i & ". "%></td>
+<td><% =frs("Material")%>
 </td>
 <td>
 <% = frs("TransactionDate") %>
@@ -272,7 +274,7 @@ end if
 %>
 
                               <tr bgcolor="#FFFFCC"> 
-                                <td align="right" colspan="10" height="28"> 
+                                <td align="right" colspan="7"> 
 
 
 
@@ -316,9 +318,9 @@ end if
 </form>  
 
 
-<table width="99%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
+<table width="97%" border="0" class="normal" style="border-width: 0" bgcolor="#808080" cellspacing="1" cellpadding="2">
 	<tr bgcolor="#FFFFCC"> 
-      <td width="99%" height="18" align="center">End of Report</td>
+      <td width="97%" height="18" align="center">End of Report</td>
 	</tr>
 </table>
                 

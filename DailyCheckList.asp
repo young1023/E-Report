@@ -164,7 +164,7 @@ else if (k==1)
                 
        fsql = "select  * "
 
-       fsql = fsql & " from DailySales order by Dailyid asc "
+       fsql = fsql & " from SaleOut order by Dailyid asc "
 
           'response.write fsql
         set frs=createobject("adodb.recordset")
@@ -223,10 +223,9 @@ else if (k==1)
 <tr bgcolor="#ADF3B6" align="center">
       
       <td>Date</td>
-      <td>Product ID</td>
-      <td>Product EAN Code</td>
-    
-      <td>QTY</td>
+      <td>Station</td>
+      <td>Material</td>
+       <td>QTY</td>
       <td>Sale Amount</td>
    
       <td>File Name</td>
@@ -244,13 +243,15 @@ else if (k==1)
 
 
 <td><% = i & ". "%>
-<% = frs("Month") %>/<% = frs("Year") %>
+<% = frs("BusinessDay") %>
 </td>
+
+<td><% = frs("Station") %></td>
+
 
 <td ><% =frs("ProductID")%>
 </td>
 
-<td><% = frs("EANCode") %></td>
  
 <td><% = frs("SaleQTY") %></td>
 

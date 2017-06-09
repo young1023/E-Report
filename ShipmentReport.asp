@@ -172,33 +172,19 @@ for i=Year_starting to Year_ending
 
        set Rs1 = server.createobject("adodb.recordset")
                
-       fsql = "Select Product, "
+    'response.write ("Exec Retrieve_InOutReport '"&Search_From_Month&"', '"&Search_From_Year&"' , '"&iPageCurrent&"' ") 
+              
+	Rs1.open ("Exec Retrieve_InOutReport '"&Search_From_Month&"', '"&Search_From_Year&"' , '"&iPageCurrent&"' ") ,  conn,3,1
 
-       fsql = fsql & "Retailer = ( Select Retailer From Retailer where ShipTo = Shipment.ShipTo) ,  "
 
-       fsql = fsql & "Sum(Cast(QTY as int)) as TotalQTY,  "
-
-       fsql = fsql & "UnitVol=(Select Volume from LubeVolume where LubeName = Shipment.Product), "
-
-       fsql = fsql & "Sum(Cast(SaleAmount as decimal(9,2))) as TotalAmount "
-
-       fsql = fsql & "from Shipment  " 
-
-       fsql = fsql & "  where "
-
-       fsql = fsql & "SUBSTRing(TransactionDate,7,4) = '" & Search_From_Year 
-
-       fsql = fsql & "' and SUBSTRing(TransactionDate,4,2) = '" & Search_From_Month 
-
-       fsql = fsql & "' group by product, ShipTo order by Product"
-
-       'response.write fsql
-
-        set frs=createobject("adodb.recordset")
-		Rs1.cursortype=1
-		Rs1.locktype=1
-        Rs1.open fsql,conn	
-  
+	'assign total number of pages
+	
+	
+	
+	iRecordCount = Rs1("Tcount")
+	
+ 
+  'response.write Rs1("Tcount")
 
 %>   
   
@@ -207,30 +193,56 @@ for i=Year_starting to Year_ending
    
 <br>
 
+
 <table width="99%" border="0" class="normal"  cellspacing="1" cellpadding="2">
 <span class="noprint">
 <tr bgcolor="#FFFFCC"> 
 <td  width="20%">¡@</td>
-      <td align="center">Report</td> 
+      <td align="center">In Out Report</td> 
       <td align="right" width="20%">
+      
 
 						
-<a href="javascript:window.doConvert()">Excel</a>&nbsp;<a href="javascript:window.print()">Friendly Print</a>
+<a href="javascript:window.doConvert()">Excel</a>
+
 
 					   	
 			</td>
 </tr>
 
 <tr>
-</span>
+
    <td>
 
+<%
 
+
+
+
+  if iRecordCount <= 0 then
+
+
+		'no record found
+		response.write ("No record found")
+						
+	else
+
+		
+        'cal total no of pages
+		iPageCount = int(iRecordCount / 1000) + 1
+		
+
+
+		'move to next recordset
+  	Set Rs1 = Rs1.NextRecordset() 
+
+
+%>
 </td>
  <td  colspan="2" align="right" >
 
 <%
-response.write (iPageCurrent & " Page of " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
+response.write ( iPageCurrent & " Page of " & iPageCount &"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" )
 
 'First button
 %>
@@ -275,14 +287,16 @@ End If
 <tr bgcolor="#ADF3B6" align="center">
       
       <td></td>
-      <td>Product</td>
+      <td>Material Code</td>
+      <td>Product Name</td>
       <td>Retailer</td>
       <td>Month/Year</td>
-      <td>Qty</td>
-      <td>Sale Amount</td>
-      <td>Sale Volume</td>
-      <td>Difference</td> 
-      
+      <td>Sale In Volume</td>
+      <td>Sale In Amount</td>
+      <td>Sale Out Volume</td>
+      <td>Sale Out Amount</td>
+      <td>Difference in Volume</td> 
+     
         
 </tr>
 <%		
@@ -304,33 +318,37 @@ End If
  
 %>
 </td>
-<td>
-<%
-   
-        Response.Write Rs1("Product")
 
-%>
+<td><%  = Rs1("Material")  %></td> 
+
+<td>
+<%  = Rs1("ProductName") %>
 </td>
+
+
 <td><%  = Rs1("Retailer")  %></td> 
 
 <td><%  = Search_From_Month & "/" & Search_From_Year %></td> 
 
 
 <td>
-<% = Rs1("TotalQTY") %>
+<% = FormatNumber(Rs1("SaleInQTY"),0) %>
 </td>
 
 <td>
 
-<% = Rs1("UnitVol") *  Rs1("TotalQTY") %>
-
-          
+<% = FormatNumber(Rs1("SaleInAmount"),2) %>
 
 </td>
 
+<td>
+<% = FormatNumber(Rs1("SaleOutQTY"),0) %>
+</td>
 
-<td><% = FormatNumber(Rs1("TotalAmount"),2) %></td>
-<td ><%  '= Rs1("Date")  %></td>
+
+<td><% = FormatNumber(Rs1("SaleOutAmount"),2) %></td>
+
+<td ><% = FormatNumber(Rs1("SaleInQTY"),0) - FormatNumber(Rs1("SaleOutQTY"),2) %></td>
 
 
 
@@ -345,7 +363,7 @@ End If
 				
 		loop
 	
-
+End If
 
 %>
 
@@ -417,7 +435,7 @@ End If
 <SCRIPT language=JavaScript>
 <!--
 function doConvert(){
-window.open("ReconExcelReport.asp?DepotCode=<%=Search_DepotCode%>&Search_Match=<%=Search_Match%>&Search_Market=<%=Search_Market%>&From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>"); 
+window.open("LubeExcelReport.asp?From_Month=<%=Search_From_Month%>&From_Year=<%=Search_From_Year%>"); 
 
 }
 

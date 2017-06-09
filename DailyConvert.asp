@@ -49,7 +49,7 @@ end if
 <!--
 
 function doDelete(what){
-document.fm1.action="ShipConvert.asp?sid=<%=sessionid%>&depotid="+what;
+document.fm1.action="DailyConvert.asp?sid=<%=sessionid%>&depotid="+what;
 document.fm1.action_button.value="deleteFile";
 document.fm1.submit();
 }

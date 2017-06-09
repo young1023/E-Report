@@ -71,7 +71,7 @@ DepotID = trim(Request("DepotID"))
 
              FileName = x.Name
 
-        sql_d = "Delete from Shipment where FileName like '%"&FileName&"'"
+        sql_d = "Delete from SaleIn where FileName like '%"&FileName&"'"
 
         Conn.execute(sql_d)
             
@@ -122,37 +122,37 @@ DepotID = trim(Request("DepotID"))
         End If
 
 
-        'Retrieve strProduct
-        If delimiterNo = 5 Then
       
-        strProduct  = replace(strProduct,",","") & strCharacter 
-
-        End if
-
-
         'Retrieve QTY
-        If delimiterNo = 8 Then
+        If delimiterNo = 9 Then
       
         QTY  = replace(replace(QTY,",","")," ","_") & strCharacter 
 
         End if
 
         'Retrieve Date
-        If delimiterNo = 14 Then
+        If delimiterNo = 15 Then
       
          strDate  = replace(replace(strDate,",",""),".","/") & strCharacter 
 
         End if
 
-        'Retrieve Sale Amount
-        If delimiterNo = 32 Then
+        'Retrieve Material
+        If delimiterNo = 23 Then
+      
+        strMaterial  = replace(strMaterial,",","") & strCharacter 
+
+        End if
+
+       'Retrieve Sale Amount
+        If delimiterNo = 34 Then
       
           SaleAmount = replace(replace(SaleAmount,",","")," ","") & strCharacter
 
         End if
 
        ' Retrieve Ship To
-       If delimiterNo = 83 Then
+       If delimiterNo = 84 Then
       
            strShipTo = replace(strShipTo,",","") & strCharacter
 
@@ -164,11 +164,11 @@ DepotID = trim(Request("DepotID"))
      If QTY <> "," Then
 
 
-     SQL2 = "Insert into Shipment (Product, QTY, TransactionDate, ShipTo, SaleAmount, FileName) Values "
+     SQL2 = "Insert into SaleIn (QTY, TransactionDate, Material,  SaleAmount, ShipTo, FileName) Values "
 
-     SQL2 = SQL2 & "( '" & strProduct &"' , '" & QTY &"' , '" & strDate &"' , '" & strShipTo &"'  "
+     SQL2 = SQL2 & "( '" & QTY &"' , '" & strDate &"' , '" & strMaterial &"' , "
 
-     SQL2 = SQL2 & " , ' " & trim(SaleAmount) & "', ' " & trim(FileName) & "' )"
+     SQL2 = SQL2 & "  ' " & trim(SaleAmount) & "', '" & strShipTo &"' ,' " & trim(FileName) & "' )"
 
      'Response.write "Write into database :" & SQL2 & "<br/>"
 
@@ -178,7 +178,7 @@ DepotID = trim(Request("DepotID"))
 
 
     ' reset character
-    strProduct  = ""
+    strMaterial  = ""
     QTY         = ""
     strDate     = ""
     strShipTo   = ""

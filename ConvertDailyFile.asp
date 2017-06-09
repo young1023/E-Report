@@ -1,4 +1,4 @@
-<% Response.Buffer = False %>
+<% Server.ScriptTimeout = 120000 %>
 <!--#include file="include/SessionHandler.inc.asp" -->
 <%
 if session("shell_power")="" then
@@ -71,7 +71,7 @@ DepotID = trim(Request("DepotID"))
 
              FileName = x.Name
 
-        sql_d = "Delete from DailySales where FileName like '%"&FileName&"'"
+        sql_d = "Delete from SaleOut where FileName like '%"&FileName&"'"
 
         Conn.execute(sql_d)
             
@@ -123,64 +123,49 @@ DepotID = trim(Request("DepotID"))
 
 
         'Retrieve Year
-        If delimiterNo = 1 Then
+        If delimiterNo = 0 Then
       
-        strYear  = replace(strYear,",","") & strCharacter 
+        strDate  = replace(strDate,",","") & strCharacter 
 
         End if
 
 
-        'Retrieve Month
-        If delimiterNo = 2 Then
+       'Retrieve Station
+        If delimiterNo = 5 Then
       
-        strMonth  = replace(replace(strMonth,",","")," ","_") & strCharacter 
+          strStation = replace(replace(strStation,",","")," ","") & strCharacter
 
         End if
 
-        'Retrieve Product ID
+        'Retrieve Material
         If delimiterNo = 6 Then
       
          strProductID  = replace(replace(strProductID,",",""),".","/") & strCharacter 
 
         End if
 
-        'Retrieve Product EAN Code
-        If delimiterNo = 7 Then
-      
-          strEANCode = replace(replace(strEANCode,",","")," ","") & strCharacter
-
-        End if
+       
 
        ' Retrieve QTY
-       If delimiterNo = 13 Then
+       If delimiterNo = 15 Then
       
            strQTY = replace(strQTY,",","") & strCharacter
 
         End if
 
        ' Retrieve Total of Sales
-       If delimiterNo = 15 Then
+       If delimiterNo = 18 Then
       
            strSales = replace(strSales,",","") & strCharacter
 
         End if
 
-    
-    Next
+     Next
 
-     If Len(strMonth) = 1 then
+  
+     SQL2 = "Insert into SaleOut (BusinessDay , Station, ProductID, SaleQTY, TotalSale, FileName) Values "
 
-         strMonth = "0" & strMonth
-
-     End If
-
-
-     If QTY <> "," Then
-
-
-     SQL2 = "Insert into DailySales (Year, Month, ProductID, EANCode, SaleQTY, TotalSale, FileName) Values "
-
-     SQL2 = SQL2 & "( '" & strYear &"' , '" & strMonth &"' , '" & strProductID &"' , '" & strEANCode &"'  "
+     SQL2 = SQL2 & "( '" & strDate &"'  , '" & strStation &"' , '" & strProductID &"'  "
 
      SQL2 = SQL2 & " , ' " & trim(strQTY) & "', ' " & trim(strSales) & "' , ' " & trim(FileName) & "' )"
 
@@ -188,14 +173,13 @@ DepotID = trim(Request("DepotID"))
 
      Conn.Execute(SQL2)
 
-    End If 
+ 
 
 
     ' reset character
-    strYear          = ""
-    strMonth         = ""
+    strDate         = ""
     strProductID     = ""
-    strEANCode       = ""
+    strStation       = ""
     strQTY           = ""
     strSales         = ""
     
@@ -203,14 +187,14 @@ DepotID = trim(Request("DepotID"))
 
 
     ' end of line number > 1
-    End if
-  
+    
+   End if
+
 
 Loop
 
 
-  
-
+ 
          ' Record if there is error
          If Err.Number <> 0 Then
   
