@@ -203,7 +203,7 @@ for i=Year_starting to Year_ending
       
 
 						
-<a href="javascript:window.doConvert()">Excel</a>
+<a href="javascript:window.doConvert()">CSV</a>
 
 
 					   	
