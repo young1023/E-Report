@@ -31,7 +31,7 @@ Search_From_Year        = Request("From_Year")
 
         
 
-Response.Write "Material Code, Product, Retailer, Date, Sale In Volume, Sale In Amount, Sale Out Volume, Sale Out Amount, Difference" & vbcrlf 
+Response.Write "Material Code, Product, Retailer,  Sale In Volume, Sale In Amount, Sale Out Volume, Sale Out Amount, Difference" & vbcrlf 
 
 If not rs.eof then
 
@@ -46,7 +46,7 @@ do while not rs.eof
 Response.Write """" & rs("Material") & """," 
 Response.Write """" & rs("ProductName") & """," 
 Response.Write """" & rs("Retailer") & """," 
-Response.Write """" & Search_From_Month &"/"& Search_From_Year & """," 
+'Response.Write """" & Search_From_Month &"/"& Search_From_Year & """," 
 Response.Write """" & rs("SaleInQTY") & """," 
 Response.Write """" & rs("SaleInAmount") & """," 
 Response.Write """" & rs("SaleOutQTY") & """," 

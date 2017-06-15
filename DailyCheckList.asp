@@ -164,9 +164,9 @@ else if (k==1)
                 
        fsql = "select  * "
 
-       fsql = fsql & " from SaleOut order by Dailyid asc "
+       fsql = fsql & " from SaleOut order by ProductID asc "
 
-          'response.write fsql
+        'response.write fsql
         set frs=createobject("adodb.recordset")
 		frs.cursortype=1
 		frs.locktype=1

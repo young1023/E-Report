@@ -172,7 +172,7 @@ for i=Year_starting to Year_ending
 
        set Rs1 = server.createobject("adodb.recordset")
                
-    'response.write ("Exec Retrieve_InOutReport '"&Search_From_Month&"', '"&Search_From_Year&"' , '"&iPageCurrent&"' ") 
+    response.write ("Exec Retrieve_InOutReport '"&Search_From_Month&"', '"&Search_From_Year&"' , '"&iPageCurrent&"' ") 
               
 	Rs1.open ("Exec Retrieve_InOutReport '"&Search_From_Month&"', '"&Search_From_Year&"' , '"&iPageCurrent&"' ") ,  conn,3,1
 

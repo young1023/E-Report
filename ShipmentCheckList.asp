@@ -164,9 +164,9 @@ else if (k==1)
                 
        fsql = "select  * "
 
-       fsql = fsql & " from SaleIn order by shipid asc "
+       fsql = fsql & " from SaleIn order by Material asc "
 
-          'response.write fsql
+        'response.write fsql
         set frs=createobject("adodb.recordset")
 		frs.cursortype=1
 		frs.locktype=1
